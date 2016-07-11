@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Spotlight</string>
+    
+    <string name="tabs_spotlights">Spotlights</string>
+    <string name="tabs_friends">Friends</string>
+    <string name="tabs_teams">Teams</string>
+    <string name="tabs_profile">Profile</string>
+
+    <string name="add_teams">Add Team</string>
+    <string name="search_teams">Search Teams</string>
+    <string name="add_family">Add Family</string>
+    <string name="add_spotlighters">Add Spotlighters</string>
+    <string name="add_spotlight">Add Spotlight</string>
+
+    <string name="teams_dialog">Search/Add a New Team</string>
+    <string name="friends_dialog">Search/Add Spotlighters</string>
+</resources>

@@ -1,0 +1,77 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
+apply plugin: 'com.android.application'
+//apply plugin: 'io.fabric'
+
+repositories {
+    jcenter()
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
+
+    defaultConfig {
+        applicationId "me.spotlight.spotlight"
+        minSdkVersion 15
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibVersion"
+    compile "com.android.support:design:$rootProject.ext.supportLibVersion"
+    compile "joda-time:joda-time:$rootProject.ext.jodaTimeVersion"
+    compile "com.yqritc:recyclerview-flexibledivider:$rootProject.ext.rvFlexDividerVersion"
+    compile "com.jakewharton:butterknife:$rootProject.ext.butterKnifeVersion"
+    compile "com.squareup.picasso:picasso:$rootProject.ext.picassoVersion"
+    compile "com.makeramen:roundedimageview:$rootProject.ext.roundedImageViewVersion"
+    compile "com.github.JakeWharton:ViewPagerIndicator:$rootProject.ext.viewPagerIndicatorVersion"
+    compile "org.apmem.tools:layouts:$rootProject.ext.apmemToolsLayoutsVersion"
+    compile "com.timehop.stickyheadersrecyclerview:library:$rootProject.ext.stickyHeadersVersion"
+    compile "com.github.aakira:expandable-layout:$rootProject.ext.expandableLayoutVersion"
+    compile "com.jmedeisis:draglinearlayout:$rootProject.ext.dragLinearLayoutVersion"
+    compile "com.diogobernardino:williamchart:$rootProject.ext.williamChartVersion"
+    compile "com.nineoldandroids:library:$rootProject.ext.nineOldAndroidsVersion"
+    compile "com.daimajia.slider:library:$rootProject.ext.daimajiaSliderVersion"
+    compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofitVersion"
+    compile "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
+    compile "io.reactivex:rxjava:$rootProject.ext.rxJavaVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava:$rootProject.ext.retrofitRxJavaAdapterVersion"
+    compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofitGsonVersion"
+    compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okhttp3LoggingInterceptorVersion"
+    compile "com.j256.ormlite:ormlite-android:$rootProject.ext.j256OrmLiteVersion"
+    compile "com.trello:rxlifecycle:$rootProject.ext.trelloRxLifecycleVersion"
+    compile "com.trello:rxlifecycle-components:$rootProject.ext.trelloRxLifecycleComponentsVersion"
+    compile 'com.facebook.android:facebook-android-sdk:+'
+    compile('com.twitter.sdk.android:twitter:1.13.3@aar') {
+        transitive = true;
+    }
+    compile 'commons-codec:commons-codec:1.10'
+    compile "com.squareup:otto:$rootProject.ext.ottoVersion"
+    // compile project(":linkedin-sdk")
+    compile "uk.co.chrisjenx:calligraphy:$rootProject.ext.chrisJenxCalligraphyVersion"
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+        transitive = true;
+    }
+}

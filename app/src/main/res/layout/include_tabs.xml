@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/darker_gray"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_gravity="bottom"
+    android:layout_height="wrap_content">
+    
+    <TextView
+        android:id="@+id/btn_tab_spotlights"
+        style="@style/BottomTabs"
+        android:text="@string/tabs_spotlights"/>
+
+
+    <TextView
+        android:id="@+id/btn_tab_friends"
+        style="@style/BottomTabs"
+        android:text="@string/tabs_friends"/>
+
+
+    <TextView
+        android:id="@+id/btn_tab_teams"
+        style="@style/BottomTabs"
+        android:text="@string/tabs_teams"/>
+
+
+    <TextView
+        android:id="@+id/btn_tab_profile"
+        style="@style/BottomTabs"
+        android:text="@string/tabs_profile"/>
+
+</LinearLayout>
