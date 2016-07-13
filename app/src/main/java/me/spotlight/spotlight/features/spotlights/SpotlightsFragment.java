@@ -4,9 +4,18 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -58,7 +67,22 @@ public class SpotlightsFragment extends Fragment {
     @OnClick(R.id.fab_add_spotlight)
     public void onFab() {
 
-        addSpotlight();
+//        addSpotlight();
+
+        ParseQuery<ParseObject> mParseQuery = new ParseQuery("Team");
+        mParseQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+//                    Toast.makeText(getContext(), "Teams not null", Toast.LENGTH_SHORT).show();
+                    for (ParseObject parseObject : objects) {
+                        Log.d("parseq", String.valueOf(parseObject.get("town")));
+                    }
+                } else {
+                    Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 }

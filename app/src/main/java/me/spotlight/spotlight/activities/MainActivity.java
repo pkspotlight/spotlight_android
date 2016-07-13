@@ -19,6 +19,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,18 +83,17 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().addOnBackStackChangedListener(backStackListener);
 
 
-        String token = Token.getToken();
-        User user = User.getCurrent();
-//        if (null == user || null == token) {
-//            startActivity(LoginActivity.getStartIntent(getApplication()));
-//            finish();
-//        }
+        if (null == ParseUser.getCurrentUser()) {
+            startActivity(LoginActivity.getStartIntent(getApplication()));
+            finish();
+        }
 
 
         tabViews.add(SpotlightsFragment.newInstance());
         tabViews.add(FriendsFragment.newInstance());
         tabViews.add(TeamsFragment.newInstance());
         tabViews.add(ProfileFragment.newInstance());
+
 
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
