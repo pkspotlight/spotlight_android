@@ -14,4 +14,22 @@
 
     <string name="teams_dialog">Search/Add a New Team</string>
     <string name="friends_dialog">Search/Add Spotlighters</string>
+
+    <string name="profile_send_feedback">Send Feedback</string>
+    <string name="profile_log_out">Log Out</string>
+    <string name="profile_username"><b>Username</b></string>
+    <string name="profile_first_name"><b>First Name</b></string>
+    <string name="profile_last_name"><b>Last Name</b></string>
+    <string name="profile_hometown"><b>Hometown</b></string>
+    <string name="profile_family"><b>Family</b></string>
+
+    <string name="picture_gallery">Pick from gallery</string>
+    <string name="picture_camera">Take new picture</string>
+    <string name="cancel">Cancel</string>
+    
+    <string name="profile_family_hint">Touch to add family</string>
+    <string name="profile_hometown_hint">Touch to add hometown</string>
+    <string name="profile_last_hint">Touch to add last name</string>
+    <string name="profile_first_hint">Touch to add first name</string>
+
 </resources>

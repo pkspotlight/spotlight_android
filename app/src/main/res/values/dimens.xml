@@ -6,4 +6,6 @@
     <dimen name="fab_diagonal">64dp</dimen>
     <dimen name="fab_padding_right">16dp</dimen>
     <dimen name="fab_padding_bottom">82dp</dimen>
+
+    <dimen name="profile_left">190dp</dimen>
 </resources>

@@ -149,6 +149,15 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            // do nothing
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     /*
         Backstack listener
      */
