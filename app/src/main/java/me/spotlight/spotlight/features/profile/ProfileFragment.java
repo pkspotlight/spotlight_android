@@ -117,29 +117,6 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    private void populateFields() {
-        if (null != currentUser.getUsername()) {
-            if (!TextUtils.isEmpty(currentUser.getUsername())) {
-                profileUsername.setText(currentUser.getUsername());
-            }
-        }
-
-        if (null != currentUser.getString("firstName") && null != currentUser.getString("lastName")) {
-            if (!TextUtils.isEmpty(currentUser.getString("firstName"))
-                    && !TextUtils.isEmpty(currentUser.getString("lastName"))) {
-                profileName.setText(currentUser.getString("firstName") + " " + currentUser.getString("lastName"));
-                profileFirst.setText(currentUser.getString("firstName"));
-                profileLast.setText(currentUser.getString("lastName"));
-            }
-        }
-
-        if (null != currentUser.getString("homeTown")) {
-            if (!TextUtils.isEmpty(currentUser.getString("homeTown"))) {
-                profileHometown.setText(currentUser.getString("homeTown"));
-            }
-        }
-    }
-
 
     private void parse() {
 
@@ -163,6 +140,33 @@ public class ProfileFragment extends Fragment {
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+
+
+
+    private void populateFields() {
+        if (null != currentUser.getUsername()) {
+            if (!TextUtils.isEmpty(currentUser.getUsername())) {
+                profileUsername.setText(currentUser.getUsername());
+            }
+        }
+
+        if (null != currentUser.getString("firstName") && null != currentUser.getString("lastName")) {
+            if (!TextUtils.isEmpty(currentUser.getString("firstName"))
+                    && !TextUtils.isEmpty(currentUser.getString("lastName"))) {
+                profileName.setText(currentUser.getString("firstName") + " " + currentUser.getString("lastName"));
+                profileFirst.setText(currentUser.getString("firstName"));
+                profileLast.setText(currentUser.getString("lastName"));
+            }
+        }
+
+        if (null != currentUser.getString("homeTown")) {
+            if (!TextUtils.isEmpty(currentUser.getString("homeTown"))) {
+                profileHometown.setText(currentUser.getString("homeTown"));
+            }
+        }
     }
 
     private void initAvatar(String url) {
