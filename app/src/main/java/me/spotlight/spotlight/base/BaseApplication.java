@@ -21,8 +21,8 @@ public class BaseApplication extends Application {
     private static final String PARSE_APP_ID = "nuNuhBJQp4cYfeUnWlNFo27QUCKeAgWBX5D74r4F";
     private static final String PARSE_CLIENT_KEY = "vMH2XfoFKQAy8vbOYzgXZtJrRJ8LjCD5933k3kPF";
 
-    private static final String TWITTER_KEY = "W4vmDjrSiLj6znKtnQ2PAUmft";
-    private static final String TWITTER_SECRET = "CYkUwY5sdkev7dlRrA2OjvrdA2MVcrQW1BxJyfe4hUckKhiEm4";
+    private static final String TWITTER_KEY = "OYaQ9xpbGKHyUUnZRMqfSK2uP";
+    private static final String TWITTER_SECRET = "JVzIk5VT6YAMkrU7lwJRDLXsm39TgPG6HSMr9ZEygX1gRP55bQ";
 
     @Override
     public void onCreate() {

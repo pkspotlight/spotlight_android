@@ -238,7 +238,6 @@ public class ProfileFragment extends Fragment {
 
     @OnClick(R.id.profile_avatar)
     public void onAvatarCLick() {
-//        Toast.makeText(getActivity(), "TODO: upload avatar", Toast.LENGTH_SHORT).show();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final String[] items = new String[]{getString(R.string.picture_camera), getString(R.string.picture_gallery)};
         builder.setItems(items, new DialogInterface.OnClickListener() {

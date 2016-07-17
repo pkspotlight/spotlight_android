@@ -27,6 +27,8 @@
             <!-- Login -->
         </activity>
 
+        <meta-data android:name="io.fabric.ApiKey" android:value="OYaQ9xpbGKHyUUnZRMqfSK2uP"/>
+
     </application>
 
 </manifest>
