@@ -84,29 +84,31 @@ public class AddSpotlightersFragment extends Fragment {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
                 if (null == e) {
-                    for (ParseUser parseUser : objects) {
-                        User user = new User();
-                        if (null != parseUser.getString("firstName")) {
-                            if (!"".equals(parseUser.getString("firstName"))) {
-                                user.setFirstName(parseUser.getString("firstName"));
-                            }
-                        }
-                        if (null != parseUser.getString("lastName")) {
-                            if (!"".equals(parseUser.getString("lastName"))) {
-                                user.setLastName(parseUser.getString("lastName"));
-                            }
-                        }
-                        if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
-                            try {
-                                parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
-                            } catch (ParseException e1) {}
-                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
-                                if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
-                                    user.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
+                    if (!objects.isEmpty()) {
+                        for (ParseUser parseUser : objects) {
+                            User user = new User();
+                            if (null != parseUser.getString("firstName")) {
+                                if (!"".equals(parseUser.getString("firstName"))) {
+                                    user.setFirstName(parseUser.getString("firstName"));
                                 }
                             }
+                            if (null != parseUser.getString("lastName")) {
+                                if (!"".equals(parseUser.getString("lastName"))) {
+                                    user.setLastName(parseUser.getString("lastName"));
+                                }
+                            }
+                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
+                                try {
+                                    parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
+                                } catch (ParseException e1) {}
+                                if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
+                                    if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
+                                        user.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
+                                    }
+                                }
+                            }
+                            users.add(user);
                         }
-                        users.add(user);
                     }
                     usersAdapter.notifyDataSetChanged();
                 } else {

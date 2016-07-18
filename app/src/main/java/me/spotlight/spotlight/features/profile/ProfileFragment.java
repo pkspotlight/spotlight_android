@@ -145,6 +145,7 @@ public class ProfileFragment extends Fragment {
 
 
 
+    private void populateFamily() {}
 
     private void populateFields() {
         if (null != currentUser.getUsername()) {
