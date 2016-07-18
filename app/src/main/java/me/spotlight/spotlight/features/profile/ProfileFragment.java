@@ -35,6 +35,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
@@ -145,7 +146,32 @@ public class ProfileFragment extends Fragment {
 
 
 
-    private void populateFamily() {}
+    private void loadFamily() {
+        final StringBuilder stringBuilder = new StringBuilder();
+        final ParseRelation<ParseObject> familyRelation = ParseUser.getCurrentUser().getRelation("children");
+        ParseQuery<ParseObject> familyQuery = familyRelation.getQuery();
+        familyQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject parseObject : objects) {
+                            if (null != parseObject.getString("firstName")) {
+                                stringBuilder.append(parseObject.getString("firstName"));
+                                stringBuilder.append(" ");
+                            }
+                            if (null != parseObject.getString("lastName")) {
+                                stringBuilder.append(parseObject.getString("lastName"));
+                                stringBuilder.append(", ");
+                            }
+                        }
+
+                        profileFamily.setText(stringBuilder.toString());
+                    }
+                }
+            }
+        });
+    }
 
     private void populateFields() {
         if (null != currentUser.getUsername()) {
@@ -168,6 +194,8 @@ public class ProfileFragment extends Fragment {
                 profileHometown.setText(currentUser.getString("homeTown"));
             }
         }
+
+        loadFamily();
     }
 
     private void initAvatar(String url) {
