@@ -2,12 +2,12 @@ package me.spotlight.spotlight.features.teams;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +28,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
-import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.teams.add.AddTeamFragment;
+import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
 import me.spotlight.spotlight.features.teams.search.SearchTeamsFragment;
 import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
@@ -38,7 +38,7 @@ import me.spotlight.spotlight.utils.ParseConstants;
 /**
  * Created by Anatol on 7/11/2016.
  */
-public class TeamsFragment extends Fragment {
+public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListener {
 
     @Bind(R.id.recycler_view_myteams)
     RecyclerView myteamsList;
@@ -57,6 +57,12 @@ public class TeamsFragment extends Fragment {
         return teamsFragment;
     }
 
+    public void onShowDetails(Team team) {
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", team.getObjectId());
+        FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_teams, container, false);
@@ -69,7 +75,7 @@ public class TeamsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         myteamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        myteamsAdapter = new TeamsAdapter(getActivity(), myTeams);
+        myteamsAdapter = new TeamsAdapter(getActivity(), myTeams, this);
         myteamsList.setAdapter(myteamsAdapter);
         swipeFriends.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -143,6 +149,7 @@ public class TeamsFragment extends Fragment {
                     if (!objects.isEmpty()) {
                         for (ParseObject parseObject : objects) {
                             Team team = new Team();
+                            team.setObjectId(parseObject.getObjectId());
                             if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
                                 if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
                                     team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
@@ -189,4 +196,5 @@ public class TeamsFragment extends Fragment {
             }
         });
     }
+
 }

@@ -23,13 +23,15 @@ import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.teams.TeamsAdapter;
+import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
 import me.spotlight.spotlight.models.Team;
+import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/11/2016.
  */
-public class SearchTeamsFragment extends Fragment {
+public class SearchTeamsFragment extends Fragment implements TeamsAdapter.ActionListener {
 
     @Bind(R.id.teams_search)
     EditText searchTeams;
@@ -48,6 +50,12 @@ public class SearchTeamsFragment extends Fragment {
         return searchTeamsFragment;
     }
 
+    public void onShowDetails(Team team) {
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", team.getObjectId());
+        FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_search_teams, container, false);
@@ -60,7 +68,7 @@ public class SearchTeamsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         teamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        teamsAdapter = new TeamsAdapter(getActivity(), teams);
+        teamsAdapter = new TeamsAdapter(getActivity(), teams, this);
         teamsList.setAdapter(teamsAdapter);
 
         loadTeams();
@@ -88,6 +96,7 @@ public class SearchTeamsFragment extends Fragment {
                     if (!objects.isEmpty()) {
                         for (ParseObject parseObject : objects) {
                             Team team = new Team();
+                            team.setObjectId(parseObject.getObjectId());
                             if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
                                 if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
                                     team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));

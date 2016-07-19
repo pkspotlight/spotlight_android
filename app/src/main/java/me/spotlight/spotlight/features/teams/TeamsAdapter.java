@@ -29,10 +29,16 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
     List<Team> teams = new ArrayList<>();
     Transformation round;
     String avatarUrl = "";
+    ActionListener actionListener;
 
-    public TeamsAdapter(Context context, List<Team> teams) {
+    public interface ActionListener {
+        void onShowDetails(Team team);
+    }
+
+    public TeamsAdapter(Context context, List<Team> teams, ActionListener actionListener) {
         this.context = context;
         this.teams = teams;
+        this.actionListener = actionListener;
         round = new RoundedTransformationBuilder().oval(true).build();
     }
 
@@ -60,6 +66,13 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
             Picasso.with(context).load(R.drawable.unknown_user).fit().centerCrop()
                     .transform(round).into(teamHolder.teamAvatar);
         }
+
+        teamHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionListener.onShowDetails(team);
+            }
+        });
 
     }
 

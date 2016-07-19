@@ -6,7 +6,11 @@
     <string name="tabs_teams">Teams</string>
     <string name="tabs_profile">Profile</string>
 
+    <string name="team_details_member">Members</string>
+    <string name="team_details_spotlights">Spotlights</string>
+
     <string name="add_teams">Add Team</string>
+    <string name="team_details">Team Details</string>
     <string name="search_teams">Search Teams</string>
     <string name="add_family">Add Family</string>
     <string name="add_spotlighters">Add Spotlighters</string>
