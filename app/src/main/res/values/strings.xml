@@ -8,6 +8,13 @@
 
     <string name="team_details_member">Members</string>
     <string name="team_details_spotlights">Spotlights</string>
+    <string name="team_add_name">Add team name</string>
+    <string name="team_add_coach">Add team coach</string>
+    <string name="team_add_season">Add season</string>
+    <string name="team_add_year">Add year</string>
+    <string name="team_add_sport">Add sport</string>
+    <string name="team_add_town">Add team town</string>
+    <string name="team_add_grade">Add grade</string>
 
     <string name="add_teams">Add Team</string>
     <string name="team_details">Team Details</string>
