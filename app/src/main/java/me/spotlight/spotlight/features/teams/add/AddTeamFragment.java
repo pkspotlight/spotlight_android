@@ -73,8 +73,6 @@ public class AddTeamFragment extends Fragment {
     EditText teamAddCoach;
     @Bind(R.id.team_add_year)
     EditText teamAddYear;
-    @Bind(R.id.team_add_submit)
-    Button submit;
 
     /*
         Manufacturing singleton
@@ -104,15 +102,7 @@ public class AddTeamFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.add_teams));
-
         getPermission();
-
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                submitTeam();
-            }
-        });
     }
 
     @Override
@@ -258,7 +248,8 @@ public class AddTeamFragment extends Fragment {
         }
     }
 
-    private void submitTeam() {
+    @OnClick(R.id.team_add_submit)
+    public void submitTeam() {
         if (validate()) {
             ParseObject mTeam = new ParseObject(ParseConstants.OBJECT_TEAM);
             mTeam.put("teamName", teamAddName.getText().toString());

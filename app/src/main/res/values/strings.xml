@@ -16,6 +16,10 @@
     <string name="team_add_town">Add team town</string>
     <string name="team_add_grade">Add grade</string>
 
+    <string name="fam_add_first">Add first name</string>
+    <string name="fam_add_last">Add last name</string>
+    <string name="fam_add_hometown">Add hometown</string>
+
     <string name="add_teams">Add Team</string>
     <string name="team_details">Team Details</string>
     <string name="search_teams">Search Teams</string>

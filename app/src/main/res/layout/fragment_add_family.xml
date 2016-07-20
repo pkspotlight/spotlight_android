@@ -1,13 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:background="@android:color/darker_gray"
+    android:clickable="true"
+    android:background="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:text="@string/add_family"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <!-- Header  -->
+
+    <LinearLayout
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:layout_margin="8dp"
+            android:id="@+id/fam_add_avatar"
+            android:layout_width="130dp"
+            android:layout_height="130dp" />
+
+    </LinearLayout>
+
+    <!-- Fields -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:layout_margin="6dp"
+            android:textSize="16sp"
+            android:hint="@string/fam_add_first"
+            android:id="@+id/fam_add_first"
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="34dp" />
+
+
+        <EditText
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
+            android:textSize="16sp"
+            android:hint="@string/fam_add_last"
+            android:id="@+id/fam_add_last"
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="34dp" />
+
+
+        <EditText
+            android:layout_margin="6dp"
+            android:textSize="16sp"
+            android:hint="@string/fam_add_hometown"
+            android:id="@+id/fam_add_hometown"
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="34dp" />
+
+
+        <Button
+            android:layout_gravity="center"
+            android:layout_margin="2dp"
+            android:id="@+id/fam_add_submit"
+            android:text="Save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 </LinearLayout>
