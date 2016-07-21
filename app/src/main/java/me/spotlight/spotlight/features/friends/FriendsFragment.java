@@ -33,16 +33,19 @@ import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.features.friends.add.AddSpotlightersFragment;
+import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
 import me.spotlight.spotlight.features.teams.add.AddTeamFragment;
+import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
 import me.spotlight.spotlight.features.teams.search.SearchTeamsFragment;
 import me.spotlight.spotlight.models.Friend;
+import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/11/2016.
  */
-public class FriendsFragment extends Fragment {
+public class FriendsFragment extends Fragment implements FriendsAdapter.ActionListener {
 
     @Bind(R.id.recycler_view_friends)
     RecyclerView friendsList;
@@ -61,6 +64,12 @@ public class FriendsFragment extends Fragment {
         return friendsFragment;
     }
 
+    public void onShowDetails(Friend friend) {
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", friend.getObjectId());
+        FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_friends, container, false);
@@ -71,9 +80,9 @@ public class FriendsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         friendsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendsAdapter = new FriendsAdapter(getActivity(), friends);
+        friendsAdapter.setActionListener(this);
         friendsList.setAdapter(friendsAdapter);
         swipeFriends.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -145,6 +154,7 @@ public class FriendsFragment extends Fragment {
                     if (!objects.isEmpty()) {
                         for (ParseUser parseUser : objects) {
                             Friend friend = new Friend();
+                            friend.setObjectId(parseUser.getObjectId());
                             if (null != parseUser.getString("firstName")) {
                                 if (!"".equals(parseUser.getString("firstName"))) {
                                     friend.setFirstName(parseUser.getString("firstName"));

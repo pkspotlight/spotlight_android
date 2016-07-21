@@ -87,6 +87,7 @@ public class AddSpotlightersFragment extends Fragment {
                     if (!objects.isEmpty()) {
                         for (ParseUser parseUser : objects) {
                             User user = new User();
+                            user.setObjectId(parseUser.getObjectId());
                             if (null != parseUser.getString("firstName")) {
                                 if (!"".equals(parseUser.getString("firstName"))) {
                                     user.setFirstName(parseUser.getString("firstName"));

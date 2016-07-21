@@ -73,7 +73,6 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         myteamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         myteamsAdapter = new TeamsAdapter(getActivity(), myTeams, this);
         myteamsList.setAdapter(myteamsAdapter);

@@ -19,6 +19,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Friend;
+import me.spotlight.spotlight.models.Team;
 
 /**
  * Created by Anatol on 7/15/2016.
@@ -29,6 +30,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
     List<Friend> friends = new ArrayList<>();
     Transformation round;
     String avatarUrl = "";
+    ActionListener actionListener;
+
+    public interface ActionListener {
+        void onShowDetails(Friend friend);
+    }
+
+    public void setActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
+    }
 
     public FriendsAdapter(Context context, List<Friend> friends) {
         this.context = context;
@@ -69,6 +79,13 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
 
         // for now always showing -- later introduce a boolean
         friendHolder.friendFollowing.setVisibility(View.VISIBLE);
+
+        friendHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionListener.onShowDetails(friend);
+            }
+        });
     }
 
     @Override

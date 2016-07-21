@@ -109,7 +109,6 @@ public class TeamDetailsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.team_details));
-
         populate();
     }
 
