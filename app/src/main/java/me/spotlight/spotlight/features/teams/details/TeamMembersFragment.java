@@ -25,12 +25,15 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.features.friends.add.UsersAdapter;
+import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
+import me.spotlight.spotlight.models.Friend;
 import me.spotlight.spotlight.models.User;
+import me.spotlight.spotlight.utils.FragmentUtils;
 
 /**
  * Created by Anatol on 7/18/2016.
  */
-public class TeamMembersFragment extends Fragment {
+public class TeamMembersFragment extends Fragment implements UsersAdapter.ActionListener {
 
     @Bind(R.id.recycler_view_team_members)
     RecyclerView teamMembersList;
@@ -46,6 +49,12 @@ public class TeamMembersFragment extends Fragment {
         return teamMembersFragment;
     }
 
+    public void onShowDetails(User user) {
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", user.getObjectId());
+        FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_team_details_members, container, false);
@@ -56,9 +65,9 @@ public class TeamMembersFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         teamMembersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         teamMembersAdapter = new UsersAdapter(getActivity(), members);
+        teamMembersAdapter.setActionListener(this);
         teamMembersList.setAdapter(teamMembersAdapter);
     }
 
@@ -99,6 +108,7 @@ public class TeamMembersFragment extends Fragment {
                                                 parseUser.fetchIfNeeded();
                                             } catch (ParseException parseException2) {}
                                             User user = new User();
+                                            user.setObjectId(parseUser.getObjectId());
                                             user.setFirstName(parseUser.getString("firstName"));
                                             user.setLastName(parseUser.getString("lastName"));
                                             if (null != parseUser.getParseObject("profilePic")) {

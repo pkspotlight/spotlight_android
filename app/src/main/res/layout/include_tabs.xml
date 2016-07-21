@@ -4,19 +4,19 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_gravity="bottom"
-    android:layout_height="52dp">
+    android:layout_height="58dp">
 
     <LinearLayout
+        android:id="@+id/btn_tab_spotlights"
+        style="@style/BottomTabs"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:layout_weight=".25"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <TextView
             android:background="@drawable/spotlight"
-            android:id="@+id/btn_tab_spotlights"
             android:layout_height="28dp"
             android:layout_width="28dp" />
 
@@ -31,6 +31,8 @@
 
 
     <LinearLayout
+        android:id="@+id/btn_tab_friends"
+        style="@style/BottomTabs"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:layout_weight=".25"
@@ -40,7 +42,6 @@
 
         <TextView
             android:background="@drawable/friends"
-            android:id="@+id/btn_tab_friends"
             android:layout_height="28dp"
             android:layout_width="28dp"/>
 
@@ -55,16 +56,16 @@
 
 
     <LinearLayout
+        android:id="@+id/btn_tab_teams"
+        style="@style/BottomTabs"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:layout_weight=".25"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <TextView
             android:background="@drawable/teams"
-            android:id="@+id/btn_tab_teams"
             android:layout_height="28dp"
             android:layout_width="28dp"/>
 
@@ -78,16 +79,16 @@
 
 
     <LinearLayout
+        android:id="@+id/btn_tab_profile"
+        style="@style/BottomTabs"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:layout_weight=".25"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <TextView
             android:background="@drawable/profile"
-            android:id="@+id/btn_tab_profile"
             android:layout_height="28dp"
             android:layout_width="28dp" />
 

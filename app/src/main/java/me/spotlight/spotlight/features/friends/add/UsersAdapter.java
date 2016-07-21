@@ -30,6 +30,15 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
     List<User> users = new ArrayList<>();
     Transformation round;
     String avatarUrl = "";
+    ActionListener actionListener;
+
+    public interface ActionListener {
+        void onShowDetails(User user);
+    }
+
+    public void setActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
+    }
 
     public UsersAdapter(Context context, List<User> users) {
         this.context = context;
@@ -70,6 +79,13 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
 
         // for now always showing -- later introduce a boolean
         userHolder.friendFollowing.setVisibility(View.VISIBLE);
+
+        userHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionListener.onShowDetails(user);
+            }
+        });
     }
 
     @Override

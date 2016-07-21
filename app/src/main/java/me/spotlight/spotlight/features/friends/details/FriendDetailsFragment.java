@@ -139,7 +139,9 @@ public class FriendDetailsFragment extends Fragment {
                         }
                         if (null != currentUser.getString("username")) {
                             friendDetailName.setText(currentUser.getString("username"));
-                            getActivity().setTitle(currentUser.getString("username"));
+                            try {
+                                getActivity().setTitle(currentUser.getString("username"));
+                            } catch (NullPointerException e1) {}
                         }
                         if (!"".equals(avatarUrl))
                             initAvatar(avatarUrl);
