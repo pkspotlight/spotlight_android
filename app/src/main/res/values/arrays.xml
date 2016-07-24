@@ -10,4 +10,11 @@
         <item>Search Teams</item>
         <item>Add New Team</item>
     </string-array>
+
+    <string-array name="spot_view">
+        <item>Cool Kids</item>
+        <item>Disney Funk</item>
+        <item>Every Single Night</item>
+        <item>Ready 2 Go</item>
+    </string-array>
 </resources>

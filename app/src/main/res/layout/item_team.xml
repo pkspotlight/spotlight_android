@@ -28,25 +28,23 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="6dp"
                 android:id="@+id/team_name"
-                android:textSize="20sp"
-                android:layout_width="120dp"
+                android:textSize="16sp"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.45" />
 
             <TextView
-                android:layout_marginTop="2dp"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="6dp"
                 android:id="@+id/team_grade"
                 android:layout_below="@+id/team_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginTop="2dp"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="6dp"
                 android:id="@+id/team_sport"
                 android:layout_below="@+id/team_name"
                 android:layout_toRightOf="@+id/team_grade"
@@ -54,8 +52,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_marginTop="2dp"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="6dp"
                 android:id="@+id/team_season"
                 android:layout_below="@+id/team_grade"
                 android:layout_width="wrap_content"

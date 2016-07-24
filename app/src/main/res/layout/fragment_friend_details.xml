@@ -29,6 +29,7 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
+            android:background="@drawable/round_border"
             android:layout_margin="12dp"
             android:layout_gravity="center"
             android:orientation="horizontal"

@@ -1,35 +1,38 @@
 package me.spotlight.spotlight.features.spotlights;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-
+import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
-import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.spotlights.add.AddSpotlightFragment;
-import me.spotlight.spotlight.features.teams.add.AddTeamFragment;
-import me.spotlight.spotlight.features.teams.search.SearchTeamsFragment;
+import me.spotlight.spotlight.features.spotlights.details.SpotlightDetailsFragment;
+import me.spotlight.spotlight.models.Spotlight;
 import me.spotlight.spotlight.utils.FragmentUtils;
 
 /**
  * Created by Anatol on 7/10/2016.
  */
-public class SpotlightsFragment extends Fragment {
+public class SpotlightsFragment extends Fragment
+        implements SpotlightsAdapter.ActionListener {
+
+    @Bind(R.id.recycler_view_spolights)
+    RecyclerView mySpotlightsList;
+    SpotlightsAdapter spotlightsAdapter;
+    List<Spotlight> mySpotlights = new ArrayList<>();
+    @Bind(R.id.swipe_spotlights)
+    SwipeRefreshLayout swipeSpotlights;
 
     /*
         Manufacturing singleton
@@ -39,6 +42,12 @@ public class SpotlightsFragment extends Fragment {
         SpotlightsFragment spotlightsFragment = new SpotlightsFragment();
         spotlightsFragment.setArguments(args);
         return spotlightsFragment;
+    }
+
+    public void onShowDetails(Spotlight spotlight) {
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", spotlight.getObjectId());
+        FragmentUtils.changeFragment(getActivity(), R.id.content, SpotlightDetailsFragment.newInstance(bundle), true);
     }
 
     @Override
@@ -52,6 +61,21 @@ public class SpotlightsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mySpotlightsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        spotlightsAdapter = new SpotlightsAdapter(getActivity(), mySpotlights, this);
+        mySpotlightsList.setAdapter(spotlightsAdapter);
+        swipeSpotlights.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!mySpotlights.isEmpty())
+                    mySpotlights.clear();
+                spotlightsAdapter.notifyDataSetChanged();
+                loadSpotlights();
+                swipeSpotlights.setRefreshing(false);
+            }
+        });
+
+        loadSpotlights();
     }
 
     @Override
@@ -66,23 +90,18 @@ public class SpotlightsFragment extends Fragment {
 
     @OnClick(R.id.fab_add_spotlight)
     public void onFab() {
+        addSpotlight();
+    }
 
-//        addSpotlight();
-
-        ParseQuery<ParseObject> mParseQuery = new ParseQuery("Team");
-        mParseQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (null == e) {
-//                    Toast.makeText(getContext(), "Teams not null", Toast.LENGTH_SHORT).show();
-                    for (ParseObject parseObject : objects) {
-                        Log.d("parseq", String.valueOf(parseObject.get("town")));
-                    }
-                } else {
-                    Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
+    private void loadSpotlights() {
+        Spotlight spotlight = new Spotlight();
+        spotlight.setObjectId("dfdfdsfsd");
+        mySpotlights.add(spotlight);
+        mySpotlights.add(spotlight);
+        mySpotlights.add(spotlight);
+        mySpotlights.add(spotlight);
+        mySpotlights.add(spotlight);
+        mySpotlights.add(spotlight);
+        spotlightsAdapter.notifyDataSetChanged();
     }
 }

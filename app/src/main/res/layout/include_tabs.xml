@@ -23,6 +23,7 @@
         <TextView
             android:layout_marginTop="2dp"
             android:text="@string/tabs_spotlights"
+            android:textColor="@color/bottom_tabs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -48,6 +49,7 @@
         <TextView
             android:layout_marginTop="2dp"
             android:text="@string/tabs_friends"
+            android:textColor="@color/bottom_tabs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -72,6 +74,7 @@
         <TextView
             android:layout_marginTop="2dp"
             android:text="@string/tabs_teams"
+            android:textColor="@color/bottom_tabs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -95,6 +98,7 @@
         <TextView
             android:layout_marginTop="2dp"
             android:text="@string/tabs_profile"
+            android:textColor="@color/bottom_tabs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

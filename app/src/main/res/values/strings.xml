@@ -6,6 +6,11 @@
     <string name="tabs_teams">Teams</string>
     <string name="tabs_profile">Profile</string>
 
+    <string name="view">View</string>
+    <string name="share">Share</string>
+    <string name="share_via">Share via</string>
+    <string name="view_dialog">Select your background music</string>
+
     <string name="team_details_member">Members</string>
     <string name="team_details_spotlights">Spotlights</string>
     <string name="team_add_name">Add team name</string>

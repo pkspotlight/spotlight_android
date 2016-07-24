@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    android:background="@android:color/darker_gray"
+<android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_spotlights"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <TextView
-        android:text="spotlights"
+    <android.support.design.widget.CoordinatorLayout
+        android:background="@android:color/darker_gray"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent">
 
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add_spotlight"
-        android:src="@android:drawable/ic_menu_add"
-        android:layout_marginBottom="@dimen/fab_padding_bottom"
-        android:layout_marginRight="@dimen/fab_padding_right"
-        android:layout_gravity="bottom|right"
-        android:layout_width="@dimen/fab_diagonal"
-        android:layout_height="@dimen/fab_diagonal" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-</android.support.design.widget.CoordinatorLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_spolights"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_add_spotlight"
+            android:src="@android:drawable/ic_menu_add"
+            android:layout_marginBottom="@dimen/fab_padding_bottom"
+            android:layout_marginRight="@dimen/fab_padding_right"
+            android:layout_gravity="bottom|right"
+            android:layout_width="@dimen/fab_diagonal"
+            android:layout_height="@dimen/fab_diagonal" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+</android.support.v4.widget.SwipeRefreshLayout>
