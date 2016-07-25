@@ -19,6 +19,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -35,6 +39,8 @@ import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.features.profile.ProfileFragment;
 import me.spotlight.spotlight.features.spotlights.SpotlightsFragment;
 import me.spotlight.spotlight.features.teams.TeamsFragment;
+import me.spotlight.spotlight.models.Spotlight;
+import me.spotlight.spotlight.models.SpotlightMedia;
 import me.spotlight.spotlight.models.User;
 import me.spotlight.spotlight.utils.CustomViewPager;
 import me.spotlight.spotlight.utils.FragmentUtils;
@@ -68,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private PagerAdapter mPagerAdapter;
     private List<Fragment> tabViews = new ArrayList<>();
     private static final int NUM_TABS = 4;
+
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -245,6 +252,8 @@ public class MainActivity extends AppCompatActivity {
         }
         FragmentUtils.popBackStack(this);
     }
+
+
 
 
 }

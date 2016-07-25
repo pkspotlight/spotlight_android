@@ -68,7 +68,7 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
         super.onActivityCreated(savedInstanceState);
 
         teamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        teamsAdapter = new TeamsAdapter(getActivity(), teams, this);
+        teamsAdapter = new TeamsAdapter(getActivity(), teams, this, false);
         teamsList.setAdapter(teamsAdapter);
 
         loadTeams();
@@ -133,9 +133,9 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
                                 }
                             }
                             teams.add(team);
+                            teamsAdapter.notifyDataSetChanged();
                         }
                     }
-                    teamsAdapter.notifyDataSetChanged();
                 } else {
                     // TODO: handle e
                 }

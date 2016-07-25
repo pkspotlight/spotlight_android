@@ -79,6 +79,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
 
         // for now always showing -- later introduce a boolean
         userHolder.friendFollowing.setVisibility(View.VISIBLE);
+        userHolder.friendFollowing.setText("Follow");
 
         userHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

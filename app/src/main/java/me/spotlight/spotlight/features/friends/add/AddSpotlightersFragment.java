@@ -21,13 +21,16 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
+import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
+import me.spotlight.spotlight.models.Friend;
 import me.spotlight.spotlight.models.User;
+import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/11/2016.
  */
-public class AddSpotlightersFragment extends Fragment {
+public class AddSpotlightersFragment extends Fragment implements UsersAdapter.ActionListener {
 
     @Bind(R.id.friends_search)
     EditText searchFriends;
@@ -53,6 +56,11 @@ public class AddSpotlightersFragment extends Fragment {
         return view;
     }
 
+    public void onShowDetails(User user) {
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", user.getObjectId());
+        FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -60,6 +68,7 @@ public class AddSpotlightersFragment extends Fragment {
 
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         usersAdapter = new UsersAdapter(getActivity(), users);
+        usersAdapter.setActionListener(this);
         usersList.setAdapter(usersAdapter);
 
         loadUsers();
@@ -85,7 +94,9 @@ public class AddSpotlightersFragment extends Fragment {
             public void done(List<ParseUser> objects, ParseException e) {
                 if (null == e) {
                     if (!objects.isEmpty()) {
+                        int i = 0;
                         for (ParseUser parseUser : objects) {
+                            i++;
                             User user = new User();
                             user.setObjectId(parseUser.getObjectId());
                             if (null != parseUser.getString("firstName")) {
@@ -109,6 +120,8 @@ public class AddSpotlightersFragment extends Fragment {
                                 }
                             }
                             users.add(user);
+                            if (i % 3 == 0)
+                                usersAdapter.notifyDataSetChanged();
                         }
                     }
                     usersAdapter.notifyDataSetChanged();

@@ -2,9 +2,12 @@ package me.spotlight.spotlight.features.spotlights;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
@@ -13,6 +16,7 @@ import com.squareup.picasso.Transformation;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Spotlight;
@@ -49,6 +53,55 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
         final Spotlight spotlight = spotlights.get(position);
 
 
+        spotlightHolder.teamInfo.setText(spotlight.getTeam().getTeamName()
+                                           + " " + spotlight.getTeam().getSport()
+                                            + " - Grade " + spotlight.getTeam().getGrade());
+
+
+
+        // cover
+        if (null != spotlight.getCover()) {
+            if (!"".equals(spotlight.getCover())) {
+                Picasso.with(context)
+                        .load(spotlight.getCover())
+                        .fit().centerCrop()
+                        .into(spotlightHolder.spotCover);
+            } else {
+                Picasso.with(context)
+                        .load(R.drawable.spot_placeholder)
+                        .fit().centerCrop()
+                        .into(spotlightHolder.spotCover);
+            }
+        } else {
+            Picasso.with(context)
+                    .load(R.drawable.spot_placeholder)
+                    .fit().centerCrop()
+                    .into(spotlightHolder.spotCover);
+        }
+
+
+        //team avatar 
+        if (null != spotlight.getTeamsAvatar()) {
+            if (!"".equals(spotlight.getTeamsAvatar())) {
+                Picasso.with(context)
+                        .load(spotlight.getTeamsAvatar())
+                        .fit().centerCrop()
+                        .transform(round)
+                        .into(spotlightHolder.spotAvatar);
+            } else {
+                Picasso.with(context)
+                        .load(R.drawable.unknown_user)
+                        .fit().centerCrop()
+                        .transform(round)
+                        .into(spotlightHolder.spotAvatar);
+            }
+        } else {
+            Picasso.with(context)
+                    .load(R.drawable.unknown_user)
+                    .fit().centerCrop()
+                    .transform(round)
+                    .into(spotlightHolder.spotAvatar);
+        }
 
         spotlightHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +122,12 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
 
     public class SpotlightHolder extends RecyclerView.ViewHolder {
 
-        // TODO: bind the fields here
+        @Bind(R.id.spotlight_avatar)
+        ImageView spotAvatar;
+        @Bind(R.id.spotlight_cover)
+        ImageView spotCover;
+        @Bind(R.id.spotlight_team_info)
+        TextView teamInfo;
 
         public SpotlightHolder(View itemView) {
             super(itemView);

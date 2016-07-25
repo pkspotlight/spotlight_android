@@ -5,9 +5,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +24,14 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
+import me.spotlight.spotlight.activities.MainActivity;
 import me.spotlight.spotlight.features.spotlights.add.AddSpotlightFragment;
 import me.spotlight.spotlight.features.spotlights.details.SpotlightDetailsFragment;
 import me.spotlight.spotlight.models.Spotlight;
+import me.spotlight.spotlight.models.SpotlightMedia;
+import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
+import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/10/2016.
@@ -31,6 +43,8 @@ public class SpotlightsFragment extends Fragment
     RecyclerView mySpotlightsList;
     SpotlightsAdapter spotlightsAdapter;
     List<Spotlight> mySpotlights = new ArrayList<>();
+    List<Team> myTeams = new ArrayList<>();
+    List<SpotlightMedia> spotlightMedias = new ArrayList<>();
     @Bind(R.id.swipe_spotlights)
     SwipeRefreshLayout swipeSpotlights;
 
@@ -70,12 +84,12 @@ public class SpotlightsFragment extends Fragment
                 if (!mySpotlights.isEmpty())
                     mySpotlights.clear();
                 spotlightsAdapter.notifyDataSetChanged();
-                loadSpotlights();
+                loadTeams();
                 swipeSpotlights.setRefreshing(false);
             }
         });
 
-        loadSpotlights();
+        preloadSpotlightMedia();
     }
 
     @Override
@@ -93,15 +107,191 @@ public class SpotlightsFragment extends Fragment
         addSpotlight();
     }
 
+
     private void loadSpotlights() {
-        Spotlight spotlight = new Spotlight();
-        spotlight.setObjectId("dfdfdsfsd");
-        mySpotlights.add(spotlight);
-        mySpotlights.add(spotlight);
-        mySpotlights.add(spotlight);
-        mySpotlights.add(spotlight);
-        mySpotlights.add(spotlight);
-        mySpotlights.add(spotlight);
-        spotlightsAdapter.notifyDataSetChanged();
+        if (!mySpotlights.isEmpty())
+            mySpotlights.clear();
+        ParseQuery<ParseObject> spotQuery = new ParseQuery<>("Spotlight");
+        spotQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject spotlight : objects) {
+                            try {
+                                spotlight.fetchIfNeeded();
+                            } catch (ParseException e1) {}
+                            if (null != spotlight.getParseObject("team")) {
+                                ParseObject team = spotlight.getParseObject("team");
+//                                Log.d("spotteams", team.getObjectId());
+                            }
+                            Log.d("spotteams", spotlight.getObjectId());
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+
+    private void preloadSpotlightMedia() {
+        ParseQuery<ParseObject> mediaQ = new ParseQuery<>("SpotlightMedia");
+        mediaQ.whereEqualTo("isVideo", true);
+        mediaQ.setLimit(250);
+        mediaQ.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject spotMedia : objects) {
+                            try {
+                                spotMedia.fetchIfNeeded();
+                            } catch (ParseException e1) {}
+
+                            SpotlightMedia spotlightMedia = new SpotlightMedia();
+                            spotlightMedia.setObjectId(spotMedia.getObjectId());
+
+                            if (null != spotMedia.getParseFile("mediaFile")) {
+                                //
+                            }
+                            if (null != spotMedia.getParseFile("thumbnailImageFile")) {
+                                if (null != spotMedia.getParseFile("thumbnailImageFile").getUrl()) {
+                                    spotlightMedia.setThumbnailUrl(spotMedia.getParseFile("thumbnailImageFile").getUrl());
+                                }
+                            }
+                            if (null != spotMedia.getParseObject("parent")) {
+                                spotlightMedia.setParentId(spotMedia.getParseObject("parent").getObjectId());
+                            }
+
+                            spotlightMedias.add(spotlightMedia);
+                            Log.d("mainspotmedias", spotlightMedia.getObjectId());
+                        }
+
+                        loadTeams();
+                    }
+                }
+            }
+        });
+    }
+
+
+    private void loadTeams() {
+        if (!myTeams.isEmpty())
+            myTeams.clear();
+        final ParseRelation<ParseObject> myteamsRelation = ParseUser.getCurrentUser().getRelation("teams");
+        ParseQuery<ParseObject> myteamsQuery = myteamsRelation.getQuery();
+        myteamsQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject parseObject : objects) {
+                            Team team = new Team();
+                            team.setObjectId(parseObject.getObjectId());
+                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
+                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
+                                    team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
+                                }
+                            }
+                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
+                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
+                                    team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
+                                }
+                            }
+                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
+                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
+                                    team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
+                                }
+                            }
+                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
+                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
+                                    team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
+                                }
+                            }
+                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
+                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
+                                    team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
+                                }
+                            }
+                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
+                                try {
+                                    parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
+                                } catch (ParseException e1) {
+                                }
+                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
+                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
+                                        team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
+                                    }
+                                }
+                            }
+                            myTeams.add(team);
+                            Log.d("spotteams", parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
+                        }
+                        loadMySpotlights(myTeams);
+
+                    } else {
+                        Log.d("spotteams", "Empty");
+                    }
+                } else {
+                    // TODO: handle e
+                    Log.d("spotteams", "Error");
+                }
+            }
+        });
+    }
+
+
+    private void loadMySpotlights(final List<Team> teams) {
+        if (!mySpotlights.isEmpty())
+            mySpotlights.clear();
+        ParseQuery<ParseObject> spotQuery = new ParseQuery<>("Spotlight");
+        spotQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        List<String> coverUrls = new ArrayList<>();
+                        for (ParseObject spotlight : objects) {
+                            try {
+                                spotlight.fetchIfNeeded();
+                            } catch (ParseException e1) {}
+
+                            if (null != spotlight.getParseObject("team")) {
+                                ParseObject team = spotlight.getParseObject("team");
+
+                                for (Team team1 : teams) {
+                                    if (team.getObjectId().equals(team1.getObjectId())) {
+                                        // this is our spotlight - convert to our model and add it
+                                        Spotlight spotlight1 = new Spotlight();
+                                        spotlight1.setObjectId(spotlight.getObjectId());
+                                        spotlight1.setTeamsAvatar(team1.getAvatarUrl());
+                                        spotlight1.setTeam(team1);
+
+                                        coverUrls.clear();
+                                        for (SpotlightMedia m : spotlightMedias) {
+                                            if (m.getParentId().equals(spotlight.getObjectId())) {
+                                                coverUrls.add(m.getThumbnailUrl());
+                                                spotlight1.setCover(m.getThumbnailUrl());
+                                            }
+                                        }
+
+                                        spotlight1.setCoverUrl(coverUrls);
+
+                                        mySpotlights.add(spotlight1);
+                                        spotlightsAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+                        }
+                        Log.d("spotteams", String.valueOf(mySpotlights.size()));
+
+
+                    }
+                }
+            }
+        });
+
+
     }
 }

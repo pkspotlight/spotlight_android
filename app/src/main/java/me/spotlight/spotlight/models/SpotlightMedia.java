@@ -12,8 +12,10 @@ public class SpotlightMedia {
 
     String objectId;
     boolean isVideo;
+    String thumbnailUrl;
     ParseFile mediaFile;
     Spotlight parent;
+    String parentId;
     ParseFile thumbnailImageFile;
     Date createdAt;
     Date updatedAt;
@@ -26,6 +28,22 @@ public class SpotlightMedia {
 
     public void setObjectId(String objectId) {
         this.objectId = objectId;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 
     public boolean isVideo() {

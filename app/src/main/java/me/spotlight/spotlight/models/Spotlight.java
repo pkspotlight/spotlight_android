@@ -1,5 +1,6 @@
 package me.spotlight.spotlight.models;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,9 @@ public class Spotlight {
 
     String objectId;
     String title;
+    String teamsAvatar;
+    String cover;
+    List<String> coverUrls = new ArrayList<>();
     Date createdAt;
     Date updatedAt;
     User spotlightParticipant;
@@ -26,12 +30,36 @@ public class Spotlight {
         this.objectId = objectId;
     }
 
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public List<String> getCoverUrls() {
+        return coverUrls;
+    }
+
+    public void setCoverUrl(List<String> coverUrls) {
+        this.coverUrls = coverUrls;
+    }
+
+    public String getTeamsAvatar() {
+        return teamsAvatar;
+    }
+
+    public void setTeamsAvatar(String teamsAvatar) {
+        this.teamsAvatar = teamsAvatar;
     }
 
     public Date getCreatedAt() {

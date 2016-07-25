@@ -63,7 +63,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         friendTeamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        friendTeamsAdapter = new TeamsAdapter(getActivity(), friendTeams, this);
+        friendTeamsAdapter = new TeamsAdapter(getActivity(), friendTeams, this, false);
         friendTeamsList.setAdapter(friendTeamsAdapter);
 
         loadTeams();

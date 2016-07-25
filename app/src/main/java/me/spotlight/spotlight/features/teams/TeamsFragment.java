@@ -74,7 +74,7 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         myteamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        myteamsAdapter = new TeamsAdapter(getActivity(), myTeams, this);
+        myteamsAdapter = new TeamsAdapter(getActivity(), myTeams, this, true);
         myteamsList.setAdapter(myteamsAdapter);
         swipeFriends.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

@@ -113,7 +113,6 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
 
     @OnClick(R.id.fab_add_spotlighters)
     public void onFab() {
-
         final AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle(getString(R.string.friends_dialog))
                 .setItems(getResources().getTextArray(R.array.friends_add), new DialogInterface.OnClickListener() {
@@ -139,7 +138,6 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
                 })
                 .create();
         dialog.show();
-
     }
 
     private void loadFriends() {
