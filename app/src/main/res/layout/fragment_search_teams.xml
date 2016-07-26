@@ -5,8 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
     <EditText
-        android:background="@android:color/darker_gray"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/darker_gray"
+        android:paddingLeft="12dp"
+        android:background="@android:color/white"
         android:id="@+id/teams_search"
         android:hint="Search existing teams"
         android:layout_width="match_parent"

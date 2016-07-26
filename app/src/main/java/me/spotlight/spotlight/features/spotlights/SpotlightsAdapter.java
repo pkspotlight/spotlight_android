@@ -53,7 +53,7 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
         final Spotlight spotlight = spotlights.get(position);
 
 
-        spotlightHolder.teamInfo.setText(spotlight.getTeam().getTeamName()
+        spotlightHolder.teamInfo.setText(spotlight.getTeam().getName()
                                            + " " + spotlight.getTeam().getSport()
                                             + " - Grade " + spotlight.getTeam().getGrade());
 
@@ -80,7 +80,7 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
         }
 
 
-        //team avatar 
+        //team avatar
         if (null != spotlight.getTeamsAvatar()) {
             if (!"".equals(spotlight.getTeamsAvatar())) {
                 Picasso.with(context)

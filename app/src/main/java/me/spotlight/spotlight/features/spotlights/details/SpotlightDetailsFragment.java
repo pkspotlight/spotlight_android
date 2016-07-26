@@ -11,9 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -24,6 +27,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
+import me.spotlight.spotlight.features.spotlights.SpotlightsFragment;
+import me.spotlight.spotlight.models.Spotlight;
+import me.spotlight.spotlight.models.SpotlightMedia;
 
 /**
  * Created by Anatol on 7/22/2016.
@@ -37,6 +43,12 @@ public class SpotlightDetailsFragment extends Fragment {
     Transformation round;
     @Bind(R.id.spotlight_avatar)
     ImageView spotlightAvatar;
+    @Bind(R.id.spot_details_date)
+    TextView spotlightDate;
+    @Bind(R.id.spot_details_info)
+    TextView spotlightInfo;
+    @Bind(R.id.spot_details_name)
+    TextView spotlightName;
 
     /*
         Manufacturing singleton
@@ -68,12 +80,16 @@ public class SpotlightDetailsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Picasso.with(getContext())
-                .load("http://www.active.com/Assets/Cycling/Major+Taylor.jpg")
-                .fit().centerCrop()
-                .transform(round)
-                .into(spotlightAvatar);
+
+        initTeamAvatar();
+        populateInfo();
     }
+
+
+
+
+
+
 
     @OnClick(R.id.view)
     public void view(View view) {
@@ -119,12 +135,56 @@ public class SpotlightDetailsFragment extends Fragment {
         getActivity().startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
     }
 
+
+
+
     private void loadSpotDetails() {
-        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
-        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
-        urls.add("http://us.123rf.com/450wm/deklofenak/deklofenak1201/deklofenak120100054/12019120-family-on-bikes-in-the-park.jpg");
-        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
-        urls.add("http://us.123rf.com/450wm/deklofenak/deklofenak1201/deklofenak120100054/12019120-family-on-bikes-in-the-park.jpg");
+//        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
+//        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
+//        urls.add("http://us.123rf.com/450wm/deklofenak/deklofenak1201/deklofenak120100054/12019120-family-on-bikes-in-the-park.jpg");
+//        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
+//        urls.add("http://us.123rf.com/450wm/deklofenak/deklofenak1201/deklofenak120100054/12019120-family-on-bikes-in-the-park.jpg");
+
+
+        for (SpotlightMedia spotlightMedia : SpotlightsFragment.spotlightMedias) {
+            if (spotlightMedia.getParentId().equals(getArguments().getString("objectId"))) {
+                urls.add(spotlightMedia.getThumbnailUrl());
+            }
+        }
+
+
         spotPreviewAdapter.notifyDataSetChanged();
+    }
+
+
+
+    private void initTeamAvatar() {
+        if (null != getArguments().getString("teamAvatar")) {
+            if (!"".equals(getArguments().getString("teamAvatar"))) {
+                Picasso.with(getContext())
+                        .load(getArguments().getString("teamAvatar"))
+                        .fit().centerCrop()
+                        .transform(round)
+                        .into(spotlightAvatar);
+            } else {
+                Picasso.with(getContext())
+                        .load(R.drawable.unknown_user)
+                        .fit().centerCrop()
+                        .transform(round)
+                        .into(spotlightAvatar);
+            }
+        } else {
+            Picasso.with(getContext())
+                    .load(R.drawable.unknown_user)
+                    .fit().centerCrop()
+                    .transform(round)
+                    .into(spotlightAvatar);
+        }
+    }
+
+    private void populateInfo() {
+        spotlightInfo.setText("Grade " + getArguments().getString("teamGrade") + " "
+                                    + getArguments().getString("teamSport"));
+        spotlightName.setText(getArguments().getString("teamName"));
     }
 }

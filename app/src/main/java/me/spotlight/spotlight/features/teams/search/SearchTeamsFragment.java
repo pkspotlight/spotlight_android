@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -39,6 +40,9 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
     RecyclerView teamsList;
     List<Team> teams = new ArrayList<>();
     TeamsAdapter teamsAdapter;
+    @Bind(R.id.progress)
+    ProgressBar progressBar;
+    Thread teamsThread;
 
     /*
         Manufacturing singleton
@@ -83,58 +87,80 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
     @Override
     public void onPause() {
         super.onPause();
+        if (null != teamsThread)
+            teamsThread.interrupt();
     }
 
     private void loadTeams() {
         if (!teams.isEmpty())
             teams.clear();
-        ParseQuery<ParseObject> teamsQuery = new ParseQuery<ParseObject>(ParseConstants.OBJECT_TEAM);
+        progressBar.setVisibility(View.VISIBLE);
+        final ParseQuery<ParseObject> teamsQuery = new ParseQuery<ParseObject>(ParseConstants.OBJECT_TEAM);
+        teamsQuery.setLimit(30);
         teamsQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e) {
+            public void done(final List<ParseObject> objects, ParseException e) {
                 if (null == e) {
                     if (!objects.isEmpty()) {
-                        for (ParseObject parseObject : objects) {
-                            Team team = new Team();
-                            team.setObjectId(parseObject.getObjectId());
-                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
-                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
-                                    team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
-                                }
-                            }
-                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
-                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
-                                    team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
-                                }
-                            }
-                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
-                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
-                                    team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
-                                }
-                            }
-                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
-                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
-                                    team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
-                                }
-                            }
-                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
-                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
-                                    team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
-                                }
-                            }
-                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
-                                try {
-                                    parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
-                                } catch (ParseException e1) {}
-                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
-                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
-                                        team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
+
+                        Runnable getTeams = new Runnable() {
+                            @Override
+                            public void run() {
+                                for (ParseObject parseObject : objects) {
+                                    Team team = new Team();
+                                    team.setObjectId(parseObject.getObjectId());
+                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
+                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
+                                            team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
+                                        }
                                     }
+                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
+                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
+                                            team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
+                                        }
+                                    }
+                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
+                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
+                                            team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
+                                        }
+                                    }
+                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
+                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
+                                            team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
+                                        }
+                                    }
+                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
+                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
+                                            team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
+                                        }
+                                    }
+                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
+                                        try {
+                                            parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
+                                        } catch (ParseException e1) {}
+                                        if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
+                                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
+                                                team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
+                                            }
+                                        }
+                                    }
+                                    teams.add(team);
                                 }
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progressBar.setVisibility(View.GONE);
+                                        teamsAdapter.notifyDataSetChanged();
+                                    }
+                                });
                             }
-                            teams.add(team);
-                            teamsAdapter.notifyDataSetChanged();
-                        }
+                        };
+
+
+                        teamsThread = new Thread(getTeams);
+                        teamsThread.start();
+
                     }
                 } else {
                     // TODO: handle e

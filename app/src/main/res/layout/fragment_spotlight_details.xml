@@ -37,6 +37,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/spot_details_name"
                     android:text="Port Washington Jets"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -45,12 +46,14 @@
                     android:layout_height="wrap_content" />
 
                 <TextView
+                    android:id="@+id/spot_details_info"
                     android:text="Grade 2 Flag Football"
                     android:textColor="@android:color/white"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <TextView
+                    android:id="@+id/spot_details_date"
                     android:text="December 9, 2015"
                     android:textSize="14sp"
                     android:textColor="@android:color/white"

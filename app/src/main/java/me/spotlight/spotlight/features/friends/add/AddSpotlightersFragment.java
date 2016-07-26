@@ -1,6 +1,5 @@
 package me.spotlight.spotlight.features.friends.add;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -22,7 +22,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
-import me.spotlight.spotlight.models.Friend;
 import me.spotlight.spotlight.models.User;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
@@ -38,6 +37,9 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
     RecyclerView usersList;
     List<User> users = new ArrayList<>();
     UsersAdapter usersAdapter;
+    @Bind(R.id.progress)
+    ProgressBar progressBar;
+    Thread friendsThread;
 
     /*
         Manufacturing singleton
@@ -83,48 +85,69 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
     @Override
     public void onPause() {
         super.onPause();
+        if (null != friendsThread)
+            friendsThread.interrupt();
     }
 
     private void loadUsers() {
         if (!users.isEmpty())
             users.clear();
+        progressBar.setVisibility(View.VISIBLE);
         ParseQuery<ParseUser> usersQuery = ParseUser.getCurrentUser().getQuery();
+        usersQuery.setLimit(40);
         usersQuery.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void done(List<ParseUser> objects, ParseException e) {
+            public void done(final List<ParseUser> objects, ParseException e) {
                 if (null == e) {
                     if (!objects.isEmpty()) {
-                        int i = 0;
-                        for (ParseUser parseUser : objects) {
-                            i++;
-                            User user = new User();
-                            user.setObjectId(parseUser.getObjectId());
-                            if (null != parseUser.getString("firstName")) {
-                                if (!"".equals(parseUser.getString("firstName"))) {
-                                    user.setFirstName(parseUser.getString("firstName"));
-                                }
-                            }
-                            if (null != parseUser.getString("lastName")) {
-                                if (!"".equals(parseUser.getString("lastName"))) {
-                                    user.setLastName(parseUser.getString("lastName"));
-                                }
-                            }
-                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
-                                try {
-                                    parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
-                                } catch (ParseException e1) {}
-                                if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
-                                    if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
-                                        user.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
+
+
+                        Runnable getUsers = new Runnable() {
+                            @Override
+                            public void run() {
+                                for (ParseUser parseUser : objects) {
+
+                                    User user = new User();
+                                    user.setObjectId(parseUser.getObjectId());
+                                    if (null != parseUser.getString("firstName")) {
+                                        if (!"".equals(parseUser.getString("firstName"))) {
+                                            user.setFirstName(parseUser.getString("firstName"));
+                                        }
                                     }
+                                    if (null != parseUser.getString("lastName")) {
+                                        if (!"".equals(parseUser.getString("lastName"))) {
+                                            user.setLastName(parseUser.getString("lastName"));
+                                        }
+                                    }
+                                    if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
+                                        try {
+                                            parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
+                                        } catch (ParseException e1) {}
+                                        if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
+                                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
+                                                user.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
+                                            }
+                                        }
+                                    }
+
+                                    users.add(user);
                                 }
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progressBar.setVisibility(View.GONE);
+                                        usersAdapter.notifyDataSetChanged();
+                                    }
+                                });
                             }
-                            users.add(user);
-                            if (i % 3 == 0)
-                                usersAdapter.notifyDataSetChanged();
-                        }
+                        };
+
+                        /// post here
+                        friendsThread = new Thread(getUsers);
+                        friendsThread.start();
+
                     }
-                    usersAdapter.notifyDataSetChanged();
                 } else {
                     // TODO: handle e
                 }
