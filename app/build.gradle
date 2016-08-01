@@ -21,12 +21,14 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
 
+
     defaultConfig {
         applicationId "me.spotlight.spotlight"
-        minSdkVersion 15
+        minSdkVersion 17
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -46,20 +48,6 @@ dependencies {
     compile "com.jakewharton:butterknife:$rootProject.ext.butterKnifeVersion"
     compile "com.squareup.picasso:picasso:$rootProject.ext.picassoVersion"
     compile "com.makeramen:roundedimageview:$rootProject.ext.roundedImageViewVersion"
-    compile "com.github.JakeWharton:ViewPagerIndicator:$rootProject.ext.viewPagerIndicatorVersion"
-    compile "org.apmem.tools:layouts:$rootProject.ext.apmemToolsLayoutsVersion"
-    compile "com.timehop.stickyheadersrecyclerview:library:$rootProject.ext.stickyHeadersVersion"
-    compile "com.github.aakira:expandable-layout:$rootProject.ext.expandableLayoutVersion"
-    compile "com.jmedeisis:draglinearlayout:$rootProject.ext.dragLinearLayoutVersion"
-    compile "com.diogobernardino:williamchart:$rootProject.ext.williamChartVersion"
-    compile "com.nineoldandroids:library:$rootProject.ext.nineOldAndroidsVersion"
-    compile "com.daimajia.slider:library:$rootProject.ext.daimajiaSliderVersion"
-    compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofitVersion"
-    compile "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
-    compile "io.reactivex:rxjava:$rootProject.ext.rxJavaVersion"
-    compile "com.squareup.retrofit2:adapter-rxjava:$rootProject.ext.retrofitRxJavaAdapterVersion"
-    compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofitGsonVersion"
-    compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okhttp3LoggingInterceptorVersion"
     compile "com.j256.ormlite:ormlite-android:$rootProject.ext.j256OrmLiteVersion"
     compile "com.trello:rxlifecycle:$rootProject.ext.trelloRxLifecycleVersion"
     compile "com.trello:rxlifecycle-components:$rootProject.ext.trelloRxLifecycleComponentsVersion"
@@ -75,4 +63,7 @@ dependencies {
         transitive = true;
     }
     compile 'com.parse:parse-android:1.+'
+
+    compile 'com.googlecode.mp4parser:isoparser:1.1.14'
+    compile 'org.jcodec:jcodec-android:0.1.9'
 }

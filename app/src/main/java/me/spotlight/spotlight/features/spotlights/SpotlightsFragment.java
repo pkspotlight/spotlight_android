@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -161,7 +162,7 @@ public class SpotlightsFragment extends Fragment
                             spotlightMedia.setObjectId(spotMedia.getObjectId());
 
                             if (null != spotMedia.getParseFile("mediaFile")) {
-                                //
+                                spotlightMedia.setFileUrl(spotMedia.getParseFile("mediaFile").getUrl());
                             }
                             if (null != spotMedia.getParseFile("thumbnailImageFile")) {
                                 if (null != spotMedia.getParseFile("thumbnailImageFile").getUrl()) {
@@ -171,6 +172,7 @@ public class SpotlightsFragment extends Fragment
                             if (null != spotMedia.getParseObject("parent")) {
                                 spotlightMedia.setParentId(spotMedia.getParseObject("parent").getObjectId());
                             }
+
 
                             spotlightMedias.add(spotlightMedia);
                             Log.d("mainspotmedias", spotlightMedia.getObjectId());

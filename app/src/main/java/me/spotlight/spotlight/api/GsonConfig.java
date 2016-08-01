@@ -57,17 +57,17 @@ public class GsonConfig {
         return builder;
     }
 
-    public static Gson buildDefaultJson() {
-        Gson gson = getBuilder()
-                .setLenient()
-                .create();
-        return gson;
-    }
+//    public static Gson buildDefaultJson() {
+//        Gson gson = getBuilder()
+//                .setLenient()
+//                .create();
+//        return gson;
+//    }
 
-    public static Map<String, String> getValues(Object object) {
-        Gson gson = buildDefaultJson();
-        Type type = new TypeToken<Map<String, String>>() {}.getType();
-        Map<String, String> myMap = gson.fromJson(gson.toJson(object), type);
-        return myMap;
-    }
+//    public static Map<String, String> getValues(Object object) {
+//        Gson gson = buildDefaultJson();
+//        Type type = new TypeToken<Map<String, String>>() {}.getType();
+//        Map<String, String> myMap = gson.fromJson(gson.toJson(object), type);
+//        return myMap;
+//    }
 }

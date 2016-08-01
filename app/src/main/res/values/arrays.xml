@@ -17,4 +17,11 @@
         <item>Every Single Night</item>
         <item>Ready 2 Go</item>
     </string-array>
+
+    <string-array name="add_media">
+        <item>Choose from Photos</item>
+        <item>Choose from Videos</item>
+        <item>Take new Photo</item>
+        <item>Record new Video</item>
+    </string-array>
 </resources>

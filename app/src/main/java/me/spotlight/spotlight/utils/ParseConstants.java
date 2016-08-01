@@ -7,6 +7,7 @@ public class ParseConstants {
 
     public static final String FIELD_USER_PIC = "profilePic";
     public static final String FIELD_OBJECT_MEDIA_FILE = "mediaFile";
+    public static final String FIELD_OBJECT_THUMB_FILE = "thumbnailImageFile";
     public static final String FIELD_OBJECT_ID = "objectId";
 
     public static final String FIELD_TEAM_NAME = "teamName";
@@ -19,4 +20,6 @@ public class ParseConstants {
     public static final String OBJECT_PROFILE_PIC = "ProfilePictureMedia";
     public static final String OBJECT_CHILD = "Child";
     public static final String OBJECT_TEAM = "Team";
+    public static final String OBJECT_SPOTLIGHT_MEDIA = "SpotlightMedia";
+    public static final String OBJECT_SPOTLIGHT = "Spotlight";
 }

@@ -32,22 +32,32 @@
     </LinearLayout>
 
 
-
-    <TextView
-        android:padding="18dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textColor="@android:color/holo_green_dark"
-        android:text="Create Spotlight"
+    <LinearLayout
+        android:id="@+id/create"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
 
-    <View
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:background="@android:color/darker_gray"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+
+        <TextView
+            android:padding="18dp"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textColor="@android:color/holo_green_dark"
+            android:text="Create Spotlight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+
+
+    </LinearLayout>
 
 
 </LinearLayout>

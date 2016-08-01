@@ -9,4 +9,6 @@ public class Constants {
 
     public static final int PICTURE_CAMERA_REQUEST = 59;
     public static final int PICTURE_GALLERY_REQUEST = 57;
+    public static final int VIDEO_CAMERA_REQUEST = 58;
+    public static final int VIDEO_GALLERY_REQUEST = 56;
 }

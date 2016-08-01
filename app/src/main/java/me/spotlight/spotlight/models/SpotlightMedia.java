@@ -13,6 +13,7 @@ public class SpotlightMedia {
     String objectId;
     boolean isVideo;
     String thumbnailUrl;
+    String fileUrl;
     ParseFile mediaFile;
     Spotlight parent;
     String parentId;
@@ -44,6 +45,14 @@ public class SpotlightMedia {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
     public boolean isVideo() {

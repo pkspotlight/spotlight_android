@@ -27,6 +27,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
+import me.spotlight.spotlight.activities.TheaterActivity;
 import me.spotlight.spotlight.features.spotlights.SpotlightsFragment;
 import me.spotlight.spotlight.models.Spotlight;
 import me.spotlight.spotlight.models.SpotlightMedia;
@@ -49,6 +50,7 @@ public class SpotlightDetailsFragment extends Fragment {
     TextView spotlightInfo;
     @Bind(R.id.spot_details_name)
     TextView spotlightName;
+    public static List<String> movs = new ArrayList<>();
 
     /*
         Manufacturing singleton
@@ -100,7 +102,8 @@ public class SpotlightDetailsFragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         switch (i) {
                             case 0:
-                                Toast.makeText(getContext(), "Cool Kids", Toast.LENGTH_LONG).show();
+//                                Toast.makeText(getContext(), "Cool Kids", Toast.LENGTH_LONG).show();
+                                startActivity(TheaterActivity.getStartIntent(getContext()));
                                 break;
                             case 1:
                                 Toast.makeText(getContext(), "Disney Funk", Toast.LENGTH_LONG).show();
@@ -139,20 +142,12 @@ public class SpotlightDetailsFragment extends Fragment {
 
 
     private void loadSpotDetails() {
-//        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
-//        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
-//        urls.add("http://us.123rf.com/450wm/deklofenak/deklofenak1201/deklofenak120100054/12019120-family-on-bikes-in-the-park.jpg");
-//        urls.add("http://www.active.com/Assets/Cycling/Major+Taylor.jpg");
-//        urls.add("http://us.123rf.com/450wm/deklofenak/deklofenak1201/deklofenak120100054/12019120-family-on-bikes-in-the-park.jpg");
-
-
         for (SpotlightMedia spotlightMedia : SpotlightsFragment.spotlightMedias) {
             if (spotlightMedia.getParentId().equals(getArguments().getString("objectId"))) {
                 urls.add(spotlightMedia.getThumbnailUrl());
+                movs.add(spotlightMedia.getFileUrl());
             }
         }
-
-
         spotPreviewAdapter.notifyDataSetChanged();
     }
 

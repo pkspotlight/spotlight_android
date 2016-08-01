@@ -181,7 +181,7 @@ public class User {
     public static void save(User user) {
         String json = null;
         if (null != user) {
-            json = GsonConfig.buildDefaultJson().toJson(user);
+//            json = GsonConfig.buildDefaultJson().toJson(user);
         }
         SharedPreferences sharedPreferences =
                 BaseApplication.getContext().getSharedPreferences("User", Context.MODE_PRIVATE);
@@ -193,7 +193,7 @@ public class User {
                 BaseApplication.getContext().getSharedPreferences("User", Context.MODE_PRIVATE);
         String json = sharedPreferences.getString("user", null);
         if (null != json) {
-            return GsonConfig.buildDefaultJson().fromJson(json, User.class);
+//            return GsonConfig.buildDefaultJson().fromJson(json, User.class);
         }
         return new User();
     }
