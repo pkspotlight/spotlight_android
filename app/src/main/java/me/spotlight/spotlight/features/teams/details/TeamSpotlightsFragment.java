@@ -1,7 +1,10 @@
 package me.spotlight.spotlight.features.teams.details;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -57,6 +61,49 @@ public class TeamSpotlightsFragment extends Fragment implements SpotlightsAdapte
         bundle.putString("teamGrade", spotlight.getTeam().getGrade());
         bundle.putString("teamSport", spotlight.getTeam().getSport());
         FragmentUtils.changeFragment(getActivity(), R.id.content, SpotlightDetailsFragment.newInstance(bundle), true);
+    }
+
+    public void onDelete(final Spotlight spotlight, final int position) {
+        final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle(getString(R.string.remove_spotlight))
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                        progressDialog.setMessage("deleting...");
+                        progressDialog.show();
+                        ParseQuery<ParseObject> q = new ParseQuery<>(ParseConstants.OBJECT_SPOTLIGHT);
+                        q.whereEqualTo("objectId", spotlight.getObjectId());
+                        q.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, ParseException e) {
+                                if (null == e) {
+                                    ParseObject s = objects.get(0);
+                                    s.deleteInBackground(new DeleteCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (null == e) {
+                                                progressDialog.dismiss();
+                                                spotlights.remove(position);
+                                                spotlightsAdapter.notifyDataSetChanged();
+                                                Toast.makeText(getActivity(), "Spotlight deleted successfully!", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                })
+                .create();
+        dialog.show();
     }
 
     @Override

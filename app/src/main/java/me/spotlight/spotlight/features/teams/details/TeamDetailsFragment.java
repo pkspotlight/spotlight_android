@@ -32,6 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.features.spotlights.add.FinishSpotlightFragment;
+import me.spotlight.spotlight.utils.CustomViewPager;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
@@ -47,7 +48,7 @@ public class TeamDetailsFragment extends Fragment {
     @Bind(R.id.team_detail_name)
     TextView teamDetailName;
     @Bind(R.id.team_detail_pager)
-    ViewPager teamDetailPager;
+    CustomViewPager teamDetailPager;
     private List<Fragment> fragments = new ArrayList<>();
     private PagerAdapter pagerAdapter;
     private static final int NUM_TABS = 2;

@@ -33,7 +33,12 @@
 
         <activity android:name=".activities.TheaterActivity"/>
 
-
+        <activity
+            android:name="io.vov.vitamio.activity.InitActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateAlwaysHidden" />
 
 
         <meta-data android:name="io.fabric.ApiKey" android:value="OYaQ9xpbGKHyUUnZRMqfSK2uP"/>

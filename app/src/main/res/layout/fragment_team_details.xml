@@ -77,7 +77,7 @@
     </LinearLayout>
 
 
-    <android.support.v4.view.ViewPager
+    <me.spotlight.spotlight.utils.CustomViewPager
         android:id="@+id/team_detail_pager"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

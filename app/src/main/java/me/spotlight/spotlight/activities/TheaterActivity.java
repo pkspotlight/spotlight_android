@@ -56,6 +56,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.vov.vitamio.widget.VideoView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.utils.ParseConstants;
 import me.spotlight.spotlight.utils.PathUtils;
@@ -68,7 +69,7 @@ public class TheaterActivity extends Activity {
 
     private Uri uri;
     @Bind(R.id.vid)
-    android.widget.VideoView vid;
+    VideoView vid;
     @Bind(R.id.vid2)
     android.widget.VideoView vid2;
     @Bind(R.id.image)
@@ -96,29 +97,17 @@ public class TheaterActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_theater);
         ButterKnife.bind(this);
+        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
 
         getPermission();
 
 //        reelPath = getIntent().getExtras().getString("reelPath");
 //        musicPath = getIntent().getExtras().getString("musicPath");
 
-        vid.setVideoPath("/storage/emulated/01470148773697in.mp4");
+        vid.setVideoPath("/storage/sdcard/1470151215059in.mp4");
         vid.start();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem favorite = menu.findItem(R.id.action_add);
-        favorite.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                Toast.makeText(getApplicationContext(), "WOW", Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-        return super.onCreateOptionsMenu(menu);
-    }
 
 
 

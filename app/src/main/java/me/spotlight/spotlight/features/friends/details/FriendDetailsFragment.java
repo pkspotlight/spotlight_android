@@ -29,6 +29,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
+import me.spotlight.spotlight.utils.CustomViewPager;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
@@ -43,7 +44,7 @@ public class FriendDetailsFragment extends Fragment {
     @Bind(R.id.friend_detail_name)
     TextView friendDetailName;
     @Bind(R.id.friend_detail_pager)
-    ViewPager friendDetailPager;
+    CustomViewPager friendDetailPager;
     private List<Fragment> fragments = new ArrayList<>();
     private PagerAdapter pagerAdapter;
     private static final int NUM_TABS = 2;
@@ -175,12 +176,12 @@ public class FriendDetailsFragment extends Fragment {
 
     @OnClick(R.id.friend_detail_spot)
     public void mem() {
-        friendDetailPager.setCurrentItem(1, true);
+        friendDetailPager.setCurrentItem(0, true);
     }
 
     @OnClick(R.id.friend_detail_teams)
     public void spot() {
-        friendDetailPager.setCurrentItem(0, true);
+        friendDetailPager.setCurrentItem(1, true);
     }
 
     /*

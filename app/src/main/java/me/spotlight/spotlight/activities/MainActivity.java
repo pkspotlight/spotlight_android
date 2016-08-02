@@ -107,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+//        mViewPager = new CustomViewPager(getApplicationContext());
+        mViewPager.setPagingEnabled(false);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

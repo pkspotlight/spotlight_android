@@ -55,4 +55,7 @@
     <string name="profile_last_hint">Touch to add last name</string>
     <string name="profile_first_hint">Touch to add first name</string>
 
+
+    <string name="remove_spotlight">Are you sure?</string>
+
 </resources>

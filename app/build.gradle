@@ -66,4 +66,7 @@ dependencies {
 
     compile 'com.googlecode.mp4parser:isoparser:1.1.14'
     compile 'org.jcodec:jcodec-android:0.1.9'
+
+
+    compile 'me.neavo:vitamio:4.2.2'
 }
