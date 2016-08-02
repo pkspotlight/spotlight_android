@@ -34,6 +34,7 @@ import me.spotlight.spotlight.models.SpotlightMedia;
 import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
+import me.spotlight.spotlight.utils.QuickAction;
 
 /**
  * Created by Anatol on 7/10/2016.
@@ -104,17 +105,16 @@ public class SpotlightsFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
+        if (null != QuickAction.addSpotlight) {
+            QuickAction.addSpotlight.setVisible(true);
+        }
     }
 
-
-//    public void addSpotlight() {
-//        FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
-//    }
-//
-//    @OnClick(R.id.fab_add_spotlight)
-//    public void onFab() {
-//        addSpotlight();
-//    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        QuickAction.addSpotlight.setVisible(false);
+    }
 
 
     private void loadSpotlights() {
@@ -146,8 +146,8 @@ public class SpotlightsFragment extends Fragment
 
     private void preloadSpotlightMedia() {
         ParseQuery<ParseObject> mediaQ = new ParseQuery<>("SpotlightMedia");
-        mediaQ.whereEqualTo("isVideo", true);
-        mediaQ.setLimit(220);
+//        mediaQ.whereEqualTo("isVideo", true);
+        mediaQ.setLimit(420);
         mediaQ.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {

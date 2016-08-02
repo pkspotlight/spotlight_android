@@ -47,6 +47,7 @@ import me.spotlight.spotlight.models.SpotlightMedia;
 import me.spotlight.spotlight.models.User;
 import me.spotlight.spotlight.utils.CustomViewPager;
 import me.spotlight.spotlight.utils.FragmentUtils;
+import me.spotlight.spotlight.utils.QuickAction;
 
 
 /**
@@ -155,8 +156,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem item = menu.findItem(R.id.action_add);
+        QuickAction.addSpotlight = item;
         return true;
     }
 

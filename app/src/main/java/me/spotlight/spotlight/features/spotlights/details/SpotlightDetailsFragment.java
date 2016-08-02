@@ -3,10 +3,12 @@ package me.spotlight.spotlight.features.spotlights.details;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +17,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +41,7 @@ import me.spotlight.spotlight.activities.TheaterActivity;
 import me.spotlight.spotlight.features.spotlights.SpotlightsFragment;
 import me.spotlight.spotlight.models.Spotlight;
 import me.spotlight.spotlight.models.SpotlightMedia;
+import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/22/2016.
@@ -50,6 +61,7 @@ public class SpotlightDetailsFragment extends Fragment {
     TextView spotlightInfo;
     @Bind(R.id.spot_details_name)
     TextView spotlightName;
+    List<String> ids = new ArrayList<>();
     public static List<String> movs = new ArrayList<>();
 
     /*
@@ -133,14 +145,63 @@ public class SpotlightDetailsFragment extends Fragment {
 
     @OnClick(R.id.share)
     public void share(View view) {
+        for (SpotlightMedia spotlightMedia : SpotlightsFragment.spotlightMedias) {
+            if (spotlightMedia.getParentId().equals(getArguments().getString("objectId"))) {
+                ids.add(spotlightMedia.getObjectId());
+            }
+        }
+
+
+        for (String id : ids) {
+            Log.d("downloading", id + " bytes");
+            ParseQuery<ParseObject> mediaQuery = new ParseQuery<>(ParseConstants.OBJECT_SPOTLIGHT_MEDIA);
+            mediaQuery.whereEqualTo("objectId", id);
+            mediaQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> objects, ParseException e) {
+                    try {
+                        ParseObject media = objects.get(0).fetchIfNeeded();
+                        ParseFile parseFile = media.getParseFile("mediaFile");
+                        parseFile.getFile();
+                        byte[] bytes = parseFile.getData();
+                        ByteArrayOutputStream bbw = new ByteArrayOutputStream(bytes.length);
+                        bbw.write(bytes);
+
+                        String fileExtension = media.getBoolean("isVideo") ? ".mp4" : ".png";
+                        String fileName = "in" + fileExtension;
+                        String incoming = writeFile(bbw, fileName);
+                        Log.d("downloading", incoming);
+
+                    } catch (ParseException ee) {
+                        //
+                    } catch (IOException eee) {}
+                }
+            });
+        }
+    }
+
+    private String writeFile(ByteArrayOutputStream baos, String filename) {
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+        try {
+            File file = new File(Environment.getExternalStorageDirectory() + "/" + timeStamp + filename);
+            FileOutputStream fos = new FileOutputStream(file);
+            baos.writeTo(fos);
+        } catch (FileNotFoundException e) {
+            Log.d("extracom", "file not found exception");
+        } catch (IOException e1) {
+            Log.d("extracom", "io exception");
+        }
+
+        return Environment.getExternalStorageDirectory() + timeStamp + filename;
+    }
+
+    private void shareIntent() {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Jobularity");
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Spotlight");
         sharingIntent.putExtra(Intent.EXTRA_TEXT, "Check out this amazing spotlight!");
         getActivity().startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
     }
-
-
 
 
     private void loadSpotDetails() {

@@ -31,6 +31,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
+import me.spotlight.spotlight.features.spotlights.add.FinishSpotlightFragment;
+import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
@@ -38,7 +40,7 @@ import me.spotlight.spotlight.utils.ParseConstants;
  */
 public class TeamDetailsFragment extends Fragment {
 
-    String avatarUrl;
+    String avatarUrl = "";
     Transformation round;
     @Bind(R.id.team_detail_avatar)
     ImageView teamDetailAvatar;
@@ -53,6 +55,7 @@ public class TeamDetailsFragment extends Fragment {
     View teamMembers;
     @Bind(R.id.team_detail_spot)
     View teamSpot;
+    String teamName = "";
 
     /*
         Manufacturing singleton
@@ -140,6 +143,7 @@ public class TeamDetailsFragment extends Fragment {
                             }
                         }
                         if (null != currentTeam.getString("teamName")) {
+                            teamName = currentTeam.getString("teamName");
                             teamDetailName.setText(currentTeam.getString("teamName"));
                         }
                         if (!"".equals(avatarUrl))
@@ -176,6 +180,15 @@ public class TeamDetailsFragment extends Fragment {
     @OnClick(R.id.team_detail_spot)
     public void spot() {
         teamDetailPager.setCurrentItem(0, true);
+    }
+
+    @OnClick(R.id.team_detail_add_spot)
+    public void addSpotlight() {
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", getArguments().getString("objectId"));
+        bundle.putString("teamName", teamName);
+        bundle.putString("teamAvatar", avatarUrl);
+        FragmentUtils.changeFragment(getActivity(), R.id.content, FinishSpotlightFragment.newInstance(bundle), true);
     }
 
 

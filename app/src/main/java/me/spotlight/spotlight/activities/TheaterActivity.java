@@ -78,6 +78,9 @@ public class TheaterActivity extends Activity {
     Movie movie, movie2, movie3;
     Movie result;
 
+    String reelPath;
+    String musicPath;
+
     /*
         Intent manufacturing
      */
@@ -96,7 +99,10 @@ public class TheaterActivity extends Activity {
 
         getPermission();
 
-        vid.setVideoPath(Environment.getExternalStorageDirectory()+"/err.mp4");
+//        reelPath = getIntent().getExtras().getString("reelPath");
+//        musicPath = getIntent().getExtras().getString("musicPath");
+
+        vid.setVideoPath("/storage/emulated/01470148773697in.mp4");
         vid.start();
     }
 
