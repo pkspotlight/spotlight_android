@@ -23,5 +23,6 @@
         <item>Choose from Videos</item>
         <item>Take new Photo</item>
         <item>Record new Video</item>
+        <item>No music</item>
     </string-array>
 </resources>

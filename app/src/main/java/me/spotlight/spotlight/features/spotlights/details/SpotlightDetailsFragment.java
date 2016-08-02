@@ -102,8 +102,7 @@ public class SpotlightDetailsFragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         switch (i) {
                             case 0:
-//                                Toast.makeText(getContext(), "Cool Kids", Toast.LENGTH_LONG).show();
-                                startActivity(TheaterActivity.getStartIntent(getContext()));
+                                Toast.makeText(getContext(), "Cool Kids", Toast.LENGTH_LONG).show();
                                 break;
                             case 1:
                                 Toast.makeText(getContext(), "Disney Funk", Toast.LENGTH_LONG).show();
@@ -112,6 +111,9 @@ public class SpotlightDetailsFragment extends Fragment {
                                 Toast.makeText(getContext(), "Every single night", Toast.LENGTH_LONG).show();
                                 break;
                             case 3:
+                                Toast.makeText(getContext(), "Ready 2 Go", Toast.LENGTH_LONG).show();
+                                break;
+                            case 4:
                                 Toast.makeText(getContext(), "Ready 2 Go", Toast.LENGTH_LONG).show();
                                 break;
                             default:

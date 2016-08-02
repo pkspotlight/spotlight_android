@@ -14,6 +14,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -38,6 +40,7 @@ import me.spotlight.spotlight.features.friends.FriendsFragment;
 import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.features.profile.ProfileFragment;
 import me.spotlight.spotlight.features.spotlights.SpotlightsFragment;
+import me.spotlight.spotlight.features.spotlights.add.AddSpotlightFragment;
 import me.spotlight.spotlight.features.teams.TeamsFragment;
 import me.spotlight.spotlight.models.Spotlight;
 import me.spotlight.spotlight.models.SpotlightMedia;
@@ -150,9 +153,19 @@ public class MainActivity extends AppCompatActivity {
         spotlights.setSelected(true);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == android.R.id.home)
             onBackPressed();
+        if (menuItem.getItemId() == R.id.action_add) {
+            FragmentUtils.changeFragment(this, R.id.content, AddSpotlightFragment.newInstance(), true);
+        }
         return true;
     }
 

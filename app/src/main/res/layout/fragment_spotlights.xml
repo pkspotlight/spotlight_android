@@ -29,14 +29,14 @@
         </LinearLayout>
 
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_add_spotlight"
-            android:src="@android:drawable/ic_menu_add"
-            android:layout_marginBottom="@dimen/fab_padding_bottom"
-            android:layout_marginRight="@dimen/fab_padding_right"
-            android:layout_gravity="bottom|right"
-            android:layout_width="@dimen/fab_diagonal"
-            android:layout_height="@dimen/fab_diagonal" />
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/fab_add_spotlight"-->
+            <!--android:src="@android:drawable/ic_menu_add"-->
+            <!--android:layout_marginBottom="@dimen/fab_padding_bottom"-->
+            <!--android:layout_marginRight="@dimen/fab_padding_right"-->
+            <!--android:layout_gravity="bottom|right"-->
+            <!--android:layout_width="@dimen/fab_diagonal"-->
+            <!--android:layout_height="@dimen/fab_diagonal" />-->
 
     </android.support.design.widget.CoordinatorLayout>
 

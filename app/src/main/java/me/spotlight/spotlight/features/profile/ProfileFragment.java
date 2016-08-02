@@ -390,4 +390,13 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+
+    @OnClick(R.id.profile_send_feedback)
+    public void sendFeedback() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_EMAIL, "ryan@spotlight.me");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Spotlight user feedback");
+        startActivity(Intent.createChooser(intent, "Send feedback"));
+    }
 }

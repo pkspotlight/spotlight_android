@@ -81,8 +81,10 @@ public class TheaterActivity extends Activity {
     /*
         Intent manufacturing
      */
-    public static Intent getStartIntent(Context context) {
+    public static Intent getStartIntent(Context context, String reelPath, String musicPath) {
         Intent intent = new Intent(context, TheaterActivity.class);
+        intent.putExtra("reel", reelPath);
+        intent.putExtra("music", musicPath);
         return intent;
     }
 
@@ -160,10 +162,7 @@ public class TheaterActivity extends Activity {
                 Log.d("extracom", vidUri.toString());
                 Log.d("extracom", vidPath);
 
-                Picasso.with(getApplicationContext())
-                        .load(vidUri)
-                        .fit().centerCrop()
-                        .into(image);
+
             }
         }
     }

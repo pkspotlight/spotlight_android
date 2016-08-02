@@ -107,14 +107,14 @@ public class SpotlightsFragment extends Fragment
     }
 
 
-    public void addSpotlight() {
-        FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
-    }
-
-    @OnClick(R.id.fab_add_spotlight)
-    public void onFab() {
-        addSpotlight();
-    }
+//    public void addSpotlight() {
+//        FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
+//    }
+//
+//    @OnClick(R.id.fab_add_spotlight)
+//    public void onFab() {
+//        addSpotlight();
+//    }
 
 
     private void loadSpotlights() {
