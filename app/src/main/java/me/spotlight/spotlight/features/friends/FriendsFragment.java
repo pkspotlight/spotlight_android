@@ -205,6 +205,8 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
 
 
 
+
+
     // TODO: remove this
     private void addingFriends() {
 

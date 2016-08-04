@@ -56,7 +56,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.vov.vitamio.widget.VideoView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.utils.ParseConstants;
 import me.spotlight.spotlight.utils.PathUtils;
@@ -68,10 +67,8 @@ public class TheaterActivity extends Activity {
 
 
     private Uri uri;
-    @Bind(R.id.vid)
-    VideoView vid;
     @Bind(R.id.vid2)
-    android.widget.VideoView vid2;
+    android.widget.VideoView vid1;
     @Bind(R.id.image)
     ImageView image;
     public static final int REQUEST_PERMISSION_CAMERA = 52;
@@ -97,15 +94,15 @@ public class TheaterActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_theater);
         ButterKnife.bind(this);
-        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
+//        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
 
         getPermission();
 
 //        reelPath = getIntent().getExtras().getString("reelPath");
 //        musicPath = getIntent().getExtras().getString("musicPath");
 
-        vid.setVideoPath("/storage/sdcard/1470151215059in.mp4");
-        vid.start();
+//        vid.setVideoPath("/storage/sdcard/1470151215059in.mp4");
+//        vid.start();
     }
 
 
@@ -226,9 +223,9 @@ public class TheaterActivity extends Activity {
             Log.d("extracom", "mp4parse IOException");
         }
 
-
-        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/addedSound001.mp4");
-        vid.start();
+//
+//        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/addedSound001.mp4");
+//        vid.start();
     }
     private void pathToBytes(String vidPath) {
 
@@ -341,11 +338,11 @@ public class TheaterActivity extends Activity {
 
         } catch (IOException e) {}
 
-        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/trial666.mp4");
-        vid.start();
+//        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/trial666.mp4");
+//        vid.start();
 
-        vid2.setVideoPath(vidPath);
-        vid2.start();
+//        vid2.setVideoPath(vidPath);
+//        vid2.start();
     }
 
 

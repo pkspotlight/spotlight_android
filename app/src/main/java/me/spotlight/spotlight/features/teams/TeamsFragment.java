@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -46,6 +47,8 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
     List<Team> myTeams = new ArrayList<>();
     @Bind(R.id.swipe_teams)
     SwipeRefreshLayout swipeFriends;
+    @Bind(R.id.notification)
+    TextView notification;
 
     /*
         Manufacturing singleton
@@ -61,6 +64,11 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
         Bundle bundle = new Bundle();
         bundle.putString("objectId", team.getObjectId());
         FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
+    }
+
+    public void onRequestFollow(Team team) {
+        // do nothing
+
     }
 
     @Override
@@ -185,15 +193,56 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
                                     }
                                 }
                             }
+
                             myTeams.add(team);
                         }
                     }
                     myteamsAdapter.notifyDataSetChanged();
+
+                    checkNotifications();
+
                 } else {
                     // TODO: handle e
                 }
             }
         });
     }
+
+
+
+    private void checkNotifications() {
+        ParseQuery<ParseObject> notifyQuery = new ParseQuery<>(ParseConstants.OBJECT_TEAM_REQUEST);
+        notifyQuery.whereEqualTo("admin", ParseUser.getCurrentUser());
+        notifyQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        notification.setVisibility(View.VISIBLE);
+                        boolean more = objects.size() > 1 ? true : false;
+                        if (more)
+                            notification.setText("You have " + String.valueOf(objects.size()) + " pending requests.");
+                        else
+                            notification.setText("You have " + String.valueOf(objects.size()) + " pending request.");
+//                        Toast.makeText(getContext(), "Found something " + objects.get(0).getString("nameOfRequester") , Toast.LENGTH_LONG).show();
+                    } else {
+                        notification.setVisibility(View.GONE);
+//                        Toast.makeText(getContext(), "Found nothing", Toast.LENGTH_LONG).show();
+                    }
+
+
+
+                } else {
+//                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    @OnClick(R.id.notification)
+    public void showNotifications() {
+//        FragmentUtils.changeFragment(getActivity(), );
+    }
+
 
 }

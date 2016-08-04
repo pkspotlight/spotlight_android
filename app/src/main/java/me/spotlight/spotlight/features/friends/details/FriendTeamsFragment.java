@@ -52,6 +52,10 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
         FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
     }
 
+    public void onRequestFollow(Team team) {
+        // do nothing for now
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_friend_details_teams, container, false);

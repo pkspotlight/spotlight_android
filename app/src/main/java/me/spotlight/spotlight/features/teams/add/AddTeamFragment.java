@@ -33,6 +33,8 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
@@ -46,7 +48,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.base.BaseFragment;
+import me.spotlight.spotlight.features.teams.TeamsFragment;
 import me.spotlight.spotlight.utils.Constants;
+import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
@@ -251,7 +255,7 @@ public class AddTeamFragment extends Fragment {
     @OnClick(R.id.team_add_submit)
     public void submitTeam() {
         if (validate()) {
-            ParseObject mTeam = new ParseObject(ParseConstants.OBJECT_TEAM);
+            final ParseObject mTeam = new ParseObject(ParseConstants.OBJECT_TEAM);
             mTeam.put("teamName", teamAddName.getText().toString());
             mTeam.put("coach", teamAddCoach.getText().toString());
             mTeam.put("grade", teamAddGrade.getText().toString());
@@ -263,10 +267,14 @@ public class AddTeamFragment extends Fragment {
             if (null != pickedBitmap) {
                 // get bytes here
                 ParseFile teamLogo = new ParseFile("image.png", pickedBitmap);
-                ParseObject teamLogoMedia = new ParseObject("TeamLogoMedia");
+                ParseObject teamLogoMedia = new ParseObject(ParseConstants.OBJECT_TEAM_LOGO_MEDIA);
                 teamLogoMedia.put(ParseConstants.FIELD_OBJECT_MEDIA_FILE, teamLogo);
                 mTeam.put("teamLogoMedia", teamLogoMedia);
             }
+
+            mTeam.getRelation("moderators").add(ParseUser.getCurrentUser());
+
+
 
 
             mTeam.saveInBackground(new SaveCallback() {
@@ -274,10 +282,24 @@ public class AddTeamFragment extends Fragment {
                 public void done(ParseException e) {
                     if (null == e) {
                         Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
+                        updateRelation(mTeam);
                     }
                 }
             });
         }
+    }
+
+    private void updateRelation(final ParseObject mTeam) {
+        final ParseRelation<ParseObject> myteamsRelation = ParseUser.getCurrentUser().getRelation("teams");
+        myteamsRelation.add(mTeam);
+        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (null == e) {
+                    getActivity().onBackPressed();
+                }
+            }
+        });
     }
 
     private boolean validate() {

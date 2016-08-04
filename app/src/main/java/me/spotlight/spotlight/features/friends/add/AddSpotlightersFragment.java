@@ -1,7 +1,9 @@
 package me.spotlight.spotlight.features.friends.add;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,11 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +67,50 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
         Bundle bundle = new Bundle();
         bundle.putString("objectId", user.getObjectId());
         FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
+    }
+
+    public void onFollow(final User user) {
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.sure))
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        addRelation(user);
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+    private void addRelation(User user) {
+        ParseQuery<ParseUser> findUser = ParseUser.getCurrentUser().getQuery();
+        findUser.whereEqualTo("objectId", user.getObjectId());
+        findUser.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+//                Toast.makeText(getActivity(), "Found him!", Toast.LENGTH_LONG).show();
+                ParseRelation<ParseUser> rel = ParseUser.getCurrentUser().getRelation(ParseConstants.FIELD_USER_FRIENDS);
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        rel.add(objects.get(0));
+                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (null == e) {
+                                    Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
+                                    getActivity().onBackPressed();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     @Override

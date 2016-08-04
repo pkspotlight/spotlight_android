@@ -55,6 +55,10 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
         FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
     }
 
+    public void onFollow(User user) {
+        Toast.makeText(getActivity(), "Following" + user.getLastName() + " " + user.getFirstName(), Toast.LENGTH_LONG).show();
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_team_details_members, container, false);

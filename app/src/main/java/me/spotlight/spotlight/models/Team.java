@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class Team {
 
+    boolean mine;
     String objectId;
     String avatarUrl;
     String name;
@@ -24,6 +25,13 @@ public class Team {
     String year;
     List<User> moderators;
 
+    public boolean isMine() {
+        return mine;
+    }
+
+    public void setMine(boolean mine) {
+        this.mine = mine;
+    }
 
     public String getObjectId() {
         return objectId;

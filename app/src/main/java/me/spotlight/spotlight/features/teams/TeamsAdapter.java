@@ -34,6 +34,7 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
 
     public interface ActionListener {
         void onShowDetails(Team team);
+        void onRequestFollow(Team team);
     }
 
     public TeamsAdapter(Context context, List<Team> teams, ActionListener actionListener, boolean following) {
@@ -69,7 +70,12 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
                     .transform(round).into(teamHolder.teamAvatar);
         }
 
-
+        teamHolder.fol2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionListener.onRequestFollow(team);
+            }
+        });
 
         if (following)
             teamHolder.teamFollowing.setText("Following");
@@ -95,6 +101,8 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
 
     public class TeamHolder extends RecyclerView.ViewHolder {
 
+        @Bind(R.id.fol2)
+        View fol2;
         @Bind(R.id.team_avatar)
         ImageView teamAvatar;
         @Bind(R.id.team_name)

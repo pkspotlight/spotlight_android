@@ -6,6 +6,7 @@ package me.spotlight.spotlight.utils;
 public class ParseConstants {
 
     public static final String FIELD_USER_PIC = "profilePic";
+    public static final String FIELD_USER_FRIENDS = "friends";
     public static final String FIELD_OBJECT_MEDIA_FILE = "mediaFile";
     public static final String FIELD_OBJECT_THUMB_FILE = "thumbnailImageFile";
     public static final String FIELD_OBJECT_ID = "objectId";
@@ -22,4 +23,6 @@ public class ParseConstants {
     public static final String OBJECT_TEAM = "Team";
     public static final String OBJECT_SPOTLIGHT_MEDIA = "SpotlightMedia";
     public static final String OBJECT_SPOTLIGHT = "Spotlight";
+    public static final String OBJECT_TEAM_LOGO_MEDIA = "TeamLogoMedia";
+    public static final String OBJECT_TEAM_REQUEST = "TeamRequest";
 }

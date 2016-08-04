@@ -1,6 +1,7 @@
 package me.spotlight.spotlight.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,9 +25,13 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseSession;
 import com.parse.ParseUser;
+import com.parse.PushService;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +100,27 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().addOnBackStackChangedListener(backStackListener);
 
 
+//        try {
+//            ParseInstallation.getCurrentInstallation().delete();
+//        } catch (ParseException e) {}
+
+//        ParseUser.enableAutomaticUser();
+//        ParseInstallation.getCurrentInstallation().put("GCMSenderId", "606167943462");
+//        List<String> strings = new ArrayList<>();
+//        strings.add("global");
+//        ParseInstallation.getCurrentInstallation().put("channels", strings);
+//        ParseInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (null == e) {
+//                    Toast.makeText(getApplicationContext(), "S", Toast.LENGTH_LONG).show();
+//                } else {
+//
+//                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
+
         if (null == ParseUser.getCurrentUser()) {
             startActivity(LoginActivity.getStartIntent(getApplication()));
             finish();
@@ -124,16 +151,19 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         lastSelected = spotlights;
                         lastSelected.setSelected(true);
+//                        showSpotOnboarding();
                         (MainActivity.this).setTitle(getString(R.string.tabs_spotlights));
                         break;
                     case 1:
                         lastSelected = friends;
                         lastSelected.setSelected(true);
+//                        showFriendsOnboarding();
                         (MainActivity.this).setTitle(getString(R.string.tabs_friends));
                         break;
                     case 2:
                         lastSelected = teams;
                         lastSelected.setSelected(true);
+//                        showTeamsOnboarding();
                         (MainActivity.this).setTitle(getString(R.string.tabs_teams));
                         break;
                     case 3:
@@ -157,29 +187,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem item = menu.findItem(R.id.action_add);
-        QuickAction.addSpotlight = item;
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == android.R.id.home)
-            onBackPressed();
-        if (menuItem.getItemId() == R.id.action_add) {
-            FragmentUtils.changeFragment(this, R.id.content, AddSpotlightFragment.newInstance(), true);
-        }
-        return true;
-    }
-
-    @Override
     public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
             // do nothing
         } else {
             super.onBackPressed();
         }
+    }
+
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home)
+            onBackPressed();
+        return true;
     }
 
     /*
@@ -272,5 +291,43 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private void showSpotOnboarding() {
+        final AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
+                .setTitle(getString(R.string.welcome_spotlight))
+                .setMessage(getString(R.string.welcome_message))
+                .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
 
+    private void showTeamsOnboarding() {
+        final AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
+                .setMessage(getString(R.string.teams_message))
+                .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showFriendsOnboarding() {
+        final AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
+                .setMessage(getString(R.string.friends_message))
+                .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
 }

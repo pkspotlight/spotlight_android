@@ -10,6 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -133,6 +136,7 @@ public class SpotlightsFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         mySpotlightsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         spotlightsAdapter = new SpotlightsAdapter(getActivity(), mySpotlights, this);
         mySpotlightsList.setAdapter(spotlightsAdapter);
@@ -153,15 +157,35 @@ public class SpotlightsFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        if (null != QuickAction.addSpotlight) {
-            QuickAction.addSpotlight.setVisible(true);
+        Log.d("spotFrag", "onResume");
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.main, menu);
+        MenuItem item = menu.findItem(R.id.action_add);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home)
+            getActivity().onBackPressed();
+        if (menuItem.getItemId() == R.id.action_add) {
+            menuItem.setVisible(false);
+            FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
         }
+        return true;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        QuickAction.addSpotlight.setVisible(false);
+        Log.d("spotFrag", "onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("spotFrag", "onStop");
     }
 
 
@@ -193,7 +217,7 @@ public class SpotlightsFragment extends Fragment
 
 
     private void preloadSpotlightMedia() {
-        ParseQuery<ParseObject> mediaQ = new ParseQuery<>("SpotlightMedia");
+        ParseQuery<ParseObject> mediaQ = new ParseQuery<>(ParseConstants.OBJECT_SPOTLIGHT_MEDIA);
 //        mediaQ.whereEqualTo("isVideo", true);
         mediaQ.setLimit(420);
         mediaQ.findInBackground(new FindCallback<ParseObject>() {

@@ -56,6 +56,10 @@ public class AddSpotlightFragment extends Fragment implements TeamsAdapter.Actio
         FragmentUtils.changeFragment(getActivity(), R.id.content, FinishSpotlightFragment.newInstance(bundle), true);
     }
 
+    public void onRequestFollow(Team team) {
+        // do nothing for now
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_add_spotlight, container, false);

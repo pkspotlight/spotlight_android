@@ -1,7 +1,10 @@
 package me.spotlight.spotlight.features.teams.search;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,11 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,6 +66,10 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
         Bundle bundle = new Bundle();
         bundle.putString("objectId", team.getObjectId());
         FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
+    }
+
+    public void onRequestFollow(Team team) {
+        createRequest(team);
     }
 
     @Override
@@ -167,5 +179,125 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
                 }
             }
         });
+    }
+
+
+
+
+    private void createRequest(Team team) {
+        ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.OBJECT_TEAM);
+        query.whereEqualTo("objectId", team.getObjectId());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        final ParseObject team = objects.get(0);
+                        team.getRelation("moderators").getQuery().findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, ParseException e) {
+                                if (null == e) {
+                                    if (!objects.isEmpty()) {
+//                                        Toast.makeText(getContext(), objects.get(0).getObjectId(), Toast.LENGTH_LONG).show();
+                                        String adminUserId = objects.get(0).getObjectId();
+                                        finishRequest(team, adminUserId);
+                                    } else {
+//                                        Toast.makeText(getContext(), "empty", Toast.LENGTH_LONG).show();
+                                        final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                                .setMessage(getString(R.string.no_admin))
+                                                .setNegativeButton("Got it", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        dialogInterface.dismiss();
+                                                    }
+                                                })
+                                                .create();
+                                        dialog.show();
+                                    }
+                                } else {
+//                                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                    final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                            .setMessage(e.getMessage())
+                                            .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    dialogInterface.dismiss();
+                                                }
+                                            })
+                                            .create();
+                                    dialog.show();
+                                }
+                            }
+                        });
+
+                    }
+                }
+            }
+        });
+    }
+
+    private void finishRequest(final ParseObject team, String adminUserId) {
+
+        ParseQuery<ParseUser> reqQ = ParseUser.getQuery();
+        reqQ.whereEqualTo("objectId", adminUserId);
+        reqQ.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        final ParseUser admin = objects.get(0);
+                        ParseObject parseObject = new ParseObject(ParseConstants.OBJECT_TEAM_REQUEST);
+
+                        if (null != ParseUser.getCurrentUser().getParseObject("profilePic")) {
+                            ParseObject profilePic = ParseUser.getCurrentUser().getParseObject("profilePic");
+                            try {
+                                profilePic.fetchIfNeeded();
+                            } catch (ParseException ee) {}
+
+                            parseObject.put("PicOfRequester", profilePic);
+                            parseObject.put("admin", admin);
+                            parseObject.put("nameOfRequester", ParseUser.getCurrentUser().getString("firstName") + " "
+                                    + ParseUser.getCurrentUser().getString("lastName"));
+                            parseObject.put("team", team);
+                            parseObject.put("teamName", team.getString("teamName"));
+                            parseObject.put("timeStamp", String.valueOf(System.currentTimeMillis()));
+                            parseObject.put("user", ParseUser.getCurrentUser());
+                            parseObject.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (null == e) {
+//                                        Toast.makeText(getContext(), "Request created", Toast.LENGTH_LONG).show();
+                                        final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                                                .setMessage("The request to follow has been sent")
+                                                .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        dialogInterface.dismiss();
+                                                        getActivity().onBackPressed();
+                                                    }
+                                                })
+                                                .create();
+                                        dialog.show();
+                                    } else {
+                                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+
+                        }
+
+
+
+                    } else {
+                        Toast.makeText(getContext(), "empty", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
+
     }
 }
