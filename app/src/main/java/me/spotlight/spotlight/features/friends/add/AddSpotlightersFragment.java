@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,16 +115,34 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
         });
     }
 
+
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        progressBar.setVisibility(View.GONE);
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         usersAdapter = new UsersAdapter(getActivity(), users);
         usersAdapter.setActionListener(this);
         usersList.setAdapter(usersAdapter);
+        searchFriends.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
 
-        loadUsers();
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                loadUsers(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                //
+            }
+        });
+
+//        loadUsers();
     }
 
     @Override
@@ -138,12 +158,13 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
             friendsThread.interrupt();
     }
 
-    private void loadUsers() {
+    private void loadUsers(String param) {
         if (!users.isEmpty())
             users.clear();
         progressBar.setVisibility(View.VISIBLE);
         ParseQuery<ParseUser> usersQuery = ParseUser.getCurrentUser().getQuery();
-        usersQuery.setLimit(40);
+        usersQuery.whereStartsWith("firstName", param);
+        usersQuery.setLimit(12);
         usersQuery.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(final List<ParseUser> objects, ParseException e) {

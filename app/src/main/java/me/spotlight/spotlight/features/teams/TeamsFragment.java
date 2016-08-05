@@ -31,6 +31,7 @@ import butterknife.OnClick;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.features.teams.add.AddTeamFragment;
 import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
+import me.spotlight.spotlight.features.teams.requests.RequestsFragment;
 import me.spotlight.spotlight.features.teams.search.SearchTeamsFragment;
 import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
@@ -114,7 +115,6 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
 
     @OnClick(R.id.fab_add_teams)
     public void onFab() {
-
         final AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle(getString(R.string.teams_dialog))
                 .setItems(getResources().getTextArray(R.array.teams_add), new DialogInterface.OnClickListener() {
@@ -140,7 +140,6 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
                 })
                 .create();
         dialog.show();
-
     }
 
 
@@ -210,6 +209,11 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
 
 
 
+
+    /*
+        Requests functionality
+     */
+
     private void checkNotifications() {
         ParseQuery<ParseObject> notifyQuery = new ParseQuery<>(ParseConstants.OBJECT_TEAM_REQUEST);
         notifyQuery.whereEqualTo("admin", ParseUser.getCurrentUser());
@@ -241,7 +245,8 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
 
     @OnClick(R.id.notification)
     public void showNotifications() {
-//        FragmentUtils.changeFragment(getActivity(), );
+        Bundle bundle = new Bundle();
+        FragmentUtils.changeFragment(getActivity(), R.id.content, RequestsFragment.newInstance(bundle), true);
     }
 
 

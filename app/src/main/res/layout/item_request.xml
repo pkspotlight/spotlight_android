@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_margin="12dp"
+        android:id="@+id/requester_avatar"
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
+
+
+
+    <TextView
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/requester_text"
+        android:text="wants to follow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <LinearLayout
+        android:layout_gravity="end|bottom"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+
+        <TextView
+            android:padding="3dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="12dp"
+            android:textAlignment="center"
+            android:background="@drawable/btn_accept"
+            android:text="Decline"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:id="@+id/request_decline"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:padding="3dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="12dp"
+            android:textAlignment="center"
+            android:background="@drawable/btn_decline"
+            android:text="Accept"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:id="@+id/request_accept"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</FrameLayout>

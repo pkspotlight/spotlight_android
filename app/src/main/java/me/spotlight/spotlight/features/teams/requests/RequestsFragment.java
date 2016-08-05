@@ -2,6 +2,7 @@ package me.spotlight.spotlight.features.teams.requests;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +18,12 @@ import me.spotlight.spotlight.models.TeamRequest;
 /**
  * Created by Anatol on 8/4/2016.
  */
-public class RequestsFragment extends Fragment {
+public class RequestsFragment extends Fragment implements RequestAdapter.ActionListener {
 
     @Bind(R.id.recycler_view_requests)
     RecyclerView recyclerView;
     ArrayList<TeamRequest> requests = new ArrayList<>();
+    RequestAdapter requestAdapter;
 
     /*
         Manufacturing singleton
@@ -30,6 +32,16 @@ public class RequestsFragment extends Fragment {
         RequestsFragment requestsFragment = new RequestsFragment();
         requestsFragment.setArguments(bundle);
         return requestsFragment;
+    }
+
+    @Override
+    public void onAccept(TeamRequest teamRequest) {
+        //
+    }
+
+    @Override
+    public void onDecline(TeamRequest teamRequest) {
+        //
     }
 
     @Override
@@ -42,7 +54,9 @@ public class RequestsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        requestAdapter = new RequestAdapter(getActivity(), requests, this);
+        recyclerView.setAdapter(requestAdapter);
     }
 
     @Override

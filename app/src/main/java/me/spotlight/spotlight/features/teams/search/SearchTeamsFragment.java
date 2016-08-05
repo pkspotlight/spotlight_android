@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,12 +84,28 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        progressBar.setVisibility(View.GONE);
         teamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         teamsAdapter = new TeamsAdapter(getActivity(), teams, this, false);
         teamsList.setAdapter(teamsAdapter);
+        searchTeams.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
 
-        loadTeams();
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                loadTeams(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                //
+            }
+        });
+
+//        loadTeams();
     }
 
     @Override
@@ -103,12 +121,13 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
             teamsThread.interrupt();
     }
 
-    private void loadTeams() {
+    private void loadTeams(String param) {
         if (!teams.isEmpty())
             teams.clear();
         progressBar.setVisibility(View.VISIBLE);
         final ParseQuery<ParseObject> teamsQuery = new ParseQuery<ParseObject>(ParseConstants.OBJECT_TEAM);
-        teamsQuery.setLimit(30);
+        teamsQuery.whereStartsWith("teamName", param);
+        teamsQuery.setLimit(12);
         teamsQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(final List<ParseObject> objects, ParseException e) {
@@ -183,6 +202,9 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
 
 
 
+    /*
+        Requests functionality
+     */
 
     private void createRequest(Team team) {
         ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.OBJECT_TEAM);
