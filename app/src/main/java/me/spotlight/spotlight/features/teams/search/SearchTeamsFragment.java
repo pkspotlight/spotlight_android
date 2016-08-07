@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -53,6 +54,8 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
     @Bind(R.id.progress)
     ProgressBar progressBar;
     Thread teamsThread;
+    @Bind(R.id.nodata)
+    View nodata;
 
     /*
         Manufacturing singleton
@@ -87,6 +90,7 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
         progressBar.setVisibility(View.GONE);
         teamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         teamsAdapter = new TeamsAdapter(getActivity(), teams, this, false);
+        teamsAdapter.registerAdapterDataObserver(adapterDataObserver);
         teamsList.setAdapter(teamsAdapter);
         searchTeams.addTextChangedListener(new TextWatcher() {
             @Override
@@ -96,7 +100,14 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                loadTeams(charSequence.toString());
+
+                if ("".equals(charSequence.toString())) {
+                    teams.clear();
+                    teamsAdapter.notifyDataSetChanged();
+                } else {
+                    loadTeams(charSequence.toString());
+                }
+
             }
 
             @Override
@@ -322,4 +333,20 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
 
 
     }
+
+
+    /*
+    Showing the "no data" block if there's no data
+ */
+    RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {
+        @Override
+        public void onChanged() {
+            super.onChanged();
+            if (teams.isEmpty()) {
+                nodata.setVisibility(View.VISIBLE);
+            } else {
+                nodata.setVisibility(View.GONE);
+            }
+        }
+    };
 }

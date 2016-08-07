@@ -17,8 +17,9 @@
 
 
         <android.support.design.widget.FloatingActionButton
+            android:visibility="gone"
             android:id="@+id/fab_add_spotlighters"
-            android:src="@android:drawable/ic_menu_add"
+            android:src="@drawable/plus_white"
             android:layout_marginBottom="@dimen/fab_padding_bottom"
             android:layout_marginRight="@dimen/fab_padding_right"
             android:layout_gravity="bottom|right"

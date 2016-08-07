@@ -6,10 +6,18 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:layout_gravity="center"
         android:padding="12dp"
-        android:text="Select a team: "
+        android:textSize="16sp"
+        android:text="Select a Team"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+
+    <View
+        android:background="@android:color/background_dark"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_add_spotlight"

@@ -1,6 +1,7 @@
 package me.spotlight.spotlight.features.spotlights;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -157,23 +158,43 @@ public class SpotlightsFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("spotFrag", "onResume");
+        getActivity().setTitle(getString(R.string.tabs_spotlights));
+        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first")) {
+            // dont show
+        } else {
+            final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle(getString(R.string.welcome_spotlight))
+                    .setMessage(getString(R.string.welcome_message))
+                    .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create();
+            dialog.show();
+            getActivity().getPreferences(Context.MODE_PRIVATE).edit().putBoolean("first", true).commit();
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.main, menu);
-        MenuItem item = menu.findItem(R.id.action_add);
+//        final MenuItem item = menu.findItem(R.id.action_add);
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == android.R.id.home)
-            getActivity().onBackPressed();
+        boolean ret = true;
+        if (menuItem.getItemId() == android.R.id.home) {
+            ret = false;
+        }
         if (menuItem.getItemId() == R.id.action_add) {
             menuItem.setVisible(false);
-            FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
+//            FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
+            FragmentUtils.addFragment(getActivity(), R.id.content, this, AddSpotlightFragment.newInstance(), true);
+            ret = true;
         }
-        return true;
+        return ret;
     }
 
     @Override

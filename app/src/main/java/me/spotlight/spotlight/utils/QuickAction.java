@@ -7,4 +7,6 @@ import android.view.MenuItem;
  */
 public class QuickAction {
 
+    public static MenuItem menuItem;
+
 }

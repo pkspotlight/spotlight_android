@@ -17,11 +17,11 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/notification"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
-                android:text="@string/req"
                 android:background="@android:color/holo_red_dark"
                 android:layout_width="match_parent"
                 android:layout_height="32dp"/>
@@ -35,8 +35,9 @@
 
 
         <android.support.design.widget.FloatingActionButton
+            android:visibility="gone"
             android:id="@+id/fab_add_teams"
-            android:src="@android:drawable/ic_menu_add"
+            android:src="@drawable/plus_white"
             android:layout_marginBottom="@dimen/fab_padding_bottom"
             android:layout_marginRight="@dimen/fab_padding_right"
             android:layout_gravity="bottom|right"

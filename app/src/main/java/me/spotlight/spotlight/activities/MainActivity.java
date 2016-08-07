@@ -127,60 +127,63 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        tabViews.add(SpotlightsFragment.newInstance());
-        tabViews.add(FriendsFragment.newInstance());
-        tabViews.add(TeamsFragment.newInstance());
-        tabViews.add(ProfileFragment.newInstance());
+//        tabViews.add(SpotlightsFragment.newInstance());
+//        tabViews.add(FriendsFragment.newInstance());
+//        tabViews.add(TeamsFragment.newInstance());
+//        tabViews.add(ProfileFragment.newInstance());
+//
+//
+//        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+////        mViewPager = new CustomViewPager(getApplicationContext());
+//        mViewPager.setPagingEnabled(false);
+//        mViewPager.setAdapter(mPagerAdapter);
+//        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//
+//            }
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//                Log.d("debug", "Selected ViewPager page number" + position);
+//                lastSelected.setSelected(false);
+//                switch (position) {
+//                    case 0:
+//                        lastSelected = spotlights;
+//                        lastSelected.setSelected(true);
+////                        showSpotOnboarding();
+//                        (MainActivity.this).setTitle(getString(R.string.tabs_spotlights));
+//                        break;
+//                    case 1:
+//                        lastSelected = friends;
+//                        lastSelected.setSelected(true);
+////                        showFriendsOnboarding();
+//                        (MainActivity.this).setTitle(getString(R.string.tabs_friends));
+//                        break;
+//                    case 2:
+//                        lastSelected = teams;
+//                        lastSelected.setSelected(true);
+////                        showTeamsOnboarding();
+//                        (MainActivity.this).setTitle(getString(R.string.tabs_teams));
+//                        break;
+//                    case 3:
+//                        lastSelected = profile;
+//                        lastSelected.setSelected(true);
+//                        (MainActivity.this).setTitle(getString(R.string.tabs_profile));
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//
+//            }
+//        });
 
 
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-//        mViewPager = new CustomViewPager(getApplicationContext());
-        mViewPager.setPagingEnabled(false);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.d("debug", "Selected ViewPager page number" + position);
-                lastSelected.setSelected(false);
-                switch (position) {
-                    case 0:
-                        lastSelected = spotlights;
-                        lastSelected.setSelected(true);
-//                        showSpotOnboarding();
-                        (MainActivity.this).setTitle(getString(R.string.tabs_spotlights));
-                        break;
-                    case 1:
-                        lastSelected = friends;
-                        lastSelected.setSelected(true);
-//                        showFriendsOnboarding();
-                        (MainActivity.this).setTitle(getString(R.string.tabs_friends));
-                        break;
-                    case 2:
-                        lastSelected = teams;
-                        lastSelected.setSelected(true);
-//                        showTeamsOnboarding();
-                        (MainActivity.this).setTitle(getString(R.string.tabs_teams));
-                        break;
-                    case 3:
-                        lastSelected = profile;
-                        lastSelected.setSelected(true);
-                        (MainActivity.this).setTitle(getString(R.string.tabs_profile));
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        FragmentUtils.changeFragment(this, R.id.inner_content, SpotlightsFragment.newInstance(), false);
 
         lastSelected = spotlights;
         spotlights.setSelected(true);
@@ -195,10 +198,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
+
+
+
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == android.R.id.home)
+        boolean ret = false;
+        if (menuItem.getItemId() == android.R.id.home) {
             onBackPressed();
-        return true;
+            ret = true;
+        }
+        if (menuItem.getItemId() == R.id.action_add) {
+            ret = false;
+        }
+        return ret;
     }
 
     /*
@@ -209,25 +223,25 @@ public class MainActivity extends AppCompatActivity {
         public void onBackStackChanged() {
             getSupportActionBar()
                     .setDisplayHomeAsUpEnabled(getSupportFragmentManager().getBackStackEntryCount() > 0);
-            mViewPager.setPagingEnabled(!(getSupportFragmentManager().getBackStackEntryCount() > 0));
-            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                switch (mViewPager.getCurrentItem()) {
-                    case 0:
-                        setTitle(getString(R.string.tabs_spotlights));
-                        break;
-                    case 1:
-                        setTitle(getString(R.string.tabs_friends));
-                        break;
-                    case 2:
-                        setTitle(getString(R.string.tabs_teams));
-                        break;
-                    case 3:
-                        setTitle(getString(R.string.tabs_profile));
-                        break;
-                    default:
-                        break;
-                }
-            }
+//            mViewPager.setPagingEnabled(!(getSupportFragmentManager().getBackStackEntryCount() > 0));
+//            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+//                switch (mViewPager.getCurrentItem()) {
+//                    case 0:
+//                        setTitle(getString(R.string.tabs_spotlights));
+//                        break;
+//                    case 1:
+//                        setTitle(getString(R.string.tabs_friends));
+//                        break;
+//                    case 2:
+//                        setTitle(getString(R.string.tabs_teams));
+//                        break;
+//                    case 3:
+//                        setTitle(getString(R.string.tabs_profile));
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
         }
     };
 
@@ -268,19 +282,23 @@ public class MainActivity extends AppCompatActivity {
         switch (view.getId()) {
 
             case R.id.btn_tab_spotlights:
-                mViewPager.setCurrentItem(0);
+//                mViewPager.setCurrentItem(0);
+                FragmentUtils.changeFragment(this, R.id.inner_content, SpotlightsFragment.newInstance(), false);
                 (MainActivity.this).setTitle(getString(R.string.tabs_spotlights));
                 break;
             case R.id.btn_tab_friends:
-                mViewPager.setCurrentItem(1);
+//                mViewPager.setCurrentItem(1);
+                FragmentUtils.changeFragment(this, R.id.inner_content, FriendsFragment.newInstance(), false);
                 (MainActivity.this).setTitle(getString(R.string.tabs_friends));
                 break;
             case R.id.btn_tab_teams:
-                mViewPager.setCurrentItem(2);
+//                mViewPager.setCurrentItem(2);
+                FragmentUtils.changeFragment(this, R.id.inner_content, TeamsFragment.newInstance(), false);
                 (MainActivity.this).setTitle(getString(R.string.tabs_teams));
                 break;
             case R.id.btn_tab_profile:
-                mViewPager.setCurrentItem(3);
+//                mViewPager.setCurrentItem(3);
+                FragmentUtils.changeFragment(this, R.id.inner_content, ProfileFragment.newInstance(), false);
                 (MainActivity.this).setTitle(getString(R.string.tabs_profile));
                 break;
             default:
@@ -291,36 +309,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void showSpotOnboarding() {
-        final AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
-                .setTitle(getString(R.string.welcome_spotlight))
-                .setMessage(getString(R.string.welcome_message))
-                .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
-    }
-
     private void showTeamsOnboarding() {
         final AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
                 .setMessage(getString(R.string.teams_message))
-                .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
-    }
-
-    private void showFriendsOnboarding() {
-        final AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
-                .setMessage(getString(R.string.friends_message))
                 .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

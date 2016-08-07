@@ -62,5 +62,6 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
     @Override
     public void onResume() {
         super.onResume();
+        getActivity().setTitle("Requests");
     }
 }

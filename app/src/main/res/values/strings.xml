@@ -63,7 +63,9 @@
     <string name="friends_message">This is where you can find all of your friends or teammates and follow their activity. \n\nClick on the + button to search for friends.</string>
 
     <string name="sure">Are you sure?</string>
-    <string name="req">You have 2 pending requests</string>
+    <string name="req">You have no pending requests</string>
     <string name="no_admin">This team currently has no admin. \n\nPlease try again later.</string>
+
+    <string name="nodata">No Search Results</string>
 
 </resources>

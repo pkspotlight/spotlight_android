@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -47,6 +48,8 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
     @Bind(R.id.progress)
     ProgressBar progressBar;
     Thread friendsThread;
+    @Bind(R.id.nodata)
+    View nodata;
 
     /*
         Manufacturing singleton
@@ -123,6 +126,7 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
         progressBar.setVisibility(View.GONE);
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         usersAdapter = new UsersAdapter(getActivity(), users);
+        usersAdapter.registerAdapterDataObserver(adapterDataObserver);
         usersAdapter.setActionListener(this);
         usersList.setAdapter(usersAdapter);
         searchFriends.addTextChangedListener(new TextWatcher() {
@@ -133,7 +137,12 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                loadUsers(charSequence.toString());
+                if ("".equals(charSequence.toString())) {
+                    users.clear();
+                    usersAdapter.notifyDataSetChanged();
+                } else {
+                    loadUsers(charSequence.toString());
+                }
             }
 
             @Override
@@ -224,4 +233,20 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
             }
         });
     }
+
+
+    /*
+        Showing the "no data" block if there's no data
+    */
+    RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {
+        @Override
+        public void onChanged() {
+            super.onChanged();
+            if (users.isEmpty()) {
+                nodata.setVisibility(View.VISIBLE);
+            } else {
+                nodata.setVisibility(View.GONE);
+            }
+        }
+    };
 }

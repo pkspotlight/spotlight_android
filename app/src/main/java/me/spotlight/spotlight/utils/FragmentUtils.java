@@ -57,6 +57,18 @@ public class FragmentUtils {
     }
 
 
+
+
+    public static void addFragment(FragmentActivity activity, int contentFrame, Fragment fragmentRemove,
+                                        Fragment fragmentAdd, boolean addToBackStack) {
+        FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+        ft.remove(fragmentRemove);
+        ft.add(contentFrame, fragmentAdd);
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+
     /*
         Pop backstack fragment manager
      */

@@ -1,6 +1,7 @@
 package me.spotlight.spotlight.features.friends;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -80,6 +84,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         friendsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendsAdapter = new FriendsAdapter(getActivity(), friends);
         friendsAdapter.setActionListener(this);
@@ -101,14 +106,55 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
     @Override
     public void onResume() {
         super.onResume();
+        getActivity().setTitle(getString(R.string.tabs_friends));
+        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first2")) {
+            //don't show
+        } else {
+            final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setMessage(getString(R.string.friends_message))
+                    .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create();
+            dialog.show();
+            getActivity().getPreferences(Context.MODE_PRIVATE).edit().putBoolean("first2", true).commit();
+        }
     }
 
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.main, menu);
+//        final MenuItem item = menu.findItem(R.id.action_add);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        boolean ret = true;
+        if (menuItem.getItemId() == android.R.id.home) {
+            ret = false;
+        }
+        if (menuItem.getItemId() == R.id.action_add) {
+            menuItem.setVisible(false);
+            onFab();
+            ret = true;
+        }
+        return ret;
+    }
+
+
+
     public void addSpotlighters() {
-        FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightersFragment.newInstance(), true);
+//        FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightersFragment.newInstance(), true);
+        FragmentUtils.addFragment(getActivity(), R.id.content, this, AddSpotlightersFragment.newInstance(), true);
     }
 
     public void addFamily() {
-        FragmentUtils.changeFragment(getActivity(), R.id.content, AddFamilyFragment.newInstance(), true);
+//        FragmentUtils.changeFragment(getActivity(), R.id.content, AddFamilyFragment.newInstance(), true);
+        FragmentUtils.addFragment(getActivity(), R.id.content, this, AddFamilyFragment.newInstance(), true);
     }
 
     @OnClick(R.id.fab_add_spotlighters)

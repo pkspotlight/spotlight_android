@@ -5,6 +5,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +19,8 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.Bind;
@@ -25,8 +30,10 @@ import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.teams.TeamsAdapter;
 import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
 import me.spotlight.spotlight.models.Team;
+import me.spotlight.spotlight.utils.Constants;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
+import me.spotlight.spotlight.utils.QuickAction;
 
 /**
  * Created by Anatol on 7/11/2016.
@@ -90,8 +97,6 @@ public class AddSpotlightFragment extends Fragment implements TeamsAdapter.Actio
     }
 
 
-
-
     private void loadTeams() {
         if (!pickTeams.isEmpty())
             pickTeams.clear();
@@ -144,11 +149,61 @@ public class AddSpotlightFragment extends Fragment implements TeamsAdapter.Actio
                             pickTeams.add(team);
                         }
                     }
+
+                    Collections.sort(pickTeams, comparator);
                     teamsAdapter.notifyDataSetChanged();
+
+
                 } else {
                     // TODO: handle e
                 }
             }
         });
+    }
+
+
+    Comparator<Team> comparator = new Comparator<Team>() {
+        @Override
+        public int compare(Team team1, Team team2) {
+            int result = 0;
+
+            String year1 = team1.getYear();
+            String year2 = team2.getYear();
+
+            if (year1.equals(year2)) {
+                String season1 = team1.getSeason();
+                String season2 = team2.getSeason();
+                if (season1.equals(season2)) {
+                    result = 0;
+                } else {
+                    int priority1 = getSeasonPriority(season1);
+                    int priority2 = getSeasonPriority(season2);
+                    result = priority2 - priority1;
+                }
+            } else {
+                result = (int) Integer.valueOf(year2) - Integer.valueOf(year1);
+            }
+
+
+
+            return result;
+        }
+    };
+
+    private int getSeasonPriority(String season) {
+        switch (season) {
+            case Constants.SEASON_FALL:
+                return 1;
+            case Constants.SEASON_WINTER:
+                return 4;
+            case Constants.SEASON_SPRING:
+                return 3;
+            case Constants.SEASON_SUMMER:
+                return 2;
+            default:
+                //
+                break;
+        }
+        return 0;
     }
 }
