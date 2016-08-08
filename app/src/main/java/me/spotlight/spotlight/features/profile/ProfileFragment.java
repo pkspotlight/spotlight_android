@@ -25,6 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -176,6 +177,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void done(ParseException e) {
                 if (null == e) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
                     refresh();
                 } else {
                     Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();

@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -262,7 +263,9 @@ public class AddFamilyFragment extends Fragment {
                 @Override
                 public void done(ParseException e) {
                     if (null == e) {
-                        Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
+                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+//                        Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
                         getActivity().onBackPressed();
                     } else {
                         Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
