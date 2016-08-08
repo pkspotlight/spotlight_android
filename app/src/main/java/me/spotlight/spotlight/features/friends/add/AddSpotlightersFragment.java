@@ -92,6 +92,7 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                 .create();
         dialog.show();
     }
+
     private void addRelation(User user) {
         ParseQuery<ParseUser> findUser = ParseUser.getCurrentUser().getQuery();
         findUser.whereEqualTo("objectId", user.getObjectId());

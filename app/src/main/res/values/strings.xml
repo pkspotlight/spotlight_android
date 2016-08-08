@@ -68,5 +68,6 @@
 
     <string name="nodata">No Search Results</string>
     <string name="follow_sure">Are you sure?</string>
+    <string name="please_wait">Please wait...</string>
 
 </resources>

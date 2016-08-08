@@ -34,6 +34,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
 
     public interface ActionListener {
         void onShowDetails(Friend friend);
+        void onUnfollow(Friend friend);
     }
 
     public void setActionListener(ActionListener actionListener) {
@@ -80,6 +81,13 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
         // for now always showing -- later introduce a boolean
         friendHolder.friendFollowing.setVisibility(View.VISIBLE);
 
+        friendHolder.fol.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionListener.onUnfollow(friend);
+            }
+        });
+
         friendHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,6 +112,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
         TextView friendName;
         @Bind(R.id.friend_following)
         TextView friendFollowing;
+        @Bind(R.id.fol)
+        View fol;
 
         public FriendHolder(View itemView) {
             super(itemView);

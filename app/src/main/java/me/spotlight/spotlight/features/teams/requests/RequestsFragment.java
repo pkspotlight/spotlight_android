@@ -15,7 +15,9 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +50,93 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
     }
 
     @Override
-    public void onAccept(TeamRequest teamRequest) {
-        Toast.makeText(getContext(), "changing the request state to accepted " + teamRequest.getObjectId(), Toast.LENGTH_LONG).show();
+    public void onAccept(final TeamRequest teamRequest) {
+//        Toast.makeText(getContext(), "changing the request state to accepted " + teamRequest.getObjectId(), Toast.LENGTH_LONG).show();
+        ParseQuery<ParseObject> requestQuery = new ParseQuery<>(ParseConstants.OBJECT_TEAM_REQUEST);
+        requestQuery.whereEqualTo("objectId", teamRequest.getObjectId());
+        requestQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        ParseObject parseObject = objects.get(0);
+                        parseObject.put("requestState", 2);
+                        parseObject.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (null == e) {
+                                    addRelation(teamRequest.getRequesterObjId(), teamRequest.getTeamObjectId());
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    private void addRelation(String reqId, final String teamId) {
+        ParseQuery<ParseUser> userParseQuery = ParseUser.getCurrentUser().getQuery();
+        userParseQuery.whereEqualTo("objectId", reqId);
+        userParseQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        final ParseUser parseUser = objects.get(0);
+                        final ParseRelation<ParseObject> parseRelation = parseUser.getRelation("teams");
+
+                        ParseQuery<ParseObject> teamQuery = new ParseQuery<ParseObject>(ParseConstants.OBJECT_TEAM);
+                        teamQuery.whereEqualTo("objectId", teamId);
+                        teamQuery.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, ParseException e) {
+                                if (null == e) {
+                                    if (!objects.isEmpty()) {
+                                        ParseObject team = objects.get(0);
+                                        parseRelation.add(team);
+                                        parseUser.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                if (null == e) {
+                                                    getActivity().onBackPressed();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void onDecline(TeamRequest teamRequest) {
-        Toast.makeText(getContext(), "changing the request state to declined " + teamRequest.getObjectId(), Toast.LENGTH_LONG).show();
+//        Toast.makeText(getContext(), "changing the request state to declined " + teamRequest.getObjectId(), Toast.LENGTH_LONG).show();
+        ParseQuery<ParseObject> requestQuery = new ParseQuery<>(ParseConstants.OBJECT_TEAM_REQUEST);
+        requestQuery.whereEqualTo("objectId", teamRequest.getObjectId());
+        requestQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        ParseObject parseObject = objects.get(0);
+                        parseObject.put("requestState", 2);
+                        parseObject.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (null == e) {
+                                    getActivity().onBackPressed();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -104,6 +186,10 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
                                 // avatar url
                                 parseObject.fetchIfNeeded();
                                 ParseObject pic = parseObject.getParseObject("PicOfRequester");
+                                ParseObject team = parseObject.getParseObject("team");
+                                team.fetchIfNeeded();
+                                ParseUser requester = parseObject.getParseUser("user");
+                                requester.fetchIfNeeded();
                                 pic.fetchIfNeeded();
                                 ParseFile picFile = pic.getParseFile("mediaFile");
                                 teamRequest.setObjectId(parseObject.getObjectId());
@@ -112,6 +198,10 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
                                 teamRequest.setRequesterName(parseObject.getString("nameOfRequester"));
                                 teamRequest.setState((int) parseObject.getNumber("requestState"));
                                 teamRequest.setTeamName(parseObject.getString("teamName"));
+                                // requester id
+                                teamRequest.setRequesterObjId(requester.getObjectId());
+                                // team id
+                                teamRequest.setTeamObjectId(team.getObjectId());
 
                                 if ((int) parseObject.getNumber("requestState") != 1) {
                                     requests.add(teamRequest);

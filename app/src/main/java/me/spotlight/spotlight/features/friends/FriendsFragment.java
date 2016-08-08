@@ -74,6 +74,63 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
         FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
     }
 
+    public void onUnfollow(final Friend friend) {
+        final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setMessage(R.string.follow_sure)
+                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        unfollow(friend);
+                    }
+                })
+                .setPositiveButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void unfollow(Friend friend) {
+        final ProgressDialog progress = new ProgressDialog(getContext());
+        progress.setMessage(getString(R.string.please_wait));
+        progress.setCancelable(false);
+        progress.show();
+        ParseQuery<ParseUser> friendQuery = ParseUser.getCurrentUser().getQuery();
+        friendQuery.whereEqualTo("objectId", friend.getObjectId());
+        friendQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        ParseRelation<ParseUser> friendsRel = ParseUser.getCurrentUser().getRelation("friends");
+                        friendsRel.remove(objects.get(0));
+                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+
+                                if (null == e) {
+                                    // refresh
+                                    progress.dismiss();
+                                    loadFriends();
+                                } else {
+                                    progress.dismiss();
+                                }
+                            }
+                        });
+                    } else {
+                        progress.dismiss();
+                    }
+                } else {
+                    progress.dismiss();
+                }
+            }
+        });
+    }
+
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_friends, container, false);
