@@ -63,8 +63,11 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
             avatarUrl = team.getAvatarUrl();
         // TODO: introduce is valid url check
         if (!"".equals(avatarUrl)) {
-            Picasso.with(context).load(avatarUrl).fit().centerCrop()
-                    .transform(round).into(teamHolder.teamAvatar);
+            Picasso.with(context)
+                    .load(avatarUrl)
+                    .fit().centerCrop()
+                    .transform(round)
+                    .into(teamHolder.teamAvatar);
         } else {
             Picasso.with(context).load(R.drawable.unknown_user).fit().centerCrop()
                     .transform(round).into(teamHolder.teamAvatar);

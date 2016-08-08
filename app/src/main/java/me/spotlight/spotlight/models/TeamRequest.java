@@ -6,8 +6,10 @@ package me.spotlight.spotlight.models;
 public class TeamRequest {
 
     String avatarUrl;
+    String objectId;
     int state;
     String requesterName;
+    String teamName;
 
 
     public String getAvatarUrl() {
@@ -32,5 +34,21 @@ public class TeamRequest {
 
     public void setRequesterName(String requesterName) {
         this.requesterName = requesterName;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
     }
 }

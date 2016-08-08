@@ -73,8 +73,24 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
         FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
     }
 
-    public void onRequestFollow(Team team) {
-        createRequest(team);
+    public void onRequestFollow(final Team team) {
+        final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setMessage(R.string.follow_sure)
+                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        createRequest(team);
+                    }
+                })
+                .setPositiveButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 
     @Override
@@ -289,6 +305,7 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
 
                             parseObject.put("PicOfRequester", profilePic);
                             parseObject.put("admin", admin);
+                            parseObject.put("requestState", 0);
                             parseObject.put("nameOfRequester", ParseUser.getCurrentUser().getString("firstName") + " "
                                     + ParseUser.getCurrentUser().getString("lastName"));
                             parseObject.put("team", team);

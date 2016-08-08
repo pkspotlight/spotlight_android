@@ -20,6 +20,9 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -52,8 +55,10 @@ import butterknife.OnClick;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.activities.LoginActivity;
 import me.spotlight.spotlight.base.BaseFragment;
+import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.models.User;
 import me.spotlight.spotlight.utils.Constants;
+import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
@@ -72,11 +77,11 @@ public class ProfileFragment extends Fragment {
     @Bind(R.id.profile_username)
     TextView profileUsername;
     @Bind(R.id.profile_first)
-    TextView profileFirst;
+    EditText profileFirst;
     @Bind(R.id.profile_last)
-    TextView profileLast;
+    EditText profileLast;
     @Bind(R.id.profile_hometown)
-    TextView profileHometown;
+    EditText profileHometown;
     @Bind(R.id.profile_family)
     TextView profileFamily;
 
@@ -100,7 +105,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        setHasOptionsMenu(true);
         currentUser = ParseUser.getCurrentUser();
 
         round = new RoundedTransformationBuilder().oval(true).build();
@@ -117,7 +122,25 @@ public class ProfileFragment extends Fragment {
         populateFields();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.profile, menu);
+//        final MenuItem item = menu.findItem(R.id.action_add);
+    }
 
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        boolean ret = true;
+        if (menuItem.getItemId() == android.R.id.home) {
+            ret = false;
+        }
+        if (menuItem.getItemId() == R.id.action_save) {
+            menuItem.setVisible(false);
+//            Toast.makeText(getContext(), "WWWWW", Toast.LENGTH_LONG).show();
+            update();
+            ret = true;
+        }
+        return ret;
+    }
 
     private void parse() {
 
@@ -144,7 +167,26 @@ public class ProfileFragment extends Fragment {
     }
 
 
+    private void update() {
+        currentUser.put("firstName", profileFirst.getText().toString());
+        currentUser.put("lastName", profileLast.getText().toString());
+        currentUser.put("homeTown", profileHometown.getText().toString());
 
+        currentUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (null == e) {
+                    refresh();
+                } else {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void refresh() {
+        getActivity().getSupportFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
 
     private void loadFamily() {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -393,10 +435,15 @@ public class ProfileFragment extends Fragment {
 
     @OnClick(R.id.profile_send_feedback)
     public void sendFeedback() {
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_EMAIL, "ryan@spotlight.me");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"ryan@spotlight.me"});
         intent.putExtra(Intent.EXTRA_SUBJECT, "Spotlight user feedback");
         startActivity(Intent.createChooser(intent, "Send feedback"));
+    }
+
+    @OnClick(R.id.profile_family)
+    public void addFamily() {
+        FragmentUtils.addFragment(getActivity(), R.id.content, this, AddFamilyFragment.newInstance(), true);
     }
 }

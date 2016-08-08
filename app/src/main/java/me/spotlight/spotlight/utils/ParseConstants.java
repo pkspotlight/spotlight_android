@@ -25,4 +25,9 @@ public class ParseConstants {
     public static final String OBJECT_SPOTLIGHT = "Spotlight";
     public static final String OBJECT_TEAM_LOGO_MEDIA = "TeamLogoMedia";
     public static final String OBJECT_TEAM_REQUEST = "TeamRequest";
+
+
+    public static final int REQUEST_STATE_ACCEPTED = 1;
+    public static final int REQUEST_STATE_DECLINED = 0;
+
 }

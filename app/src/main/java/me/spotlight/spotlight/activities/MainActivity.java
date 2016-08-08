@@ -308,17 +308,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    private void showTeamsOnboarding() {
-        final AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
-                .setMessage(getString(R.string.teams_message))
-                .setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
-    }
 }

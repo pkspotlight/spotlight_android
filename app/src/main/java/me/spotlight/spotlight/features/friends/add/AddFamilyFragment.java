@@ -263,6 +263,7 @@ public class AddFamilyFragment extends Fragment {
                 public void done(ParseException e) {
                     if (null == e) {
                         Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
+                        getActivity().onBackPressed();
                     } else {
                         Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                     }

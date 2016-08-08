@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
@@ -69,7 +70,31 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestH
             }
         });
 
-        requestHolder.textView.setText("");
+        requestHolder.textView.setText(teamRequest.getRequesterName());
+
+        requestHolder.textView2.setText("wants to follow " + teamRequest.getTeamName());
+
+        if (null != teamRequest.getAvatarUrl()) {
+            if (!"".equals(teamRequest.getAvatarUrl())) {
+                Picasso.with(context)
+                        .load(teamRequest.getAvatarUrl())
+                        .fit().centerCrop()
+                        .transform(round)
+                        .into(requestHolder.avatar);
+            } else {
+                Picasso.with(context)
+                        .load(R.drawable.unknown_user)
+                        .fit().centerCrop()
+                        .transform(round)
+                        .into(requestHolder.avatar);
+            }
+        } else {
+            Picasso.with(context)
+                    .load(R.drawable.unknown_user)
+                    .fit().centerCrop()
+                    .transform(round)
+                    .into(requestHolder.avatar);
+        }
     }
 
 
@@ -93,6 +118,8 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestH
         ImageView avatar;
         @Bind(R.id.requester_text)
         TextView textView;
+        @Bind(R.id.requester_text2)
+        TextView textView2;
 
         public RequestHolder(View itemView) {
             super(itemView);
