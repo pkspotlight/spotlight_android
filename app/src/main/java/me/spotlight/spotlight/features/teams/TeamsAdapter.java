@@ -69,8 +69,11 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
                     .transform(round)
                     .into(teamHolder.teamAvatar);
         } else {
-            Picasso.with(context).load(R.drawable.unknown_user).fit().centerCrop()
-                    .transform(round).into(teamHolder.teamAvatar);
+            Picasso.with(context)
+                    .load(R.drawable.unknown_user)
+                    .fit().centerCrop()
+                    .transform(round)
+                    .into(teamHolder.teamAvatar);
         }
 
         teamHolder.fol2.setOnClickListener(new View.OnClickListener() {

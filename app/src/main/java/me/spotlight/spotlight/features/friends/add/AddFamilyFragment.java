@@ -34,6 +34,8 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
@@ -245,7 +247,7 @@ public class AddFamilyFragment extends Fragment {
     @OnClick(R.id.fam_add_submit)
     public void submitFam() {
         if (validate()) {
-            ParseObject mChild = new ParseObject(ParseConstants.OBJECT_CHILD);
+            final ParseObject mChild = new ParseObject(ParseConstants.OBJECT_CHILD);
             mChild.put("lastName", famAddLast.getText().toString());
             mChild.put("firstName", famAddFirst.getText().toString());
             mChild.put("homeTown", famAddHometown.getText().toString());
@@ -263,10 +265,21 @@ public class AddFamilyFragment extends Fragment {
                 @Override
                 public void done(ParseException e) {
                     if (null == e) {
-                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+//                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+//                        imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
 //                        Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
-                        getActivity().onBackPressed();
+//                        getActivity().onBackPressed();
+                        ParseRelation<ParseObject> famRel = ParseUser.getCurrentUser().getRelation("children");
+                        famRel.add(mChild);
+                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (null == e) {
+                                    getActivity().onBackPressed();
+                                }
+                            }
+                        });
+
                     } else {
                         Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                     }

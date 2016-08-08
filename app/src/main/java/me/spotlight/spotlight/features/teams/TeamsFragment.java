@@ -1,5 +1,6 @@
 package me.spotlight.spotlight.features.teams;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +74,7 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
     public void onShowDetails(Team team) {
         Bundle bundle = new Bundle();
         bundle.putString("objectId", team.getObjectId());
-        FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
+        FragmentUtils.addFragment(getActivity(), R.id.content, this, TeamDetailsFragment.newInstance(bundle), true);
     }
 
     public void onRequestFollow(Team team) {
@@ -127,6 +129,9 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
             dialog.show();
             getActivity().getPreferences(Context.MODE_PRIVATE).edit().putBoolean("first3", true).commit();
         }
+
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_teams).getWindowToken(), 0);
     }
 
 

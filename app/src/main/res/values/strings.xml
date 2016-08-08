@@ -70,4 +70,7 @@
     <string name="follow_sure">Are you sure?</string>
     <string name="please_wait">Please wait...</string>
 
+    <string name="my_family"><b>My Family</b></string>
+    <string name="friends"><b>Friends</b></string>
+
 </resources>

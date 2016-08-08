@@ -115,6 +115,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        getActivity().setTitle("Profile");
+
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_profile).getWindowToken(), 0);
 
         loadAvatar();
 

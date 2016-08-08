@@ -5,27 +5,42 @@
     android:id="@+id/swipe_friends"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.design.widget.CoordinatorLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:background="@android:color/darker_gray"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <TextView
+            android:paddingLeft="14dp"
+            android:paddingTop="14dp"
+            android:background="@android:color/white"
+            android:text="@string/my_family"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="42dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_family"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:paddingLeft="14dp"
+            android:paddingTop="14dp"
+            android:background="@android:color/white"
+            android:text="@string/friends"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="42dp" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_friends"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-
-        <android.support.design.widget.FloatingActionButton
-            android:visibility="gone"
-            android:id="@+id/fab_add_spotlighters"
-            android:src="@drawable/plus_white"
-            android:layout_marginBottom="@dimen/fab_padding_bottom"
-            android:layout_marginRight="@dimen/fab_padding_right"
-            android:layout_gravity="bottom|right"
-            android:layout_width="@dimen/fab_diagonal"
-            android:layout_height="@dimen/fab_diagonal" />
-
-    </android.support.design.widget.CoordinatorLayout>
+    </LinearLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>

@@ -1,5 +1,6 @@
 package me.spotlight.spotlight.features.friends;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -37,10 +39,12 @@ import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.features.friends.add.AddSpotlightersFragment;
+import me.spotlight.spotlight.features.friends.details.ChildAdapter;
 import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
 import me.spotlight.spotlight.features.teams.add.AddTeamFragment;
 import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
 import me.spotlight.spotlight.features.teams.search.SearchTeamsFragment;
+import me.spotlight.spotlight.models.Child;
 import me.spotlight.spotlight.models.Friend;
 import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
@@ -49,12 +53,17 @@ import me.spotlight.spotlight.utils.ParseConstants;
 /**
  * Created by Anatol on 7/11/2016.
  */
-public class FriendsFragment extends Fragment implements FriendsAdapter.ActionListener {
+public class FriendsFragment extends Fragment implements FriendsAdapter.ActionListener,
+        ChildAdapter.ActionListener {
 
     @Bind(R.id.recycler_view_friends)
     RecyclerView friendsList;
+    @Bind(R.id.recycler_view_family)
+    RecyclerView familyList;
     FriendsAdapter friendsAdapter;
+    ChildAdapter childAdapter;
     List<Friend> friends = new ArrayList<>();
+    List<Child> children = new ArrayList<>();
     @Bind(R.id.swipe_friends)
     SwipeRefreshLayout swipeFriends;
 
@@ -71,7 +80,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
     public void onShowDetails(Friend friend) {
         Bundle bundle = new Bundle();
         bundle.putString("objectId", friend.getObjectId());
-        FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
+        FragmentUtils.addFragment(getActivity(), R.id.content, this, FriendDetailsFragment.newInstance(bundle), true);
     }
 
     public void onUnfollow(final Friend friend) {
@@ -92,6 +101,10 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
                 })
                 .create();
         dialog.show();
+    }
+
+    public void onViewChildDetails(Child child) {
+        //
     }
 
     private void unfollow(Friend friend) {
@@ -143,9 +156,12 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         friendsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        familyList.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendsAdapter = new FriendsAdapter(getActivity(), friends);
         friendsAdapter.setActionListener(this);
+        childAdapter = new ChildAdapter(getActivity(), children, this);
         friendsList.setAdapter(friendsAdapter);
+        familyList.setAdapter(childAdapter);
         swipeFriends.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -157,6 +173,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
             }
         });
 
+        loadFamily();
         loadFriends();
     }
 
@@ -179,6 +196,9 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
             dialog.show();
             getActivity().getPreferences(Context.MODE_PRIVATE).edit().putBoolean("first2", true).commit();
         }
+
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_friends).getWindowToken(), 0);
     }
 
 
@@ -214,7 +234,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
         FragmentUtils.addFragment(getActivity(), R.id.content, this, AddFamilyFragment.newInstance(), true);
     }
 
-    @OnClick(R.id.fab_add_spotlighters)
+//    @OnClick(R.id.fab_add_spotlighters)
     public void onFab() {
         final AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle(getString(R.string.friends_dialog))
@@ -288,8 +308,50 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
         });
     }
 
+    private void loadFamily() {
+        if (!children.isEmpty())
+            children.clear();
+        final ParseRelation<ParseObject> childrenRelation = ParseUser.getCurrentUser().getRelation("children");
+        final ParseQuery<ParseObject> childrenQuery = childrenRelation.getQuery();
+        childrenQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject parseObject : objects) {
 
+                            Child child = new Child();
+                            try {
+                                parseObject.fetchIfNeeded();
+                                child.setObjectId(parseObject.getObjectId());
+                                if (null != parseObject.getParseObject("profilePic")) {
+                                    ParseObject profilePic = parseObject.getParseObject("profilePic");
+                                    profilePic.fetchIfNeeded();
+                                    ParseFile mediaFile = profilePic.getParseFile("mediaFile");
+                                    if (null != mediaFile.getUrl())
+                                        child.setAvatarUrl(mediaFile.getUrl());
+                                }
+                                if (null != parseObject.getString("firstName"))
+                                    child.setFirstName(parseObject.getString("firstName"));
+                                if (null != parseObject.getString("lastName"))
+                                    child.setLastName(parseObject.getString("lastName"));
 
+                                children.add(child);
+                                childAdapter.notifyDataSetChanged();
+
+                            } catch (ParseException e1) {
+                                //
+                            }
+                        }
+                    } else {
+                        //
+                    }
+                } else {
+                    //
+                }
+            }
+        });
+    }
 
 
 
