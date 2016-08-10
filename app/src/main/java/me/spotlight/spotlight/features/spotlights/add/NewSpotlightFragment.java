@@ -18,6 +18,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -61,6 +64,7 @@ import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.activities.TheaterActivity;
 import me.spotlight.spotlight.utils.Constants;
 import me.spotlight.spotlight.utils.DialogUtils;
+import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 import me.spotlight.spotlight.utils.PathUtils;
 
@@ -108,6 +112,7 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         round = new RoundedTransformationBuilder().oval(true).build();
         create.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         spotCreateAdapter = new SpotCreateAdapter(getActivity(), thumbnails);
@@ -121,6 +126,27 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
         getActivity().setTitle(getArguments().getString("teamName"));
         initTeamAvatar();
         populateInfo();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.main, menu);
+//        final MenuItem item = menu.findItem(R.id.action_add);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        boolean ret = true;
+        if (menuItem.getItemId() == android.R.id.home) {
+            ret = false;
+        }
+        if (menuItem.getItemId() == R.id.action_add) {
+//            menuItem.setVisible(false);
+//            FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
+//            FragmentUtils.addFragment(getActivity(), R.id.content, this, AddSpotlightFragment.newInstance(), true);
+            addMedia();
+            ret = true;
+        }
+        return ret;
     }
 
     @Override
@@ -570,9 +596,9 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
             public void done(List<ParseObject> objects, ParseException e) {
                 if (null == e) {
                     currentSpotlight = objects.get(0);
-                    Toast.makeText(getActivity(), currentSpotlight.getObjectId(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getActivity(), currentSpotlight.getObjectId(), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });

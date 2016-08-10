@@ -15,7 +15,7 @@
         <!-- Header -->
         <LinearLayout
             android:orientation="horizontal"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:layout_width="match_parent"
             android:layout_height="130dp">
 
@@ -135,6 +135,7 @@
 
 
     <android.support.design.widget.FloatingActionButton
+        android:visibility="gone"
         android:id="@+id/fab_add_media"
         android:src="@android:drawable/ic_menu_add"
         android:layout_marginBottom="@dimen/fab_padding_bottom"

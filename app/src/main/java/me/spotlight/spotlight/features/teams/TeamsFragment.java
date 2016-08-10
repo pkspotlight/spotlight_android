@@ -114,7 +114,7 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.tabs_teams));
-        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first3")) {
+        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first3" + ParseUser.getCurrentUser().getObjectId())) {
             //don't show
         } else {
             final AlertDialog dialog = new AlertDialog.Builder(getContext())
@@ -127,7 +127,9 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
                     })
                     .create();
             dialog.show();
-            getActivity().getPreferences(Context.MODE_PRIVATE).edit().putBoolean("first3", true).commit();
+            getActivity().getPreferences(Context.MODE_PRIVATE)
+                    .edit().putBoolean("first3" + ParseUser.getCurrentUser().getObjectId(), true)
+                    .commit();
         }
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);

@@ -186,6 +186,12 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
             return 0;
     }
 
+    public void removeItem(int position) {
+//        spotlights.remove(position);
+//        notifyItemRemoved(position);
+//        notifyItemRangeChanged(position, spotlights.size());
+    }
+
     public class SpotlightHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.spotlight_avatar)

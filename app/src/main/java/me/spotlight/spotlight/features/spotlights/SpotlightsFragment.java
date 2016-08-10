@@ -3,12 +3,19 @@ package me.spotlight.spotlight.features.spotlights;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,6 +36,7 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -62,6 +70,7 @@ public class SpotlightsFragment extends Fragment
     @Bind(R.id.progress)
     ProgressBar progressBar;
     Thread loadTeamsThread;
+    private Paint p = new Paint();
 
     /*
         Manufacturing singleton
@@ -80,7 +89,7 @@ public class SpotlightsFragment extends Fragment
         bundle.putString("teamName", spotlight.getTeam().getName());
         bundle.putString("teamGrade", spotlight.getTeam().getGrade());
         bundle.putString("teamSport", spotlight.getTeam().getSport());
-        FragmentUtils.changeFragment(getActivity(), R.id.content, SpotlightDetailsFragment.newInstance(bundle), true);
+        FragmentUtils.addFragment(getActivity(), R.id.content, this, SpotlightDetailsFragment.newInstance(bundle), true);
     }
 
     public void onDelete(final Spotlight spotlight, final int position) {
@@ -159,7 +168,7 @@ public class SpotlightsFragment extends Fragment
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.tabs_spotlights));
-        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first")) {
+        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first" + ParseUser.getCurrentUser().getObjectId())) {
             // dont show
         } else {
             final AlertDialog dialog = new AlertDialog.Builder(getContext())
@@ -173,8 +182,11 @@ public class SpotlightsFragment extends Fragment
                     })
                     .create();
             dialog.show();
-            getActivity().getPreferences(Context.MODE_PRIVATE).edit().putBoolean("first", true).commit();
+            getActivity().getPreferences(Context.MODE_PRIVATE)
+                    .edit().putBoolean("first" + ParseUser.getCurrentUser().getObjectId(), true)
+                    .commit();
         }
+//        initSwipe(mySpotlightsList, spotlightsAdapter);
     }
 
     @Override
@@ -339,14 +351,20 @@ public class SpotlightsFragment extends Fragment
                                 }
 
 
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
+                                if (null != SpotlightsFragment.this) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                                        progressBar.setVisibility(View.GONE);
-                                        loadMySpotlights(myTeams);
-                                    }
-                                });
+                                            if (null != progressBar) {
+                                                progressBar.setVisibility(View.GONE);
+                                                loadMySpotlights(myTeams);
+                                            }
+                                            else
+                                                Log.d("crash", "crash");
+                                        }
+                                    });
+                                }
                             }
                         };
 
@@ -380,6 +398,10 @@ public class SpotlightsFragment extends Fragment
                             try {
                                 spotlight.fetchIfNeeded();
                             } catch (ParseException e1) {}
+
+//                            Log.d("dates", spotlight.getDate("updatedAt").toString());
+                            Date date = spotlight.getUpdatedAt();
+                            Log.d("dates", date.toString());
 
                             if (null != spotlight.getParseObject("team")) {
                                 ParseObject team = spotlight.getParseObject("team");
@@ -417,5 +439,63 @@ public class SpotlightsFragment extends Fragment
         });
 
 
+    }
+
+    /*
+        Recycler view stuff
+     */
+    private void initSwipe(RecyclerView recyclerView, final SpotlightsAdapter adapter) {
+        ItemTouchHelper.SimpleCallback simpleCallback =
+                new ItemTouchHelper.SimpleCallback(0,
+                        ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView,
+                                  RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
+                // this is for drag and drop
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if (direction == ItemTouchHelper.LEFT) {
+                    adapter.removeItem(position);
+                }
+            }
+
+            @Override
+            public void onChildDraw(Canvas c,
+                                    RecyclerView r,
+                                    RecyclerView.ViewHolder h,
+                                    float dX, float dY,
+                                    int actionState, boolean isCurrentlyActive) {
+                Bitmap icon;
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View itemView = h.itemView;
+                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
+                    float width = height / 3;
+                    if (dX > 0) {
+                        //
+                    } else {
+                        p.setColor(Color.parseColor("#D32F2F"));
+                        RectF background = new RectF((float) itemView.getRight() + dX,
+                                                        (float) itemView.getTop(),
+                                                            (float) itemView.getRight(),
+                                                                (float) itemView.getBottom());
+                        c.drawRect(background, p);
+                        icon = BitmapFactory.decodeResource(getResources(), R.drawable.delete_onswipe);
+                        RectF iconDest = new RectF((float) itemView.getRight() - 2 * width,
+                                                        (float) itemView.getTop() + width,
+                                                            (float) itemView.getRight() - width,
+                                                                (float) itemView.getBottom() - width);
+                        c.drawBitmap(icon, null, iconDest, p);
+                    }
+                }
+                super.onChildDraw(c, r, h, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 }

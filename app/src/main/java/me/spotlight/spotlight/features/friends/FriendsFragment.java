@@ -181,7 +181,7 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.tabs_friends));
-        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first2")) {
+        if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first2" + ParseUser.getCurrentUser().getObjectId())) {
             //don't show
         } else {
             final AlertDialog dialog = new AlertDialog.Builder(getContext())
@@ -194,7 +194,9 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
                     })
                     .create();
             dialog.show();
-            getActivity().getPreferences(Context.MODE_PRIVATE).edit().putBoolean("first2", true).commit();
+            getActivity().getPreferences(Context.MODE_PRIVATE)
+                    .edit().putBoolean("first2" + ParseUser.getCurrentUser().getObjectId(), true)
+                    .commit();
         }
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);

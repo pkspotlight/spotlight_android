@@ -14,7 +14,7 @@
         <LinearLayout
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
