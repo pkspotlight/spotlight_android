@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -61,7 +62,7 @@ public class BaseApplication extends Application {
 
         FacebookSdk.sdkInitialize(context);
         TwitterAuthConfig twitterAuthConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(twitterAuthConfig));
+        Fabric.with(this, new Twitter(twitterAuthConfig), new Crashlytics());
     }
 
     public static Context getContext() { return context; }

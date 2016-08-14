@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -17,6 +19,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Friend;
 import me.spotlight.spotlight.models.User;
@@ -29,7 +32,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
     Context context;
     List<User> users = new ArrayList<>();
     Transformation round;
-    String avatarUrl = "";
     ActionListener actionListener;
 
     public interface ActionListener {
@@ -67,15 +69,28 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
 //                }
 //            }
 //        }
+        String avatarUrl = "";
         if (null != user.getAvatarUrl())
             avatarUrl = user.getAvatarUrl();
         // TODO: introduce is valid url check
+//        if (!"".equals(avatarUrl)) {
+//            Picasso.with(context).load(avatarUrl).fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round).into(userHolder.friendAvatar);
+//        } else {
+//            Picasso.with(context).load(R.drawable.unknown_user).fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round).into(userHolder.friendAvatar);
+//        }
+
         if (!"".equals(avatarUrl)) {
-            Picasso.with(context).load(avatarUrl).fit().centerCrop()
-                    .transform(round).into(userHolder.friendAvatar);
+            Glide.with(context)
+                    .load(avatarUrl)
+                    .into(userHolder.friendAvatar);
         } else {
-            Picasso.with(context).load(R.drawable.unknown_user).fit().centerCrop()
-                    .transform(round).into(userHolder.friendAvatar);
+            Glide.with(context)
+                    .load(R.drawable.unknown_user)
+                    .into(userHolder.friendAvatar);
         }
 
         // for now always showing -- later introduce a boolean
@@ -107,7 +122,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
     public class UserHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.friend_avatar)
-        ImageView friendAvatar;
+//        ImageView friendAvatar;
+        CircleImageView friendAvatar;
         @Bind(R.id.friend_name)
         TextView friendName;
         @Bind(R.id.friend_following)

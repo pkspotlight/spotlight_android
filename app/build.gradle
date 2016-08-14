@@ -9,7 +9,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
-//apply plugin: 'io.fabric'
+apply plugin: 'io.fabric'
 
 repositories {
     jcenter()
@@ -21,14 +21,12 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
 
-
     defaultConfig {
         applicationId "me.spotlight.spotlight"
         minSdkVersion 17
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -51,23 +49,24 @@ dependencies {
     compile "com.jakewharton:butterknife:$rootProject.ext.butterKnifeVersion"
     compile "com.squareup.picasso:picasso:$rootProject.ext.picassoVersion"
     compile "com.makeramen:roundedimageview:$rootProject.ext.roundedImageViewVersion"
-    compile "com.j256.ormlite:ormlite-android:$rootProject.ext.j256OrmLiteVersion"
-    compile "com.trello:rxlifecycle:$rootProject.ext.trelloRxLifecycleVersion"
-    compile "com.trello:rxlifecycle-components:$rootProject.ext.trelloRxLifecycleComponentsVersion"
     compile 'com.facebook.android:facebook-android-sdk:+'
     compile('com.twitter.sdk.android:twitter:1.13.3@aar') {
         transitive = true;
     }
     compile 'commons-codec:commons-codec:1.10'
-    compile "com.squareup:otto:$rootProject.ext.ottoVersion"
     // compile project(":linkedin-sdk")
     compile "uk.co.chrisjenx:calligraphy:$rootProject.ext.chrisJenxCalligraphyVersion"
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
         transitive = true;
     }
     compile 'com.parse:parse-android:1.13.0'
     compile 'com.parse.bolts:bolts-android:1+'
 
-    compile 'com.googlecode.mp4parser:isoparser:1.1.14'
-    compile 'org.jcodec:jcodec-android:0.1.9'
+//    compile 'com.googlecode.mp4parser:isoparser:1.1.14'
+//    compile 'org.jcodec:jcodec-android:0.1.9'
+
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.android.support:support-v4:24.0.0'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+
 }

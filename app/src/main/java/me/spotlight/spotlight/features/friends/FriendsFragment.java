@@ -34,19 +34,13 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import me.spotlight.spotlight.R;
-import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.features.friends.add.AddSpotlightersFragment;
-import me.spotlight.spotlight.features.friends.details.ChildAdapter;
+import me.spotlight.spotlight.features.friends.details.ChildDetailsFragment;
 import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
-import me.spotlight.spotlight.features.teams.add.AddTeamFragment;
-import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
-import me.spotlight.spotlight.features.teams.search.SearchTeamsFragment;
 import me.spotlight.spotlight.models.Child;
 import me.spotlight.spotlight.models.Friend;
-import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
@@ -104,7 +98,9 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
     }
 
     public void onViewChildDetails(Child child) {
-        //
+        Bundle bundle = new Bundle();
+        bundle.putString("objectId", child.getObjectId());
+        FragmentUtils.addFragment(getActivity(), R.id.content, this, ChildDetailsFragment.newInstance(bundle), true);
     }
 
     private void unfollow(Friend friend) {

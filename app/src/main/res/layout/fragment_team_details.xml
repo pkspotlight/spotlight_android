@@ -15,7 +15,13 @@
         android:layout_height="wrap_content">
 
 
-        <ImageView
+        <!--<ImageView-->
+            <!--android:layout_margin="8dp"-->
+            <!--android:id="@+id/team_detail_avatar"-->
+            <!--android:layout_width="130dp"-->
+            <!--android:layout_height="130dp" />-->
+
+        <de.hdodenhof.circleimageview.CircleImageView
             android:layout_margin="8dp"
             android:id="@+id/team_detail_avatar"
             android:layout_width="130dp"

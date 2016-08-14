@@ -124,6 +124,11 @@ public class MainActivity extends AppCompatActivity {
         if (null == ParseUser.getCurrentUser()) {
             startActivity(LoginActivity.getStartIntent(getApplication()));
             finish();
+        } else {
+            FragmentUtils.changeFragment(this, R.id.inner_content, SpotlightsFragment.newInstance(), false);
+
+            lastSelected = spotlights;
+            spotlights.setSelected(true);
         }
 
 
@@ -183,10 +188,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
 
-        FragmentUtils.changeFragment(this, R.id.inner_content, SpotlightsFragment.newInstance(), false);
 
-        lastSelected = spotlights;
-        spotlights.setSelected(true);
     }
 
     @Override

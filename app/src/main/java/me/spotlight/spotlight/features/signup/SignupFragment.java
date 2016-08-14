@@ -1,4 +1,4 @@
-package me.spotlight.spotlight.features.login;
+package me.spotlight.spotlight.features.signup;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -73,6 +73,7 @@ public class SignupFragment extends Fragment {
                 public void done(ParseException e) {
                     if (null == e) {
                         // success
+                        Toast.makeText(getActivity(), "Logged in successfully!", Toast.LENGTH_LONG).show();
                         startActivity(MainActivity.getStartIntent(getActivity()));
                     } else {
                         Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT).show();

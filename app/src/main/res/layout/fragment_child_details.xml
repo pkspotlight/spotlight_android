@@ -17,20 +17,18 @@
 
         <!--<ImageView-->
             <!--android:layout_margin="8dp"-->
-            <!--android:id="@+id/friend_detail_avatar"-->
+            <!--android:id="@+id/child_detail_avatar"-->
             <!--android:layout_width="130dp"-->
             <!--android:layout_height="130dp" />-->
 
-
-
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_margin="8dp"
-            android:id="@+id/friend_detail_avatar"
+            android:id="@+id/child_detail_avatar"
             android:layout_width="130dp"
             android:layout_height="130dp" />
 
         <TextView
-            android:id="@+id/friend_detail_name"
+            android:id="@+id/child_detail_name"
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:layout_width="wrap_content"
@@ -46,7 +44,7 @@
 
             <TextView
                 android:padding="4dp"
-                android:id="@+id/friend_detail_spot"
+                android:id="@+id/child_detail_spot"
                 android:background="@drawable/btn_team_details"
                 android:layout_margin="4dp"
                 android:textColor="@color/team_details"
@@ -57,7 +55,7 @@
 
             <TextView
                 android:padding="4dp"
-                android:id="@+id/friend_detail_teams"
+                android:id="@+id/child_detail_teams"
                 android:background="@drawable/btn_team_details"
                 android:layout_margin="4dp"
                 android:textColor="@color/team_details"
@@ -71,7 +69,7 @@
 
 
     <me.spotlight.spotlight.utils.CustomViewPager
-        android:id="@+id/friend_detail_pager"
+        android:id="@+id/child_detail_pager"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

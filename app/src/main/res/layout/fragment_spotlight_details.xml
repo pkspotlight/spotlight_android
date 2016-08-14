@@ -14,7 +14,16 @@
         android:layout_height="140dp">
 
 
-        <ImageView
+        <!--<ImageView-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--android:id="@+id/spotlight_avatar"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="100dp"-->
+            <!--android:layout_marginTop="12dp"-->
+            <!--android:layout_marginBottom="12dp" />-->
+
+        <de.hdodenhof.circleimageview.CircleImageView
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="8dp"
             android:id="@+id/spotlight_avatar"
@@ -54,7 +63,6 @@
 
                 <TextView
                     android:id="@+id/spot_details_date"
-                    android:text="December 9, 2015"
                     android:textSize="14sp"
                     android:textColor="@android:color/white"
                     android:layout_width="wrap_content"

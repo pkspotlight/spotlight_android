@@ -35,6 +35,7 @@ import me.spotlight.spotlight.utils.FragmentUtils;
  */
 public class TeamMembersFragment extends Fragment implements UsersAdapter.ActionListener {
 
+    public static final String TAG = "TeamMembersFragment";
     @Bind(R.id.recycler_view_team_members)
     RecyclerView teamMembersList;
     UsersAdapter teamMembersAdapter;

@@ -22,23 +22,23 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.boxes.Container;
-import com.googlecode.mp4parser.FileDataSourceImpl;
-import com.googlecode.mp4parser.authoring.Movie;
-import com.googlecode.mp4parser.authoring.Track;
-import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
-import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
-import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
-import com.googlecode.mp4parser.authoring.tracks.CroppedTrack;
-import com.googlecode.mp4parser.authoring.tracks.MP3TrackImpl;
+//import com.coremedia.iso.IsoFile;
+//import com.coremedia.iso.boxes.Container;
+//import com.googlecode.mp4parser.FileDataSourceImpl;
+//import com.googlecode.mp4parser.authoring.Movie;
+//import com.googlecode.mp4parser.authoring.Track;
+//import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
+//import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
+//import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
+//import com.googlecode.mp4parser.authoring.tracks.CroppedTrack;
+//import com.googlecode.mp4parser.authoring.tracks.MP3TrackImpl;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
-import org.jcodec.api.android.SequenceEncoder;
+//import org.jcodec.api.android.SequenceEncoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,8 +73,8 @@ public class TheaterActivity extends Activity {
     ImageView image;
     public static final int REQUEST_PERMISSION_CAMERA = 52;
 
-    Movie movie, movie2, movie3;
-    Movie result;
+//    Movie movie, movie2, movie3;
+//    Movie result;
 
     String reelPath;
     String musicPath;
@@ -172,61 +172,61 @@ public class TheaterActivity extends Activity {
         Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Images.Thumbnails.MINI_KIND);
         image.setImageBitmap(bitmap);
     }
-    private void addAudio(String vidPath) {
-
-        try {
-            movie = MovieCreator.build(vidPath);
-            List<Track> vidTracks = new ArrayList<>();
-            List<Track> audioTracks = new ArrayList<>();
-
-            for (Track track : movie.getTracks()) {
-                if (track.getHandler().equals("vide")) {
-                    vidTracks.add(track);
-                }
-            }
-            result = new Movie();
-
-            String mp3File = null;
-            InputStream inputStream = getResources().openRawResource(R.raw.ready_go);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            int size = 0;
-            byte[] buffer = new byte[1024];
-            while ((size = inputStream.read(buffer, 0, 1024)) >= 0) {
-                byteArrayOutputStream.write(buffer, 0, size);
-            }
-            inputStream.close();
-            buffer = byteArrayOutputStream.toByteArray();
-            FileOutputStream fileOutputStream = new FileOutputStream(new File("/storage/emulated/0/DCIM/Camera/ready_go2.mp3"));
-            fileOutputStream.write(buffer);
-            fileOutputStream.close();
-
-
-
-            mp3File = "/storage/emulated/0/DCIM/Camera/ready_go2.mp3";
-            MP3TrackImpl mp3Track = new MP3TrackImpl(new FileDataSourceImpl(mp3File));
-            Log.d("extracom", "mp3 track created");
-            audioTracks.add(mp3Track);
-
-            Log.d("extracom", "adding audioTrack");
-            result.addTrack(new AppendTrack(audioTracks.toArray(new Track[audioTracks.size()])));
-            Log.d("extracom", "adding videoTrack");
-            result.addTrack(new AppendTrack(vidTracks.toArray(new Track[vidTracks.size()])));
-
-            Container out = new DefaultMp4Builder().build(result);
-            File file = new File("/storage/emulated/0/DCIM/Camera/addedSound001.mp4");
-            FileChannel fileChannel = new FileOutputStream(file).getChannel();
-            out.writeContainer(fileChannel);
-            fileChannel.close();
-
-
-        } catch (IOException e) {
-            Log.d("extracom", "mp4parse IOException");
-        }
-
+//    private void addAudio(String vidPath) {
 //
-//        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/addedSound001.mp4");
-//        vid.start();
-    }
+//        try {
+//            movie = MovieCreator.build(vidPath);
+//            List<Track> vidTracks = new ArrayList<>();
+//            List<Track> audioTracks = new ArrayList<>();
+//
+//            for (Track track : movie.getTracks()) {
+//                if (track.getHandler().equals("vide")) {
+//                    vidTracks.add(track);
+//                }
+//            }
+//            result = new Movie();
+//
+//            String mp3File = null;
+//            InputStream inputStream = getResources().openRawResource(R.raw.ready_go);
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//            int size = 0;
+//            byte[] buffer = new byte[1024];
+//            while ((size = inputStream.read(buffer, 0, 1024)) >= 0) {
+//                byteArrayOutputStream.write(buffer, 0, size);
+//            }
+//            inputStream.close();
+//            buffer = byteArrayOutputStream.toByteArray();
+//            FileOutputStream fileOutputStream = new FileOutputStream(new File("/storage/emulated/0/DCIM/Camera/ready_go2.mp3"));
+//            fileOutputStream.write(buffer);
+//            fileOutputStream.close();
+//
+//
+//
+//            mp3File = "/storage/emulated/0/DCIM/Camera/ready_go2.mp3";
+//            MP3TrackImpl mp3Track = new MP3TrackImpl(new FileDataSourceImpl(mp3File));
+//            Log.d("extracom", "mp3 track created");
+//            audioTracks.add(mp3Track);
+//
+//            Log.d("extracom", "adding audioTrack");
+//            result.addTrack(new AppendTrack(audioTracks.toArray(new Track[audioTracks.size()])));
+//            Log.d("extracom", "adding videoTrack");
+//            result.addTrack(new AppendTrack(vidTracks.toArray(new Track[vidTracks.size()])));
+//
+//            Container out = new DefaultMp4Builder().build(result);
+//            File file = new File("/storage/emulated/0/DCIM/Camera/addedSound001.mp4");
+//            FileChannel fileChannel = new FileOutputStream(file).getChannel();
+//            out.writeContainer(fileChannel);
+//            fileChannel.close();
+//
+//
+//        } catch (IOException e) {
+//            Log.d("extracom", "mp4parse IOException");
+//        }
+//
+////
+////        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/addedSound001.mp4");
+////        vid.start();
+//    }
     private void pathToBytes(String vidPath) {
 
         byte[] bytes;
@@ -286,64 +286,64 @@ public class TheaterActivity extends Activity {
         }
 
     }
-    private void movieCreator(String vidPath) {
-
-        try {
-
-            movie = MovieCreator.build(vidPath);
-            Log.d("extracom", "***");
-            // CAREFUL: hardcoded test paths - deleted these already
-            movie2 = MovieCreator.build("/storage/emulated/0/DCIM/Camera/VID_20160729_132746.mp4");
-            Log.d("extracom", "***");
-            // CAREFUL: hardcoded test paths - deleted these already
-            movie3 = MovieCreator.build("/storage/emulated/0/DCIM/Camera/VID_20160729_122525.mp4");
-            Log.d("extracom", "***");
-            result = new Movie();
-
-            List<Track> tracks = new ArrayList<>();
-
-            for (Track track : movie.getTracks()) {
-                Log.d("extracom", "adding track");
-                if (track.getHandler().equals("vide")) {
-                    tracks.add(track);
-                    Log.d("extracom", "adding video track");
-                }
-            }
-            for (Track track : movie2.getTracks()) {
-                Log.d("extracom", "adding track");
-                if (track.getHandler().equals("vide")) {
-                    tracks.add(track);
-                    Log.d("extracom", "adding video track");
-                }
-            }
-            for (Track track : movie3.getTracks()) {
-                Log.d("extracom", "adding track");
-                if (track.getHandler().equals("vide")) {
-                    tracks.add(track);
-                    Log.d("extracom", "adding video track");
-                }
-            }
-
-
-
-            result.addTrack(new AppendTrack(tracks.toArray(new Track[tracks.size()])));
-
-            Container mp4file = new DefaultMp4Builder().build(result);
-            File file = new File("/storage/emulated/0/DCIM/Camera/trial666.mp4");
-            FileChannel fileChannel = new FileOutputStream(file).getChannel();
-            mp4file.writeContainer(fileChannel);
-            fileChannel.close();
-
-
-
-        } catch (IOException e) {}
-
-//        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/trial666.mp4");
-//        vid.start();
-
-//        vid2.setVideoPath(vidPath);
-//        vid2.start();
-    }
+//    private void movieCreator(String vidPath) {
+//
+//        try {
+//
+//            movie = MovieCreator.build(vidPath);
+//            Log.d("extracom", "***");
+//            // CAREFUL: hardcoded test paths - deleted these already
+//            movie2 = MovieCreator.build("/storage/emulated/0/DCIM/Camera/VID_20160729_132746.mp4");
+//            Log.d("extracom", "***");
+//            // CAREFUL: hardcoded test paths - deleted these already
+//            movie3 = MovieCreator.build("/storage/emulated/0/DCIM/Camera/VID_20160729_122525.mp4");
+//            Log.d("extracom", "***");
+//            result = new Movie();
+//
+//            List<Track> tracks = new ArrayList<>();
+//
+//            for (Track track : movie.getTracks()) {
+//                Log.d("extracom", "adding track");
+//                if (track.getHandler().equals("vide")) {
+//                    tracks.add(track);
+//                    Log.d("extracom", "adding video track");
+//                }
+//            }
+//            for (Track track : movie2.getTracks()) {
+//                Log.d("extracom", "adding track");
+//                if (track.getHandler().equals("vide")) {
+//                    tracks.add(track);
+//                    Log.d("extracom", "adding video track");
+//                }
+//            }
+//            for (Track track : movie3.getTracks()) {
+//                Log.d("extracom", "adding track");
+//                if (track.getHandler().equals("vide")) {
+//                    tracks.add(track);
+//                    Log.d("extracom", "adding video track");
+//                }
+//            }
+//
+//
+//
+//            result.addTrack(new AppendTrack(tracks.toArray(new Track[tracks.size()])));
+//
+//            Container mp4file = new DefaultMp4Builder().build(result);
+//            File file = new File("/storage/emulated/0/DCIM/Camera/trial666.mp4");
+//            FileChannel fileChannel = new FileOutputStream(file).getChannel();
+//            mp4file.writeContainer(fileChannel);
+//            fileChannel.close();
+//
+//
+//
+//        } catch (IOException e) {}
+//
+////        vid.setVideoPath("/storage/emulated/0/DCIM/Camera/trial666.mp4");
+////        vid.start();
+//
+////        vid2.setVideoPath(vidPath);
+////        vid2.start();
+//    }
 
 
 

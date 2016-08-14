@@ -33,12 +33,11 @@ import me.spotlight.spotlight.utils.ParseConstants;
  */
 public class RequestsFragment extends Fragment implements RequestAdapter.ActionListener {
 
+    public static final String TAG = "RequestsFragment";
     @Bind(R.id.recycler_view_requests)
     RecyclerView recyclerView;
     ArrayList<TeamRequest> requests = new ArrayList<>();
     RequestAdapter requestAdapter;
-
-    public static final String TAG = "requests";
 
     /*
         Manufacturing singleton
@@ -66,6 +65,8 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
                             public void done(ParseException e) {
                                 if (null == e) {
                                     addRelation(teamRequest.getRequesterObjId(), teamRequest.getTeamObjectId());
+                                } else {
+                                    Log.d(TAG, "exception accepting ");
                                 }
                             }
                         });
@@ -86,7 +87,7 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
                         final ParseUser parseUser = objects.get(0);
                         final ParseRelation<ParseObject> parseRelation = parseUser.getRelation("teams");
 
-                        ParseQuery<ParseObject> teamQuery = new ParseQuery<ParseObject>(ParseConstants.OBJECT_TEAM);
+                        ParseQuery<ParseObject> teamQuery = new ParseQuery<>(ParseConstants.OBJECT_TEAM);
                         teamQuery.whereEqualTo("objectId", teamId);
                         teamQuery.findInBackground(new FindCallback<ParseObject>() {
                             @Override
@@ -100,6 +101,8 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
                                             public void done(ParseException e) {
                                                 if (null == e) {
                                                     getActivity().onBackPressed();
+                                                } else {
+                                                    Log.d(TAG, e.getMessage());
                                                 }
                                             }
                                         });
@@ -130,6 +133,8 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
                             public void done(ParseException e) {
                                 if (null == e) {
                                     getActivity().onBackPressed();
+                                } else {
+                                    Log.d(TAG, e.getMessage());
                                 }
                             }
                         });

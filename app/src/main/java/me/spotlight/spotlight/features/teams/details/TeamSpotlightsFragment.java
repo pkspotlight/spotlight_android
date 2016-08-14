@@ -20,6 +20,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -39,6 +42,7 @@ import me.spotlight.spotlight.utils.ParseConstants;
  */
 public class TeamSpotlightsFragment extends Fragment implements SpotlightsAdapter.ActionListener {
 
+    public static final String TAG = "TeamSpotlightFragment";
     @Bind(R.id.recycler_view_details_team)
     RecyclerView recyclerView;
     List<Spotlight> spotlights = new ArrayList<>();
@@ -54,13 +58,21 @@ public class TeamSpotlightsFragment extends Fragment implements SpotlightsAdapte
     }
 
     public void onShowDetails(Spotlight spotlight) {
-        Bundle bundle = new Bundle();
-        bundle.putString("objectId", spotlight.getObjectId());
-        bundle.putString("teamAvatar", spotlight.getTeamsAvatar());
-        bundle.putString("teamName", spotlight.getTeam().getName());
-        bundle.putString("teamGrade", spotlight.getTeam().getGrade());
-        bundle.putString("teamSport", spotlight.getTeam().getSport());
-        FragmentUtils.changeFragment(getActivity(), R.id.content, SpotlightDetailsFragment.newInstance(bundle), true);
+        try {
+
+            Bundle bundle = new Bundle();
+            bundle.putString("objectId", spotlight.getObjectId());
+            bundle.putString("teamAvatar", spotlight.getTeamsAvatar());
+            bundle.putString("teamName", spotlight.getTeam().getName());
+            bundle.putString("teamGrade", spotlight.getTeam().getGrade());
+            bundle.putString("teamSport", spotlight.getTeam().getSport());
+            bundle.putString("date", SpotlightsAdapter.getMonth(spotlight.getMonth())
+                    + " " + String.valueOf(spotlight.getDay()) + ", "
+                    + String.valueOf(spotlight.getYear()));
+            FragmentUtils.changeFragment(getActivity(), R.id.content, SpotlightDetailsFragment.newInstance(bundle), true);
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
     }
 
     public void onDelete(final Spotlight spotlight, final int position) {
@@ -201,31 +213,119 @@ public class TeamSpotlightsFragment extends Fragment implements SpotlightsAdapte
                         for (ParseObject spotlight : objects) {
                             try {
                                 spotlight.fetchIfNeeded();
-                            } catch (ParseException e1) {
-                            }
 
+                                Date date = spotlight.getUpdatedAt();
+                                int end = date.toString().length();
+                                int start = end - 4;
+                                Log.d(TAG, date.toString());
+                                Log.d(TAG, String.valueOf(date.toString().length()));
 
-                            if (null != spotlight.getParseObject("team")) {
-                                if (spotlight.getParseObject("team").getObjectId().equals(team.getObjectId())) {
+                                if (null != spotlight.getParseObject("team")) {
+                                    if (spotlight.getParseObject("team").getObjectId().equals(team.getObjectId())) {
 
-                                    // this is our spotlight - convert to our model and add it
-                                    Spotlight spotlight1 = new Spotlight();
-                                    spotlight1.setObjectId(spotlight.getObjectId());
-                                    spotlight1.setTeamsAvatar(team.getAvatarUrl());
-                                    spotlight1.setTeam(team);
-                                    for (SpotlightMedia m : SpotlightsFragment.spotlightMedias) {
-                                        if (m.getParentId().equals(spotlight.getObjectId())) {
-                                            spotlight1.setCover(m.getThumbnailUrl());
+                                        // this is our spotlight - convert to our model and add it
+                                        Spotlight spotlight1 = new Spotlight();
+                                        spotlight1.setObjectId(spotlight.getObjectId());
+                                        spotlight1.setTeamsAvatar(team.getAvatarUrl());
+                                        spotlight1.setTeam(team);
+                                        spotlight1.setYear(Integer.valueOf(date.toString().substring(start, end)));
+                                        spotlight1.setDay(Integer.valueOf(date.toString().substring(8, 10)));
+                                        spotlight1.setMonth(date.toString().substring(4, 7));
+                                        Log.d(TAG, date.toString().substring(start, end));
+                                        Log.d(TAG, date.toString().substring(8, 10));
+                                        Log.d(TAG, date.toString().substring(4, 7));
+
+                                        for (SpotlightMedia m : SpotlightsFragment.spotlightMedias) {
+                                            if (m.getParentId().equals(spotlight.getObjectId())) {
+                                                spotlight1.setCover(m.getThumbnailUrl());
+                                            }
                                         }
+
+                                        spotlights.add(spotlight1);
+                                        Collections.sort(spotlights, comparator);
+                                        spotlightsAdapter.notifyDataSetChanged();
                                     }
-                                    spotlights.add(spotlight1);
-                                    spotlightsAdapter.notifyDataSetChanged();
                                 }
+                            } catch (Exception e1) {
+                                Log.d(TAG, e1.getMessage());
                             }
                         }
                     }
                 }
             }
         });
+    }
+
+
+
+
+    Comparator<Spotlight> comparator = new Comparator<Spotlight>() {
+        public static final String TAG = "SpotlightsComparator";
+        @Override
+        public int compare(Spotlight one, Spotlight two) {
+            int result = 0;
+
+            try {
+
+                if (one.getYear() == two.getYear()) {
+
+                    String month1 = one.getMonth();
+                    String month2 = two.getMonth();
+
+                    if (month1.equals(month2)) {
+
+                        if (one.getDay() == two.getDay()) {
+                            result = 0;
+                        } else {
+                            result = two.getDay() - one.getDay();
+                        }
+
+                    } else {
+                        int month1Priority = getMonthPriority(month1);
+                        int month2Priority = getMonthPriority(month2);
+                        result = month2Priority - month1Priority;
+                    }
+
+                } else {
+                    result = two.getYear() - one.getYear();
+                }
+
+            } catch (Exception e) {
+                Log.d(TAG, "exception");
+            }
+
+            return result;
+        }
+    };
+
+    private int getMonthPriority(String month) {
+        switch (month) {
+            case "Jan":
+                return 1;
+            case "Feb":
+                return 2;
+            case "Mar":
+                return 3;
+            case "Apr":
+                return 4;
+            case "May":
+                return 5;
+            case "Jun":
+                return 6;
+            case "Jul":
+                return 7;
+            case "Aug":
+                return 8;
+            case "Sep":
+                return 9;
+            case "Oct":
+                return 10;
+            case "Nov":
+                return 11;
+            case "Dec":
+                return 12;
+            default:
+                return 0;
+        }
     }
 }

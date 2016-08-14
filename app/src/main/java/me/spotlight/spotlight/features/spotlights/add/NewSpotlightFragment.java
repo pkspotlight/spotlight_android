@@ -26,13 +26,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.coremedia.iso.boxes.Container;
-import com.googlecode.mp4parser.authoring.Movie;
-import com.googlecode.mp4parser.authoring.Track;
-import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
-import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
-import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
+//
+//import com.coremedia.iso.boxes.Container;
+//import com.googlecode.mp4parser.authoring.Movie;
+//import com.googlecode.mp4parser.authoring.Track;
+//import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
+//import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
+//import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -42,9 +42,9 @@ import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
-
-import org.jcodec.api.android.FrameGrab;
-import org.jcodec.api.android.SequenceEncoder;
+//
+//import org.jcodec.api.android.FrameGrab;
+//import org.jcodec.api.android.SequenceEncoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -332,54 +332,54 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
         shareIntent();
     }
 
-    @OnClick(R.id.view)
-    public void spotReel(View view) {
-        final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setTitle(getString(R.string.view_dialog))
-                .setItems(getResources().getTextArray(R.array.spot_view), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        switch (i) {
-                            case 0:
-                                Toast.makeText(getContext(), "Cool Kids", Toast.LENGTH_LONG).show();
-                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.cool_kids;
-                                createReel(spotFiles);
-                                break;
-                            case 1:
-                                Toast.makeText(getContext(), "Disney Funk", Toast.LENGTH_LONG).show();
-                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.disney_funk;
-                                createReel(spotFiles);
-                                break;
-                            case 2:
-                                Toast.makeText(getContext(), "Every single night", Toast.LENGTH_LONG).show();
-                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.every_night;
-                                createReel(spotFiles);
-                                break;
-                            case 3:
-                                Toast.makeText(getContext(), "Ready 2 Go", Toast.LENGTH_LONG).show();
-                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.ready_go;
-                                createReel(spotFiles);
-                                break;
-                            case 4:
-                                Toast.makeText(getContext(), "No music", Toast.LENGTH_LONG).show();
-                                createReel(spotFiles);
-                                musicPath = "none";
-                                break;
-                            default:
-                                musicPath = "none";
-                                break;
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
-    }
+//    @OnClick(R.id.view)
+//    public void spotReel(View view) {
+//        final AlertDialog dialog = new AlertDialog.Builder(getContext())
+//                .setTitle(getString(R.string.view_dialog))
+//                .setItems(getResources().getTextArray(R.array.spot_view), new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        switch (i) {
+//                            case 0:
+//                                Toast.makeText(getContext(), "Cool Kids", Toast.LENGTH_LONG).show();
+//                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.cool_kids;
+//                                createReel(spotFiles);
+//                                break;
+//                            case 1:
+//                                Toast.makeText(getContext(), "Disney Funk", Toast.LENGTH_LONG).show();
+//                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.disney_funk;
+//                                createReel(spotFiles);
+//                                break;
+//                            case 2:
+//                                Toast.makeText(getContext(), "Every single night", Toast.LENGTH_LONG).show();
+//                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.every_night;
+//                                createReel(spotFiles);
+//                                break;
+//                            case 3:
+//                                Toast.makeText(getContext(), "Ready 2 Go", Toast.LENGTH_LONG).show();
+//                                musicPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.ready_go;
+//                                createReel(spotFiles);
+//                                break;
+//                            case 4:
+//                                Toast.makeText(getContext(), "No music", Toast.LENGTH_LONG).show();
+//                                createReel(spotFiles);
+//                                musicPath = "none";
+//                                break;
+//                            default:
+//                                musicPath = "none";
+//                                break;
+//                        }
+//                    }
+//                })
+//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.dismiss();
+//                    }
+//                })
+//                .create();
+//        dialog.show();
+//    }
 
     private void shareIntent() {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
@@ -623,86 +623,86 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
         Creates reel from list of saved mp4 or png files
      */
 
-    private void createReel(List<String> files) {
-        Movie reel = new Movie();
-        if (!files.isEmpty()) {
-            for (String file : files) {
-                if (file.endsWith(".mp4")) {
-
-                    // deal with video file
-                    reel = appendVideo(reel, file);
-                }
-
-                if (file.endsWith(".png")) {
-
-                    // deal with photo file
-                    reel = appendSlideshow(reel, file);
-                }
-            }
-
-            // after all this appending write the reel out to internal storage
-            try {
-
-                String timeStamp = String.valueOf(System.currentTimeMillis());
-                String reelPath = Environment.getExternalStorageDirectory() + "/" + "reel" + timeStamp + ".mp4";
-                Container mp4file = new DefaultMp4Builder().build(reel);
-                File file = new File(reelPath);
-                FileChannel fileChannel = new FileOutputStream(file).getChannel();
-                mp4file.writeContainer(fileChannel);
-                fileChannel.close();
-
-                // all done - now pass the reel path to the theater activity
-                startTheater(reelPath);
-
-            } catch (IOException e) {}
-
-        } else {
-            // no data source for reel
-            DialogUtils.showAlertDialog(getActivity(), "Please add media first!");
-        }
-    }
-
-    private Movie appendVideo(Movie movie, String file) {
-        try {
-            Movie temp = MovieCreator.build(file);
-            List<Track> tracks = new ArrayList<>();
-            for (Track track : temp.getTracks()) {
-                if (track.getHandler().equals("vide")) {
-                    tracks.add(track);
-                }
-            }
-            movie.addTrack(new AppendTrack(tracks.toArray(new Track[tracks.size()])));
-
-        } catch (IOException e) {}
-        //
-        return movie;
-    }
-
-    private Movie appendSlideshow(Movie movie, String file) {
-        String outputPath = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + "slide.mp4";
-        File output = new File(outputPath);
-        List<Bitmap> bitmaps = new ArrayList<>();
-        for (int i = 0; i < 120; i++) {
-            Bitmap bitmap = BitmapFactory.decodeFile(file);
-            bitmaps.add(bitmap);
-        }
-        try {
-            SequenceEncoder sequenceEncoder = new SequenceEncoder(output);
-            for (int i = 0; i < 120; i++) {
-                sequenceEncoder.encodeImage(bitmaps.get(i));
-            }
-            sequenceEncoder.finish();
-
-            // got the slideshow mp4 - now add it
-            appendVideo(movie, outputPath);
-
-        } catch (IOException e) {
-            Log.d("jcodec", "jcodec IOExceptio" + e.getMessage());
-        }
-
-
-        return movie;
-    }
+//    private void createReel(List<String> files) {
+//        Movie reel = new Movie();
+//        if (!files.isEmpty()) {
+//            for (String file : files) {
+//                if (file.endsWith(".mp4")) {
+//
+//                    // deal with video file
+//                    reel = appendVideo(reel, file);
+//                }
+//
+//                if (file.endsWith(".png")) {
+//
+//                    // deal with photo file
+//                    reel = appendSlideshow(reel, file);
+//                }
+//            }
+//
+//            // after all this appending write the reel out to internal storage
+//            try {
+//
+//                String timeStamp = String.valueOf(System.currentTimeMillis());
+//                String reelPath = Environment.getExternalStorageDirectory() + "/" + "reel" + timeStamp + ".mp4";
+//                Container mp4file = new DefaultMp4Builder().build(reel);
+//                File file = new File(reelPath);
+//                FileChannel fileChannel = new FileOutputStream(file).getChannel();
+//                mp4file.writeContainer(fileChannel);
+//                fileChannel.close();
+//
+//                // all done - now pass the reel path to the theater activity
+//                startTheater(reelPath);
+//
+//            } catch (IOException e) {}
+//
+//        } else {
+//            // no data source for reel
+//            DialogUtils.showAlertDialog(getActivity(), "Please add media first!");
+//        }
+//    }
+//
+//    private Movie appendVideo(Movie movie, String file) {
+//        try {
+//            Movie temp = MovieCreator.build(file);
+//            List<Track> tracks = new ArrayList<>();
+//            for (Track track : temp.getTracks()) {
+//                if (track.getHandler().equals("vide")) {
+//                    tracks.add(track);
+//                }
+//            }
+//            movie.addTrack(new AppendTrack(tracks.toArray(new Track[tracks.size()])));
+//
+//        } catch (IOException e) {}
+//        //
+//        return movie;
+//    }
+//
+//    private Movie appendSlideshow(Movie movie, String file) {
+//        String outputPath = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + "slide.mp4";
+//        File output = new File(outputPath);
+//        List<Bitmap> bitmaps = new ArrayList<>();
+//        for (int i = 0; i < 120; i++) {
+//            Bitmap bitmap = BitmapFactory.decodeFile(file);
+//            bitmaps.add(bitmap);
+//        }
+//        try {
+//            SequenceEncoder sequenceEncoder = new SequenceEncoder(output);
+//            for (int i = 0; i < 120; i++) {
+//                sequenceEncoder.encodeImage(bitmaps.get(i));
+//            }
+//            sequenceEncoder.finish();
+//
+//            // got the slideshow mp4 - now add it
+//            appendVideo(movie, outputPath);
+//
+//        } catch (IOException e) {
+//            Log.d("jcodec", "jcodec IOExceptio" + e.getMessage());
+//        }
+//
+//
+//        return movie;
+//    }
 
     private void startTheater(String reelPath) {
         startActivity(TheaterActivity.getStartIntent(getActivity(), reelPath, musicPath));

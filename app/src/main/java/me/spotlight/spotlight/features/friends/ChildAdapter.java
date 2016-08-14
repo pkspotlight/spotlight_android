@@ -1,4 +1,4 @@
-package me.spotlight.spotlight.features.friends.details;
+package me.spotlight.spotlight.features.friends;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -17,6 +19,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Child;
 
@@ -28,7 +31,6 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildHolder>
     Context context;
     List<Child> children = new ArrayList<>();
     Transformation round;
-    String avatarUrl = "";
     ActionListener actionListener;
 
     public interface ActionListener {
@@ -53,20 +55,36 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildHolder>
 
         childHolder.childName.setText(child.getFirstName() + " " + child.getLastName());
 
+
+        String avatarUrl = "";
         if (null != child.getAvatarUrl())
             avatarUrl = child.getAvatarUrl();
 
+//        if (!"".equals(avatarUrl)) {
+//            Picasso.with(context)
+//                    .load(avatarUrl)
+//                    .fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round)
+//                    .into(childHolder.childAvatar);
+//        } else {
+//            Picasso.with(context)
+//                    .load(R.drawable.unknown_user)
+//                    .fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round)
+//                    .into(childHolder.childAvatar);
+//        }
+
         if (!"".equals(avatarUrl)) {
-            Picasso.with(context)
+            Glide.with(context)
                     .load(avatarUrl)
-                    .fit().centerCrop()
-                    .transform(round)
+//                    .skipMemoryCache(true)
                     .into(childHolder.childAvatar);
         } else {
-            Picasso.with(context)
+            Glide.with(context)
                     .load(R.drawable.unknown_user)
-                    .fit().centerCrop()
-                    .transform(round)
+//                    .skipMemoryCache(true)
                     .into(childHolder.childAvatar);
         }
 
@@ -91,7 +109,8 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildHolder>
     public class ChildHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.child_avatar)
-        ImageView childAvatar;
+//        ImageView childAvatar;
+        CircleImageView childAvatar;
         @Bind(R.id.child_name)
         TextView childName;
 

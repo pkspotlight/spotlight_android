@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -48,6 +49,7 @@ import me.spotlight.spotlight.utils.ParseConstants;
  */
 public class SpotlightDetailsFragment extends Fragment {
 
+    public static final String TAG = "SpotDetailFragment";
     @Bind(R.id.recycler_view_details)
     RecyclerView details;
     SpotPreviewAdapter spotPreviewAdapter;
@@ -206,9 +208,11 @@ public class SpotlightDetailsFragment extends Fragment {
 
     private void loadSpotDetails() {
         for (SpotlightMedia spotlightMedia : SpotlightsFragment.spotlightMedias) {
-            if (spotlightMedia.getParentId().equals(getArguments().getString("objectId"))) {
-                urls.add(spotlightMedia.getThumbnailUrl());
-                movs.add(spotlightMedia.getFileUrl());
+            if (null != spotlightMedia.getParentId()) {
+                if (spotlightMedia.getParentId().equals(getArguments().getString("objectId"))) {
+                    urls.add(spotlightMedia.getThumbnailUrl());
+                    movs.add(spotlightMedia.getFileUrl());
+                }
             }
         }
         spotPreviewAdapter.notifyDataSetChanged();
@@ -219,30 +223,29 @@ public class SpotlightDetailsFragment extends Fragment {
     private void initTeamAvatar() {
         if (null != getArguments().getString("teamAvatar")) {
             if (!"".equals(getArguments().getString("teamAvatar"))) {
-                Picasso.with(getContext())
+                Glide.with(getActivity())
                         .load(getArguments().getString("teamAvatar"))
-                        .fit().centerCrop()
-                        .transform(round)
                         .into(spotlightAvatar);
             } else {
-                Picasso.with(getContext())
+                Glide.with(getActivity())
                         .load(R.drawable.unknown_user)
-                        .fit().centerCrop()
-                        .transform(round)
                         .into(spotlightAvatar);
             }
         } else {
-            Picasso.with(getContext())
+            Glide.with(getActivity())
                     .load(R.drawable.unknown_user)
-                    .fit().centerCrop()
-                    .transform(round)
                     .into(spotlightAvatar);
         }
     }
 
     private void populateInfo() {
-        spotlightInfo.setText("Grade " + getArguments().getString("teamGrade") + " "
-                                    + getArguments().getString("teamSport"));
-        spotlightName.setText(getArguments().getString("teamName"));
+        try {
+            spotlightInfo.setText("Grade " + getArguments().getString("teamGrade") + " "
+                    + getArguments().getString("teamSport"));
+            spotlightName.setText(getArguments().getString("teamName"));
+            spotlightDate.setText(getArguments().getString("date"));
+        } catch (Exception e) {
+            Log.d(TAG, "exception");
+        }
     }
 }

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -30,6 +32,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.features.spotlights.add.FinishSpotlightFragment;
 import me.spotlight.spotlight.utils.CustomViewPager;
@@ -41,10 +44,12 @@ import me.spotlight.spotlight.utils.ParseConstants;
  */
 public class TeamDetailsFragment extends Fragment {
 
+    public static final String TAG = "TeamDetailsFragment";
     String avatarUrl = "";
     Transformation round;
     @Bind(R.id.team_detail_avatar)
-    ImageView teamDetailAvatar;
+//    ImageView teamDetailAvatar;
+    CircleImageView teamDetailAvatar;
     @Bind(R.id.team_detail_name)
     TextView teamDetailName;
     @Bind(R.id.team_detail_pager)
@@ -129,47 +134,62 @@ public class TeamDetailsFragment extends Fragment {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (null == e) {
                     if (!objects.isEmpty()) {
-                        ParseObject currentTeam = objects.get(0);
                         try {
-                            currentTeam.fetchIfNeeded();
-                        } catch (ParseException parseException) { /* TODO: handle this */}
+                            ParseObject currentTeam = objects.get(0);
 
-                        if (null != currentTeam.getParseObject("teamLogoMedia")) {
-                            ParseObject teamLogoMedia = currentTeam.getParseObject("teamLogoMedia");
-                            try {
+                            currentTeam.fetchIfNeeded();
+
+                            if (null != currentTeam.getParseObject("teamLogoMedia")) {
+                                ParseObject teamLogoMedia = currentTeam.getParseObject("teamLogoMedia");
+
                                 teamLogoMedia.fetchIfNeeded();
-                            } catch (ParseException parseException2) { /* TODO: handle this */}
-                            if (null != currentTeam.getParseObject("teamLogoMedia").getParseFile("mediaFile")) {
-                                avatarUrl = currentTeam.getParseObject("teamLogoMedia").getParseFile("mediaFile").getUrl();
+
+                                if (null != currentTeam.getParseObject("teamLogoMedia").getParseFile("mediaFile")) {
+                                    avatarUrl = currentTeam.getParseObject("teamLogoMedia").getParseFile("mediaFile").getUrl();
+                                }
                             }
+                            if (null != currentTeam.getString("teamName")) {
+                                teamName = currentTeam.getString("teamName");
+                                teamDetailName.setText(currentTeam.getString("teamName"));
+                            }
+                            if (!"".equals(avatarUrl))
+                                initAvatar(avatarUrl);
+                            else
+                                initEmptyAvatar();
+                        } catch (Exception e1) {
+                            Log.d(TAG, "exception");
                         }
-                        if (null != currentTeam.getString("teamName")) {
-                            teamName = currentTeam.getString("teamName");
-                            teamDetailName.setText(currentTeam.getString("teamName"));
-                        }
-                        if (!"".equals(avatarUrl))
-                            initAvatar(avatarUrl);
-                        else
-                            initEmptyAvatar();
                     }
                 }
             }
         });
     }
 
+//    private void initAvatar(String url) {
+//        Picasso.with(getActivity())
+//                .load(url)
+//                .fit().centerCrop()
+//                .transform(round)
+//                .into(teamDetailAvatar);
+//    }
+
     private void initAvatar(String url) {
-        Picasso.with(getActivity())
+        Glide.with(getActivity())
                 .load(url)
-                .fit().centerCrop()
-                .transform(round)
                 .into(teamDetailAvatar);
     }
 
+//    private void initEmptyAvatar() {
+//        Picasso.with(getActivity())
+//                .load(R.drawable.unknown_user)
+//                .fit().centerCrop()
+//                .transform(round)
+//                .into(teamDetailAvatar);
+//    }
+
     private void initEmptyAvatar() {
-        Picasso.with(getActivity())
+        Glide.with(getActivity())
                 .load(R.drawable.unknown_user)
-                .fit().centerCrop()
-                .transform(round)
                 .into(teamDetailAvatar);
     }
 

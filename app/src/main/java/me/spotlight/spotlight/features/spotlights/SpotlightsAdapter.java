@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
@@ -22,6 +23,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Spotlight;
 
@@ -33,7 +35,6 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
     Context context;
     List<Spotlight> spotlights = new ArrayList<>();
     Transformation round;
-    String avatarUrl = "";
     ActionListener actionListener;
     float xStart;
     float xFinish;
@@ -57,125 +58,114 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
 
     @Override
     public void onBindViewHolder(final SpotlightHolder spotlightHolder, final int position) {
-        final Spotlight spotlight = spotlights.get(position);
+        try {
 
-        spotlightHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.d("touch", String.valueOf(motionEvent.getAction()));
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    xStart = motionEvent.getX();
-                }
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if (motionEvent.getX() > xStart) {
-                        spotlightHolder.group.setVisibility(View.VISIBLE);
-                        spotlightHolder.group2.setVisibility(View.GONE);
-                    } else if (motionEvent.getX() < xStart) {
-                        spotlightHolder.group2.setVisibility(View.VISIBLE);
-                        spotlightHolder.group.setVisibility(View.GONE);
-                    } else {
-                        actionListener.onShowDetails(spotlight);
+            final Spotlight spotlight = spotlights.get(position);
+
+            spotlightHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    Log.d("touch", String.valueOf(motionEvent.getAction()));
+                    Log.d("touch", String.valueOf(motionEvent.getX()));
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        xStart = motionEvent.getX();
+                        Log.d("touch", String.valueOf(motionEvent.getX()));
                     }
+                    if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        if (motionEvent.getX() > (xStart)) {
+                            Log.d("touch", String.valueOf(motionEvent.getX()));
+                            spotlightHolder.group.setVisibility(View.VISIBLE);
+                            spotlightHolder.group2.setVisibility(View.GONE);
+                        } else if (motionEvent.getX() < (xStart)) {
+                            Log.d("touch", String.valueOf(motionEvent.getX()));
+                            spotlightHolder.group2.setVisibility(View.VISIBLE);
+                            spotlightHolder.group.setVisibility(View.GONE);
+                        } else {
+                            actionListener.onShowDetails(spotlight);
+                        }
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
 
 
-        spotlightHolder.teamInfo.setText(spotlight.getTeam().getName()
-                + " " + spotlight.getTeam().getSport()
-                + " - Grade " + spotlight.getTeam().getGrade());
-        spotlightHolder.teamInfo2.setText(spotlight.getTeam().getName()
-                + " " + spotlight.getTeam().getSport()
-                + " - Grade " + spotlight.getTeam().getGrade());
+            spotlightHolder.teamInfo.setText(spotlight.getTeam().getName()
+                    + " " + spotlight.getTeam().getSport()
+                    + " - Grade " + spotlight.getTeam().getGrade());
+            spotlightHolder.teamInfo2.setText(spotlight.getTeam().getName()
+                    + " " + spotlight.getTeam().getSport()
+                    + " - Grade " + spotlight.getTeam().getGrade());
 
 
 
-        // cover
-        if (null != spotlight.getCover()) {
-            if (!"".equals(spotlight.getCover())) {
-                Picasso.with(context)
-                        .load(spotlight.getCover())
-                        .fit().centerCrop()
-                        .into(spotlightHolder.spotCover);
-                Picasso.with(context)
-                        .load(spotlight.getCover())
-                        .fit().centerCrop()
-                        .into(spotlightHolder.spotCover2);
+            // cover
+            if (null != spotlight.getCover()) {
+                if (!"".equals(spotlight.getCover())) {
+                    Glide.with(context)
+                            .load(spotlight.getCover())
+                            .centerCrop()
+                            .into(spotlightHolder.spotCover);
+                    Glide.with(context)
+                            .load(spotlight.getCover())
+                            .centerCrop()
+                            .into(spotlightHolder.spotCover2);
+                } else {
+                    // TODO:
+                }
             } else {
-                Picasso.with(context)
-                        .load(R.drawable.spot_placeholder)
-                        .fit().centerCrop()
-                        .into(spotlightHolder.spotCover);
-                Picasso.with(context)
-                        .load(R.drawable.spot_placeholder)
-                        .fit().centerCrop()
-                        .into(spotlightHolder.spotCover2);
+                // TODO:
             }
-        } else {
-            Picasso.with(context)
-                    .load(R.drawable.spot_placeholder)
-                    .fit().centerCrop()
-                    .into(spotlightHolder.spotCover);
-            Picasso.with(context)
-                    .load(R.drawable.spot_placeholder)
-                    .fit().centerCrop()
-                    .into(spotlightHolder.spotCover2);
-        }
 
 
-        //team avatar
-        if (null != spotlight.getTeamsAvatar()) {
-            if (!"".equals(spotlight.getTeamsAvatar())) {
-                Picasso.with(context)
-                        .load(spotlight.getTeamsAvatar())
-                        .fit().centerCrop()
-                        .transform(round)
-                        .into(spotlightHolder.spotAvatar);
-                Picasso.with(context)
-                        .load(spotlight.getTeamsAvatar())
-                        .fit().centerCrop()
-                        .transform(round)
-                        .into(spotlightHolder.spotAvatar2);
+            //team avatar
+            if (null != spotlight.getTeamsAvatar()) {
+                if (!"".equals(spotlight.getTeamsAvatar())) {
+                    Glide.with(context)
+                            .load(spotlight.getTeamsAvatar())
+                            .into(spotlightHolder.spotAvatar);
+                    Glide.with(context)
+                            .load(spotlight.getTeamsAvatar())
+                            .into(spotlightHolder.spotAvatar2);
+                } else {
+                    Glide.with(context)
+                            .load(R.drawable.unknown_user)
+                            .into(spotlightHolder.spotAvatar);
+                    Glide.with(context)
+                            .load(R.drawable.unknown_user)
+                            .into(spotlightHolder.spotAvatar2);
+                }
             } else {
-                Picasso.with(context)
+                Glide.with(context)
                         .load(R.drawable.unknown_user)
-                        .fit().centerCrop()
-                        .transform(round)
                         .into(spotlightHolder.spotAvatar);
-                Picasso.with(context)
+                Glide.with(context)
                         .load(R.drawable.unknown_user)
-                        .fit().centerCrop()
-                        .transform(round)
                         .into(spotlightHolder.spotAvatar2);
             }
-        } else {
-            Picasso.with(context)
-                    .load(R.drawable.unknown_user)
-                    .fit().centerCrop()
-                    .transform(round)
-                    .into(spotlightHolder.spotAvatar);
-            Picasso.with(context)
-                    .load(R.drawable.unknown_user)
-                    .fit().centerCrop()
-                    .transform(round)
-                    .into(spotlightHolder.spotAvatar2);
+
+//            spotlightHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    actionListener.onShowDetails(spotlight);
+//                }
+//            });
+            spotlightHolder.remove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    spotlightHolder.group.setVisibility(View.VISIBLE);
+                    spotlightHolder.group2.setVisibility(View.GONE);
+                    actionListener.onDelete(spotlight, position);
+                }
+            });
+
+            spotlightHolder.spot_date.setText(getMonth(spotlight.getMonth()) + " " +
+                    String.valueOf(spotlight.getDay())
+                    + ", "
+                    + String.valueOf(spotlight.getYear()));
+
+        } catch (Exception e) {
+            Log.d("adapter", "exception");
         }
-
-        spotlightHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                actionListener.onShowDetails(spotlight);
-            }
-        });
-        spotlightHolder.remove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                actionListener.onDelete(spotlight, position);
-            }
-        });
-
-        // TODO: implementation
     }
 
     @Override
@@ -195,17 +185,23 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
     public class SpotlightHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.spotlight_avatar)
-        ImageView spotAvatar;
+//        ImageView spotAvatar;
+        CircleImageView spotAvatar;
         @Bind(R.id.spotlight_cover)
         ImageView spotCover;
         @Bind(R.id.spotlight_team_info)
         TextView teamInfo;
+        @Bind(R.id.spotlight_date)
+        TextView spot_date;
         @Bind(R.id.spotlight_avatar2)
-        ImageView spotAvatar2;
+//        ImageView spotAvatar2;
+        CircleImageView spotAvatar2;
         @Bind(R.id.spotlight_cover2)
         ImageView spotCover2;
         @Bind(R.id.spotlight_team_info2)
         TextView teamInfo2;
+        @Bind(R.id.spotlight_date2)
+        TextView spotDate2;
         @Bind(R.id.item_spot_frame)
         View group;
         @Bind(R.id.item_spot_frame2)
@@ -216,6 +212,37 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
         public SpotlightHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    public static String getMonth(String month) {
+        switch (month) {
+            case "Jan":
+                return "January";
+            case "Feb":
+                return "February";
+            case "Mar":
+                return "March";
+            case "Apr":
+                return "April";
+            case "May":
+                return "May";
+            case "Jun":
+                return "June";
+            case "Jul":
+                return "July";
+            case "Aug":
+                return "August";
+            case "Sep":
+                return "September";
+            case "Oct":
+                return "October";
+            case "Nov":
+                return "November";
+            case "Dec":
+                return "December";
+            default:
+                return "";
         }
     }
 }

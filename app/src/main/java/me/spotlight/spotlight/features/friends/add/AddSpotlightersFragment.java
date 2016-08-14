@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ import me.spotlight.spotlight.utils.ParseConstants;
  * Created by Anatol on 7/11/2016.
  */
 public class AddSpotlightersFragment extends Fragment implements UsersAdapter.ActionListener {
+
+    public static final String TAG = "AddSpotlightersFragment";
 
     @Bind(R.id.friends_search)
     EditText searchFriends;
@@ -108,8 +111,13 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                             @Override
                             public void done(ParseException e) {
                                 if (null == e) {
-                                    Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
-                                    getActivity().onBackPressed();
+                                    try {
+
+                                        Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
+                                        getActivity().onBackPressed();
+                                    } catch (Exception e1) {
+                                        Log.d(TAG, e1.getMessage());
+                                    }
                                 }
                             }
                         });
@@ -187,39 +195,51 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                             public void run() {
                                 for (ParseUser parseUser : objects) {
 
-                                    User user = new User();
-                                    user.setObjectId(parseUser.getObjectId());
-                                    if (null != parseUser.getString("firstName")) {
-                                        if (!"".equals(parseUser.getString("firstName"))) {
-                                            user.setFirstName(parseUser.getString("firstName"));
-                                        }
-                                    }
-                                    if (null != parseUser.getString("lastName")) {
-                                        if (!"".equals(parseUser.getString("lastName"))) {
-                                            user.setLastName(parseUser.getString("lastName"));
-                                        }
-                                    }
-                                    if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
-                                        try {
-                                            parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
-                                        } catch (ParseException e1) {}
-                                        if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
-                                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
-                                                user.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
+                                    try {
+
+                                        User user = new User();
+                                        user.setObjectId(parseUser.getObjectId());
+                                        if (null != parseUser.getString("firstName")) {
+                                            if (!"".equals(parseUser.getString("firstName"))) {
+                                                user.setFirstName(parseUser.getString("firstName"));
                                             }
                                         }
+                                        if (null != parseUser.getString("lastName")) {
+                                            if (!"".equals(parseUser.getString("lastName"))) {
+                                                user.setLastName(parseUser.getString("lastName"));
+                                            }
+                                        }
+                                        if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
+                                            try {
+                                                parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
+                                            } catch (ParseException e1) {}
+                                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
+                                                if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
+                                                    user.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
+                                                }
+                                            }
+                                        }
+
+                                        users.add(user);
+                                    } catch (Exception e1) {
+                                        Log.d(TAG, "crash");
                                     }
 
-                                    users.add(user);
                                 }
 
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        progressBar.setVisibility(View.GONE);
-                                        usersAdapter.notifyDataSetChanged();
-                                    }
-                                });
+
+                                try {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            progressBar.setVisibility(View.GONE);
+                                            usersAdapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    Log.d(TAG, "crash");
+                                }
+
                             }
                         };
 

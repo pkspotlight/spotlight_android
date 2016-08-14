@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -17,6 +19,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Team;
 
@@ -28,13 +31,12 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
     Context context;
     List<Team> teams = new ArrayList<>();
     Transformation round;
-    String avatarUrl = "";
     ActionListener actionListener;
     boolean following;
 
     public interface ActionListener {
         void onShowDetails(Team team);
-        void onRequestFollow(Team team);
+        void onRequestFollow(Team team, int position, boolean unfollow);
     }
 
     public TeamsAdapter(Context context, List<Team> teams, ActionListener actionListener, boolean following) {
@@ -51,7 +53,7 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final TeamHolder teamHolder, int position) {
+    public void onBindViewHolder(final TeamHolder teamHolder, final int position) {
         final Team team = teams.get(position);
 
         teamHolder.teamName.setText(team.getName());
@@ -59,27 +61,40 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
         teamHolder.teamSport.setText(team.getSport());
         teamHolder.teamSeason.setText(team.getSeason() + " " + team.getYear());
 
+        String avatarUrl = "";
         if (null != team.getAvatarUrl())
             avatarUrl = team.getAvatarUrl();
         // TODO: introduce is valid url check
+//        if (!"".equals(avatarUrl)) {
+//            Picasso.with(context)
+//                    .load(avatarUrl)
+//                    .fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round)
+//                    .into(teamHolder.teamAvatar);
+//        } else {
+//            Picasso.with(context)
+//                    .load(R.drawable.unknown_user)
+//                    .fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round)
+//                    .into(teamHolder.teamAvatar);
+//        }
+
         if (!"".equals(avatarUrl)) {
-            Picasso.with(context)
+            Glide.with(context)
                     .load(avatarUrl)
-                    .fit().centerCrop()
-                    .transform(round)
                     .into(teamHolder.teamAvatar);
         } else {
-            Picasso.with(context)
+            Glide.with(context)
                     .load(R.drawable.unknown_user)
-                    .fit().centerCrop()
-                    .transform(round)
                     .into(teamHolder.teamAvatar);
         }
 
         teamHolder.fol2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                actionListener.onRequestFollow(team);
+                actionListener.onRequestFollow(team, position, team.isMine());
             }
         });
 
@@ -87,6 +102,9 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
             teamHolder.teamFollowing.setText("Following");
         else
             teamHolder.teamFollowing.setText("Follow");
+
+        if (team.isMine())
+            teamHolder.teamFollowing.setText("Following");
 
         teamHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,7 +128,8 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.TeamHolder> 
         @Bind(R.id.fol2)
         View fol2;
         @Bind(R.id.team_avatar)
-        ImageView teamAvatar;
+//        ImageView teamAvatar;
+        CircleImageView teamAvatar;
         @Bind(R.id.team_name)
         TextView teamName;
         @Bind(R.id.team_grade)

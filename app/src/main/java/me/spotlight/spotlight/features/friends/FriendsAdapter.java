@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -17,6 +19,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Friend;
 import me.spotlight.spotlight.models.Team;
@@ -29,7 +32,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
     Context context;
     List<Friend> friends = new ArrayList<>();
     Transformation round;
-    String avatarUrl = "";
     ActionListener actionListener;
 
     public interface ActionListener {
@@ -67,15 +69,30 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
 //                }
 //            }
 //        }
+        String avatarUrl = "";
         if (null != friend.getAvatarUrl())
             avatarUrl = friend.getAvatarUrl();
         // TODO: introduce is valid url check
+//        if (!"".equals(avatarUrl)) {
+//            Picasso.with(context).load(avatarUrl).fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round).into(friendHolder.friendAvatar);
+//        } else {
+//            Picasso.with(context).load(R.drawable.unknown_user).fit().centerCrop()
+//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                    .transform(round).into(friendHolder.friendAvatar);
+//        }
+
         if (!"".equals(avatarUrl)) {
-            Picasso.with(context).load(avatarUrl).fit().centerCrop()
-                    .transform(round).into(friendHolder.friendAvatar);
+            Glide.with(context)
+                    .load(avatarUrl)
+//                    .skipMemoryCache(true)
+                    .into(friendHolder.friendAvatar);
         } else {
-            Picasso.with(context).load(R.drawable.unknown_user).fit().centerCrop()
-                    .transform(round).into(friendHolder.friendAvatar);
+            Glide.with(context)
+                    .load(R.drawable.unknown_user)
+//                    .skipMemoryCache(true)
+                    .into(friendHolder.friendAvatar);
         }
 
         // for now always showing -- later introduce a boolean
@@ -107,7 +124,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
     public class FriendHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.friend_avatar)
-        ImageView friendAvatar;
+//        ImageView friendAvatar;
+        CircleImageView friendAvatar;
         @Bind(R.id.friend_name)
         TextView friendName;
         @Bind(R.id.friend_following)

@@ -1,6 +1,5 @@
 package me.spotlight.spotlight.features.friends.details;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,27 +36,26 @@ import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
- * Created by Anatol on 7/21/2016.
+ * Created by Evgheni on 8/11/2016.
  */
-public class FriendTeamsFragment extends Fragment implements TeamsAdapter.ActionListener {
+public class ChildTeamsFragment extends Fragment implements TeamsAdapter.ActionListener {
 
-    public static final String TAG = "FriendTeamsFragment";
-    @Bind(R.id.recycler_view_friend_teams)
-    RecyclerView friendTeamsList;
-    TeamsAdapter friendTeamsAdapter;
-    List<Team> friendTeams = new ArrayList<>();
-    List<String> myTeamsIds = new ArrayList<>();
+    public static final String TAG = "ChildTeamsFragment";
+    @Bind(R.id.recycler_view_child_teams)
+    RecyclerView recyclerView;
+    TeamsAdapter teamsAdapter;
+    List<Team> childTeams = new ArrayList<>();
 
     /*
         Manufacturing singleton
      */
-    public static FriendTeamsFragment newInstance(Bundle args) {
-        FriendTeamsFragment friendTeamsFragment = new FriendTeamsFragment();
-        friendTeamsFragment.setArguments(args);
-        return friendTeamsFragment;
+    public static ChildTeamsFragment newInstance(Bundle args) {
+        ChildTeamsFragment childTeamsFragment = new ChildTeamsFragment();
+        childTeamsFragment.setArguments(args);
+        return childTeamsFragment;
     }
 
-    public void onShowDetails(Team team) {
+    public void onShowDetails(final Team team) {
         try {
             Bundle bundle = new Bundle();
             bundle.putString("objectId", team.getObjectId());
@@ -67,28 +65,27 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
         }
     }
 
-    public void onRequestFollow(final Team team, int position, final boolean unfollow) {
-        final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setMessage(R.string.follow_sure)
-                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        if (!unfollow) {
-                            createRequest(team);
-                        } else {
-                            unfollowTeam(team);
-                        }
-                    }
-                })
-                .setPositiveButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
+    public void onRequestFollow(final Team team, int position, boolean unfollow) {
+        // you are following all your kids teams by default
+
+
+//        final AlertDialog dialog = new AlertDialog.Builder(getContext())
+//                .setMessage(R.string.follow_sure)
+//                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.dismiss();
+//                        createRequest(team);
+//                    }
+//                })
+//                .setPositiveButton("No", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.dismiss();
+//                    }
+//                })
+//                .create();
+//        dialog.show();
     }
 
     private void unfollowTeam(Team team) {
@@ -97,7 +94,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = layoutInflater.inflate(R.layout.fragment_friend_details_teams, container, false);
+        View view = layoutInflater.inflate(R.layout.fragment_child_teams, container, true);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -105,134 +102,127 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        friendTeamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        friendTeamsAdapter = new TeamsAdapter(getActivity(), friendTeams, this, false);
-        friendTeamsList.setAdapter(friendTeamsAdapter);
+//        Toast.makeText(getContext(), getArguments().getString("objectId"), Toast.LENGTH_LONG).show();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        teamsAdapter = new TeamsAdapter(getActivity(), childTeams, this, false);
+        recyclerView.setAdapter(teamsAdapter);
 
         loadTeams();
-        loadMyTeamsIds();
     }
 
-    private void loadMyTeamsIds() {
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
-        ParseRelation teamsRel = ParseUser.getCurrentUser().getRelation("teams");
-        ParseQuery<ParseObject> teamsQ = teamsRel.getQuery();
-        teamsQ.findInBackground(new FindCallback<ParseObject>() {
+
+    private void loadTeams() {
+        if (!childTeams.isEmpty())
+            childTeams.clear();
+        ParseQuery<ParseObject> childQuery = new ParseQuery<>(ParseConstants.OBJECT_CHILD);
+        childQuery.whereEqualTo("objectId", getArguments().getString("objectId"));
+        childQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if (null == e) {
                     if (!objects.isEmpty()) {
-                        for (ParseObject parseObject : objects) {
-                            myTeamsIds.add(parseObject.getObjectId());
+
+                        ParseObject mChild = objects.get(0);
+                        try {
+                            mChild.fetchIfNeeded();
+                        } catch (Exception e1) {
+                            Log.d(TAG, "parse exception");
                         }
 
-                        progressDialog.dismiss();
+                        ParseRelation<ParseObject> teamsRel = mChild.getRelation("teams");
+                        ParseQuery<ParseObject> teamsQuery = teamsRel.getQuery();
+                        teamsQuery.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, ParseException e) {
+                                if (null == e) {
+                                    if (!objects.isEmpty()) {
+
+                                        for (ParseObject parseObject : objects) {
+                                            try {
+                                                Team team = new Team();
+                                                team.setObjectId(parseObject.getObjectId());
+
+                                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
+                                                    team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
+                                                    team.setTeamName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
+                                                }
+
+                                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
+                                                    team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
+                                                }
+                                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
+                                                    team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
+                                                }
+                                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
+                                                    team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
+                                                }
+                                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
+                                                    team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
+                                                }
+                                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
+                                                    try {
+                                                        parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
+                                                    } catch (ParseException e1) {
+                                                    }
+                                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
+                                                        if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
+                                                            team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
+                                                        }
+                                                    }
+                                                }
+
+                                                childTeams.add(team);
+
+                                            } catch (Exception e3) {
+                                                Log.d(TAG, e3.getMessage());
+                                            }
+                                        }
+
+                                        Collections.sort(childTeams, comparator);
+                                        teamsAdapter.notifyDataSetChanged();
+
+                                    } else {
+                                        Log.d(TAG, "empty teams query");
+                                    }
+                                } else {
+                                    Log.d(TAG, "exception finding teams");
+                                }
+                            }
+                        });
+
                     } else {
-                        progressDialog.dismiss();
+                        Log.d(TAG, "empty query for current child ");
                     }
                 } else {
-                    progressDialog.dismiss();
+                    Log.d(TAG, "finding current child exception");
                 }
             }
         });
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume");
     }
 
-    private void loadTeams() {
-        if (!friendTeams.isEmpty())
-            friendTeams.clear();
-        ParseQuery<ParseUser> query = ParseUser.getCurrentUser().getQuery();
-        query.whereEqualTo("objectId", getArguments().getString("objectId"));
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-                if (null == e) {
-                    if (!objects.isEmpty()) {
-                        ParseUser parseUser = objects.get(0);
-                        try {
-                            parseUser.fetchIfNeeded();
-                        } catch (ParseException e1) {}
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause");
+    }
 
-                        ParseRelation<ParseObject> teamRel = parseUser.getRelation("teams");
-                        ParseQuery<ParseObject> teamQuery = teamRel.getQuery();
-                        teamQuery.findInBackground(new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(List<ParseObject> objects, ParseException e) {
-                                if (null == e) {
-                                    if (!objects.isEmpty()) {
-                                        for (ParseObject parseObject : objects) {
-                                            Team team = new Team();
-                                            team.setObjectId(parseObject.getObjectId());
-
-                                            for (String string : myTeamsIds) {
-                                                if (string.equals(parseObject.getObjectId())) {
-                                                    team.setMine(true);
-                                                }
-                                            }
-
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
-                                                    team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
-                                                    team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
-                                                    team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
-                                                    team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
-                                                    team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
-                                                }
-                                            }
-                                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
-                                                try {
-                                                    parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
-                                                } catch (ParseException e1) {
-                                                }
-                                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
-                                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
-                                                        team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
-                                                    }
-                                                }
-                                            }
-                                            friendTeams.add(team);
-                                        }
-
-                                        Collections.sort(friendTeams, comparator);
-                                        friendTeamsAdapter.notifyDataSetChanged();
-
-                                    } else {
-                                        Log.d(TAG, "empty teams query");
-                                    }
-
-
-                                } else {
-                                    // TODO: handle e
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
     }
 
     Comparator<Team> comparator = new Comparator<Team>() {
@@ -259,7 +249,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
                     result = (int) Integer.valueOf(year2) - Integer.valueOf(year1);
                 }
             } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
+                Log.d(TAG, "crash");
             }
 
 
@@ -283,6 +273,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
         }
         return 0;
     }
+
 
 
     /*
@@ -379,7 +370,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
                                                     @Override
                                                     public void onClick(DialogInterface dialogInterface, int i) {
                                                         dialogInterface.dismiss();
-                                                        getActivity().onBackPressed();
+                                                        /// getActivity().onBackPressed();
                                                     }
                                                 })
                                                 .create();
@@ -406,4 +397,5 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
 
 
     }
+
 }

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -28,6 +30,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.utils.CustomViewPager;
 import me.spotlight.spotlight.utils.ParseConstants;
@@ -37,17 +40,19 @@ import me.spotlight.spotlight.utils.ParseConstants;
  */
 public class FriendDetailsFragment extends Fragment {
 
+    public static final String TAG = "FriendDetailsFragment";
+    private static final int NUM_TABS = 2;
     String avatarUrl;
     Transformation round;
     @Bind(R.id.friend_detail_avatar)
-    ImageView friendDetailAvatar;
+//    ImageView friendDetailAvatar;
+    CircleImageView friendDetailAvatar;
     @Bind(R.id.friend_detail_name)
     TextView friendDetailName;
     @Bind(R.id.friend_detail_pager)
     CustomViewPager friendDetailPager;
     private List<Fragment> fragments = new ArrayList<>();
     private PagerAdapter pagerAdapter;
-    private static final int NUM_TABS = 2;
     @Bind(R.id.friend_detail_spot)
     View friendSpot;
     @Bind(R.id.friend_detail_teams)
@@ -107,6 +112,7 @@ public class FriendDetailsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        getActivity().setTitle(R.string.title_friend_details);
         populate();
     }
 
@@ -123,31 +129,46 @@ public class FriendDetailsFragment extends Fragment {
             public void done(List<ParseUser> objects, ParseException e) {
                 if (null == e) {
                     if (!objects.isEmpty()) {
-                        ParseUser currentUser = objects.get(0);
                         try {
+
+                            ParseUser currentUser = objects.get(0);
+
                             currentUser.fetchIfNeeded();
-                        } catch (ParseException parseException) { /* TODO: handle this */}
 
-                        if (null != currentUser.getParseObject("profilePic")) {
-                            ParseObject profilePic = currentUser.getParseObject("profilePic");
-                            try {
+                            if (null != currentUser.getParseObject("profilePic")) {
+                                ParseObject profilePic = currentUser.getParseObject("profilePic");
+
                                 profilePic.fetchIfNeeded();
-                            } catch (ParseException parseException2) { /* TODO: handle this */}
 
-                            if (null != currentUser.getParseObject("profilePic").getParseFile("mediaFile")) {
-                                avatarUrl = currentUser.getParseObject("profilePic").getParseFile("mediaFile").getUrl();
+                                if (null != currentUser.getParseObject("profilePic").getParseFile("mediaFile")) {
+                                    avatarUrl = currentUser.getParseObject("profilePic").getParseFile("mediaFile").getUrl();
+                                }
                             }
+
+                            if (null != currentUser.getString("username")) {
+                                //
+                            }
+
+
+                            StringBuilder fullName = new StringBuilder();
+                            if (null != currentUser.getString("firstName")) {
+                                fullName.append(currentUser.getString("firstName"));
+                                friendDetailName.setText(fullName.toString());
+                            }
+
+                            if (null != currentUser.getString("lastName")) {
+                                fullName.append(" ");
+                                fullName.append(currentUser.getString("lastName"));
+                                friendDetailName.setText(fullName.toString());
+                            }
+
+                            if (!"".equals(avatarUrl))
+                                initAvatar(avatarUrl);
+                            else
+                                initEmptyAvatar();
+                        } catch (Exception e1) {
+                            Log.d(TAG, "exception");
                         }
-                        if (null != currentUser.getString("username")) {
-                            friendDetailName.setText(currentUser.getString("username"));
-                            try {
-                                getActivity().setTitle(currentUser.getString("username"));
-                            } catch (NullPointerException e1) {}
-                        }
-                        if (!"".equals(avatarUrl))
-                            initAvatar(avatarUrl);
-                        else
-                            initEmptyAvatar();
                     } else {
                         // handle empty result
                     }
@@ -158,19 +179,31 @@ public class FriendDetailsFragment extends Fragment {
         });
     }
 
+//    private void initAvatar(String url) {
+//        Picasso.with(getActivity())
+//                .load(url)
+//                .fit().centerCrop()
+//                .transform(round)
+//                .into(friendDetailAvatar);
+//    }
+
     private void initAvatar(String url) {
-        Picasso.with(getActivity())
+        Glide.with(getActivity())
                 .load(url)
-                .fit().centerCrop()
-                .transform(round)
                 .into(friendDetailAvatar);
     }
 
+//    private void initEmptyAvatar() {
+//        Picasso.with(getActivity())
+//                .load(R.drawable.unknown_user)
+//                .fit().centerCrop()
+//                .transform(round)
+//                .into(friendDetailAvatar);
+//    }
+
     private void initEmptyAvatar() {
-        Picasso.with(getActivity())
+        Glide.with(getActivity())
                 .load(R.drawable.unknown_user)
-                .fit().centerCrop()
-                .transform(round)
                 .into(friendDetailAvatar);
     }
 

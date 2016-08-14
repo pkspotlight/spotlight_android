@@ -9,34 +9,32 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
-import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.teams.TeamsAdapter;
 import me.spotlight.spotlight.features.teams.details.TeamDetailsFragment;
 import me.spotlight.spotlight.models.Team;
+import me.spotlight.spotlight.utils.DialogUtils;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
@@ -45,11 +43,13 @@ import me.spotlight.spotlight.utils.ParseConstants;
  */
 public class SearchTeamsFragment extends Fragment implements TeamsAdapter.ActionListener {
 
+    public static final String TAG = "SearchTeamsFragment";
     @Bind(R.id.teams_search)
     EditText searchTeams;
     @Bind(R.id.recycler_view_teams)
     RecyclerView teamsList;
     List<Team> teams = new ArrayList<>();
+    List<String> myTeams = new ArrayList<>();
     TeamsAdapter teamsAdapter;
     @Bind(R.id.progress)
     ProgressBar progressBar;
@@ -73,14 +73,18 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
         FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
     }
 
-    public void onRequestFollow(final Team team) {
+    public void onRequestFollow(final Team team, int position, final boolean unfollow) {
         final AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setMessage(R.string.follow_sure)
                 .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
-                        createRequest(team);
+                        if (!unfollow) {
+                            createRequest(team);
+                        } else {
+                            unfollowTeam(team);
+                        }
                     }
                 })
                 .setPositiveButton("No", new DialogInterface.OnClickListener() {
@@ -91,6 +95,10 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
                 })
                 .create();
         dialog.show();
+    }
+
+    private void unfollowTeam(Team team) {
+        Toast.makeText(getActivity(), "Unfollowing " + team.getName(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -139,6 +147,7 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
     public void onResume() {
         super.onResume();
         getActivity().setTitle(R.string.search_teams);
+        loadMyTeams();
     }
 
     @Override
@@ -148,7 +157,34 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
             teamsThread.interrupt();
     }
 
-    private void loadTeams(String param) {
+    private void loadMyTeams() {
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+        ParseRelation teamsRel = ParseUser.getCurrentUser().getRelation("teams");
+        ParseQuery<ParseObject> teamsQ = teamsRel.getQuery();
+        teamsQ.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject parseObject : objects) {
+                            myTeams.add(parseObject.getObjectId());
+                        }
+
+                        progressDialog.dismiss();
+                    } else {
+                        progressDialog.dismiss();
+                    }
+                } else {
+                    progressDialog.dismiss();
+                }
+            }
+        });
+    }
+
+    private void loadTeams(final String param) {
         if (!teams.isEmpty())
             teams.clear();
         progressBar.setVisibility(View.VISIBLE);
@@ -165,53 +201,70 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
                             @Override
                             public void run() {
                                 for (ParseObject parseObject : objects) {
-                                    Team team = new Team();
-                                    team.setObjectId(parseObject.getObjectId());
-                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
-                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
-                                            team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
-                                        }
-                                    }
-                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
-                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
-                                            team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
-                                        }
-                                    }
-                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
-                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
-                                            team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
-                                        }
-                                    }
-                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
-                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
-                                            team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
-                                        }
-                                    }
-                                    if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
-                                        if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
-                                            team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
-                                        }
-                                    }
-                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
-                                        try {
-                                            parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
-                                        } catch (ParseException e1) {}
-                                        if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
-                                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
-                                                team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
+                                    try {
+
+                                        Team team = new Team();
+                                        team.setObjectId(parseObject.getObjectId());
+
+                                        for (String string : myTeams) {
+                                            if (string.equals(parseObject.getObjectId())) {
+                                                team.setMine(true);
                                             }
                                         }
+
+                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
+                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
+                                                team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
+                                            }
+                                        }
+                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
+                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
+                                                team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
+                                            }
+                                        }
+                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
+                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
+                                                team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
+                                            }
+                                        }
+                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
+                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
+                                                team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
+                                            }
+                                        }
+                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
+                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
+                                                team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
+                                            }
+                                        }
+                                        if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
+                                            try {
+                                                parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
+                                            } catch (ParseException e1) {}
+                                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
+                                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
+                                                    team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
+                                                }
+                                            }
+                                        }
+                                        teams.add(team);
+                                    } catch (Exception e1) {
+                                        Log.d(TAG, "crash");
                                     }
-                                    teams.add(team);
                                 }
 
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        progressBar.setVisibility(View.GONE);
-                                        teamsAdapter.notifyDataSetChanged();
-                                    }
-                                });
+                                try {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            progressBar.setVisibility(View.GONE);
+                                            teamsAdapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                } catch (Exception e1) {
+                                    Log.d(TAG, "crash");
+                                }
+
                             }
                         };
 

@@ -70,6 +70,7 @@ public class LoginFragment extends Fragment {
                         @Override
                         public void done(ParseUser user, ParseException e) {
                             if (null != user) {
+                                Toast.makeText(getActivity(), "Logged in successfully!", Toast.LENGTH_LONG).show();
                                 startActivity(MainActivity.getStartIntent(getActivity()));
                             } else {
                                 Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT).show();

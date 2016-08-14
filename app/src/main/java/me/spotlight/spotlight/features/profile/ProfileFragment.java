@@ -27,14 +27,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.facebook.login.LoginManager;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.parse.FindCallback;
 import com.parse.LogOutCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -42,7 +42,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.io.ByteArrayOutputStream;
@@ -53,11 +52,10 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.activities.LoginActivity;
-import me.spotlight.spotlight.base.BaseFragment;
 import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
-import me.spotlight.spotlight.models.User;
 import me.spotlight.spotlight.utils.Constants;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
@@ -72,7 +70,8 @@ public class ProfileFragment extends Fragment {
     Transformation round;
     Uri mImageCaptureUri;
     @Bind(R.id.profile_avatar)
-    ImageView profileAvatar;
+//    ImageView profileAvatar;
+    CircleImageView profileAvatar;
     @Bind(R.id.profile_name)
     TextView profileName;
     @Bind(R.id.profile_username)
@@ -182,10 +181,10 @@ public class ProfileFragment extends Fragment {
             public void done(ParseException e) {
                 if (null == e) {
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                    imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_profile).getWindowToken(), 0);
                     refresh();
                 } else {
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -247,19 +246,31 @@ public class ProfileFragment extends Fragment {
         loadFamily();
     }
 
+//    private void initAvatar(String url) {
+//        Picasso.with(getActivity())
+//                .load(url)
+//                .fit().centerCrop()
+//                .transform(round)
+//                .into(profileAvatar);
+//    }
+
     private void initAvatar(String url) {
-        Picasso.with(getActivity())
+        Glide.with(getActivity())
                 .load(url)
-                .fit().centerCrop()
-                .transform(round)
                 .into(profileAvatar);
     }
 
+//    private void initEmptyAvatar() {
+//        Picasso.with(getActivity())
+//                .load(R.drawable.unknown_user)
+//                .fit().centerCrop()
+//                .transform(round)
+//                .into(profileAvatar);
+//    }
+
     private void initEmptyAvatar() {
-        Picasso.with(getActivity())
+        Glide.with(getActivity())
                 .load(R.drawable.unknown_user)
-                .fit().centerCrop()
-                .transform(round)
                 .into(profileAvatar);
     }
 
@@ -322,10 +333,14 @@ public class ProfileFragment extends Fragment {
             public void onClick(DialogInterface dialog, int item) {
                 switch (item) {
                     case 0:
-                        takePicture();
+                        try {
+                            takePicture();
+                        } catch (Exception e) { }
                         break;
                     case 1:
-                        selectPicture();
+                        try {
+                            selectPicture();
+                        } catch (Exception e) { }
                         break;
                 }
             }
@@ -427,6 +442,7 @@ public class ProfileFragment extends Fragment {
 
     @OnClick(R.id.profile_logout)
     public void logout() {
+        LoginManager.getInstance().logOut();
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
             public void done(ParseException e) {
