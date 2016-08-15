@@ -97,6 +97,7 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
         dialog.show();
     }
 
+
     private void unfollowTeam(Team team) {
         Toast.makeText(getActivity(), "Unfollowing " + team.getName(), Toast.LENGTH_LONG).show();
     }

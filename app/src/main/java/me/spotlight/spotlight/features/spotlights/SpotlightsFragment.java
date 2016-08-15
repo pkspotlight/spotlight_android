@@ -67,14 +67,13 @@ public class SpotlightsFragment extends Fragment
     RecyclerView mySpotlightsList;
     SpotlightsAdapter spotlightsAdapter;
     List<Spotlight> mySpotlights = new ArrayList<>();
+    List<Spotlight> myKidsSpotlights = new ArrayList<>();
     List<Team> myTeams = new ArrayList<>();
+    List<Team> kidsTeams = new ArrayList<>();
     public static List<SpotlightMedia> spotlightMedias = new ArrayList<>();
-//    @Bind(R.id.swipe_spotlights)
-//    SwipeRefreshLayout swipeSpotlights;
     @Bind(R.id.progress)
     ProgressBar progressBar;
     Thread loadTeamsThread;
-    private Paint p = new Paint();
 
     /*
         Manufacturing singleton
@@ -87,16 +86,20 @@ public class SpotlightsFragment extends Fragment
     }
 
     public void onShowDetails(Spotlight spotlight) {
-        Bundle bundle = new Bundle();
-        bundle.putString("objectId", spotlight.getObjectId());
-        bundle.putString("teamAvatar", spotlight.getTeamsAvatar());
-        bundle.putString("teamName", spotlight.getTeam().getName());
-        bundle.putString("teamGrade", spotlight.getTeam().getGrade());
-        bundle.putString("teamSport", spotlight.getTeam().getSport());
-        bundle.putString("date", SpotlightsAdapter.getMonth(spotlight.getMonth())
-                            + " " + String.valueOf(spotlight.getDay()) + ", "
-                            + String.valueOf(spotlight.getYear()));
-        FragmentUtils.addFragment(getActivity(), R.id.content, this, SpotlightDetailsFragment.newInstance(bundle), true);
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString("objectId", spotlight.getObjectId());
+            bundle.putString("teamAvatar", spotlight.getTeamsAvatar());
+            bundle.putString("teamName", spotlight.getTeam().getName());
+            bundle.putString("teamGrade", spotlight.getTeam().getGrade());
+            bundle.putString("teamSport", spotlight.getTeam().getSport());
+            bundle.putString("date", SpotlightsAdapter.getMonth(spotlight.getMonth())
+                    + " " + String.valueOf(spotlight.getDay()) + ", "
+                    + String.valueOf(spotlight.getYear()));
+            FragmentUtils.addFragment(getActivity(), R.id.content, this, SpotlightDetailsFragment.newInstance(bundle), true);
+        } catch (Exception e){
+            Log.d(TAG, e.getMessage());
+        }
     }
 
     public void onDelete(final Spotlight spotlight, final int position) {
@@ -157,16 +160,6 @@ public class SpotlightsFragment extends Fragment
         mySpotlightsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         spotlightsAdapter = new SpotlightsAdapter(getActivity(), mySpotlights, this);
         mySpotlightsList.setAdapter(spotlightsAdapter);
-//        swipeSpotlights.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                if (!mySpotlights.isEmpty())
-//                    mySpotlights.clear();
-//                spotlightsAdapter.notifyDataSetChanged();
-//                loadTeams();
-//                swipeSpotlights.setRefreshing(false);
-//            }
-//        });
 
         preloadSpotlightMedia();
     }
@@ -175,9 +168,8 @@ public class SpotlightsFragment extends Fragment
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.tabs_spotlights));
-//        initSwipe(mySpotlightsList, spotlightsAdapter);
         if (getActivity().getPreferences(Context.MODE_PRIVATE).contains("first" + ParseUser.getCurrentUser().getObjectId())) {
-            // dont show
+            // don't show onboarding
         } else {
             final AlertDialog dialog = new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.welcome_spotlight))
@@ -200,7 +192,6 @@ public class SpotlightsFragment extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.main, menu);
-//        final MenuItem item = menu.findItem(R.id.action_add);
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -210,7 +201,6 @@ public class SpotlightsFragment extends Fragment
         }
         if (menuItem.getItemId() == R.id.action_add) {
             menuItem.setVisible(false);
-//            FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
             FragmentUtils.addFragment(getActivity(), R.id.content, this, AddSpotlightFragment.newInstance(), true);
             ret = true;
         }
@@ -270,6 +260,7 @@ public class SpotlightsFragment extends Fragment
                         }
 
                         loadTeams();
+                        getKids();
                     }
                 }
             }
@@ -296,71 +287,15 @@ public class SpotlightsFragment extends Fragment
                                 for (ParseObject parseObject : objects) {
 
                                     try {
+                                        myTeams.add(convertTeam(parseObject));
 
-                                        Team team = new Team();
-                                        team.setObjectId(parseObject.getObjectId());
-                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
-                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
-                                                team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
-                                            }
-                                        }
-                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
-                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
-                                                team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
-                                            }
-                                        }
-                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
-                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
-                                                team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
-                                            }
-                                        }
-                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
-                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
-                                                team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
-                                            }
-                                        }
-                                        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
-                                            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
-                                                team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
-                                            }
-                                        }
-                                        if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
-                                            try {
-                                                parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
-                                            } catch (ParseException e1) {
-                                            }
-                                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
-                                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
-                                                    team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
-                                                }
-                                            }
-                                        }
-                                        myTeams.add(team);
                                         Log.d(TAG, parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
                                     } catch (Exception e1) {
                                         Log.d(TAG, "crash");
                                     }
                                 }
 
-
-                                if (null != SpotlightsFragment.this) {
-                                    try {
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-
-                                                if (null != progressBar) {
-                                                    progressBar.setVisibility(View.GONE);
-                                                    loadMySpotlights(myTeams);
-                                                }
-                                                else
-                                                    Log.d("crash", "crash");
-                                            }
-                                        });
-                                    } catch (Exception e3) {
-                                        Log.d(TAG, "crash");
-                                    }
-                                }
+                                proceed();
                             }
                         };
 
@@ -377,6 +312,51 @@ public class SpotlightsFragment extends Fragment
                 }
             }
         });
+    }
+
+    private void getKids() {
+        final List<ParseObject> kids = new ArrayList<>();
+        ParseRelation<ParseObject> kidsRel = ParseUser.getCurrentUser().getRelation("children");
+        ParseQuery<ParseObject> kidsQuery = kidsRel.getQuery();
+        kidsQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject parseObject : objects) {
+                            kids.add(parseObject);
+                        }
+
+                        // go on
+                        getKidsTeams(kids);
+                    }
+                }
+            }
+        });
+    }
+
+    private void getKidsTeams(List<ParseObject> kids) {
+        final List<Team> kidsTeams = new ArrayList<>();
+        for (ParseObject kid : kids) {
+            ParseRelation<ParseObject> teamsRel = kid.getRelation("teams");
+            teamsRel.getQuery().findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> objects, ParseException e) {
+                    if (null == e) {
+                        if (!objects.isEmpty()) {
+                            for (ParseObject team : objects) {
+                                try {
+
+                                    kidsTeams.add(convertTeam(team));
+                                } catch (Exception e1) {}
+                            }
+
+                            loadKidsSpotlights(kidsTeams);
+                        }
+                    }
+                }
+            });
+        }
     }
 
 
@@ -401,8 +381,8 @@ public class SpotlightsFragment extends Fragment
                                 Date date = spotlight.getUpdatedAt();
                                 int end = date.toString().length();
                                 int start = end - 4;
-                                Log.d(TAG, date.toString());
-                                Log.d(TAG, String.valueOf(date.toString().length()));
+//                                Log.d(TAG, date.toString());
+//                                Log.d(TAG, String.valueOf(date.toString().length()));
 
                                 if (null != spotlight.getParseObject("team")) {
                                     ParseObject team = spotlight.getParseObject("team");
@@ -417,9 +397,9 @@ public class SpotlightsFragment extends Fragment
                                             mSpot.setYear(Integer.valueOf(date.toString().substring(start, end)));
                                             mSpot.setDay(Integer.valueOf(date.toString().substring(8, 10)));
                                             mSpot.setMonth(date.toString().substring(4, 7));
-                                            Log.d(TAG, date.toString().substring(start, end));
-                                            Log.d(TAG, date.toString().substring(8, 10));
-                                            Log.d(TAG, date.toString().substring(4, 7));
+//                                            Log.d(TAG, date.toString().substring(start, end));
+//                                            Log.d(TAG, date.toString().substring(8, 10));
+//                                            Log.d(TAG, date.toString().substring(4, 7));
 
                                             coverUrls.clear();
                                             for (SpotlightMedia m : spotlightMedias) {
@@ -434,10 +414,11 @@ public class SpotlightsFragment extends Fragment
                                             mSpot.setCoverUrl(coverUrls);
 
                                             mySpotlights.add(mSpot);
-                                            Collections.sort(mySpotlights, comparator);
-                                            spotlightsAdapter.notifyDataSetChanged();
                                         }
                                     }
+
+                                    Collections.sort(mySpotlights, comparator);
+                                    spotlightsAdapter.notifyDataSetChanged();
                                 }
 
                             } catch (Exception e1) {
@@ -451,9 +432,77 @@ public class SpotlightsFragment extends Fragment
                 }
             }
         });
-
-
     }
+
+    private void loadKidsSpotlights(final List<Team> teams) {
+        if (!myKidsSpotlights.isEmpty())
+            myKidsSpotlights.clear();
+        ParseQuery<ParseObject> spotQuery = new ParseQuery<>("Spotlight");
+        spotQuery.setLimit(500);
+        spotQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        List<String> coverUrls = new ArrayList<>();
+                        for (ParseObject spotlight : objects) {
+
+                            try {
+
+                                spotlight.fetchIfNeeded();
+
+                                Date date = spotlight.getUpdatedAt();
+                                int end = date.toString().length();
+                                int start = end - 4;
+
+                                if (null != spotlight.getParseObject("team")) {
+                                    ParseObject team = spotlight.getParseObject("team");
+
+                                    for (Team team1 : teams) {
+                                        if (team.getObjectId().equals(team1.getObjectId())) {
+                                            // this is our spotlight - convert to our model and add it
+                                            Spotlight mSpot = new Spotlight();
+                                            mSpot.setObjectId(spotlight.getObjectId());
+                                            mSpot.setTeamsAvatar(team1.getAvatarUrl());
+                                            mSpot.setTeam(team1);
+                                            mSpot.setYear(Integer.valueOf(date.toString().substring(start, end)));
+                                            mSpot.setDay(Integer.valueOf(date.toString().substring(8, 10)));
+                                            mSpot.setMonth(date.toString().substring(4, 7));
+
+                                            coverUrls.clear();
+                                            for (SpotlightMedia m : spotlightMedias) {
+                                                if (null != m.getParentId()) {
+                                                    if (m.getParentId().equals(spotlight.getObjectId())) {
+                                                        coverUrls.add(m.getThumbnailUrl());
+                                                        mSpot.setCover(m.getThumbnailUrl());
+                                                    }
+                                                }
+                                            }
+
+                                            mSpot.setCoverUrl(coverUrls);
+
+                                            myKidsSpotlights.add(mSpot);
+                                        }
+                                    }
+                                }
+
+                            } catch (Exception e1) {
+                                Log.d(TAG, e1.getMessage());
+                            }
+                        }
+
+                        mySpotlights.addAll(myKidsSpotlights);
+                        Collections.sort(mySpotlights, comparator);
+                        spotlightsAdapter.notifyDataSetChanged();
+                        Log.d(TAG, String.valueOf(mySpotlights.size()));
+
+
+                    }
+                }
+            }
+        });
+    }
+
 
     Comparator<Spotlight> comparator = new Comparator<Spotlight>() {
         public static final String TAG = "SpotlightsComparator";
@@ -526,74 +575,65 @@ public class SpotlightsFragment extends Fragment
     }
 
 
-    /*
-        Recycler view stuff
-     */
-    private void initSwipe(RecyclerView recyclerView, final SpotlightsAdapter adapter) {
-        ItemTouchHelper.SimpleCallback simpleCallback =
-                new ItemTouchHelper.SimpleCallback(0,
-                        ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView,
-                                          RecyclerView.ViewHolder viewHolder,
-                                          RecyclerView.ViewHolder target) {
-                        // this is for drag and drop
-                        return false;
+    private Team convertTeam(ParseObject parseObject) {
+        Team team = new Team();
+        team.setObjectId(parseObject.getObjectId());
+        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
+            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
+                team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
+            }
+        }
+        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
+            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
+                team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
+            }
+        }
+        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
+            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
+                team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
+            }
+        }
+        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
+            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
+                team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
+            }
+        }
+        if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
+            if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
+                team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
+            }
+        }
+        if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
+            try {
+                parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
+            } catch (ParseException e1) {
+            }
+            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
+                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
+                    team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
+                }
+            }
+        }
+        return team;
+    }
+
+    private void proceed() {
+        try {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (null != progressBar) {
+                        progressBar.setVisibility(View.GONE);
+                        loadMySpotlights(myTeams);
                     }
-
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        int position = viewHolder.getAdapterPosition();
-                        if (direction == ItemTouchHelper.LEFT) {
-//                            adapter.removeItem(position);
-                        } else if (direction == ItemTouchHelper.RIGHT) {
-                            viewHolder.itemView.findViewById(R.id.item_spot_frame).setVisibility(View.VISIBLE);
-                            viewHolder.itemView.findViewById(R.id.item_spot_frame2).setVisibility(View.GONE);
-                        }
-                    }
-
-                    @Override
-                    public void onChildDraw(Canvas c,
-                                            RecyclerView r,
-                                            RecyclerView.ViewHolder h,
-                                            float dX, float dY,
-                                            int actionState, boolean isCurrentlyActive) {
-                        Bitmap icon;
-                        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-
-                            if (dX < 0) {
-                                h.itemView.findViewById(R.id.item_spot_frame).setVisibility(View.GONE);
-                                h.itemView.findViewById(R.id.item_spot_frame2).setVisibility(View.VISIBLE);
-                            } else if (dX > 0) {
-                                h.itemView.findViewById(R.id.item_spot_frame).setVisibility(View.VISIBLE);
-                                h.itemView.findViewById(R.id.item_spot_frame2).setVisibility(View.GONE);
-                            }
-
-//                            View itemView = h.itemView;
-//                            float height = (float) itemView.getBottom() - (float) itemView.getTop();
-//                            float width = height / 3;
-//                            if (dX > 0) {
-//                                //
-//                            } else {
-//                                p.setColor(Color.parseColor("#D32F2F"));
-//                                RectF background = new RectF((float) itemView.getRight() + dX,
-//                                        (float) itemView.getTop(),
-//                                        (float) itemView.getRight(),
-//                                        (float) itemView.getBottom());
-//                                c.drawRect(background, p);
-//                                icon = BitmapFactory.decodeResource(getResources(), R.drawable.delete_onswipe);
-//                                RectF iconDest = new RectF((float) itemView.getRight() - 2 * width,
-//                                        (float) itemView.getTop() + width,
-//                                        (float) itemView.getRight() - width,
-//                                        (float) itemView.getBottom() - width);
-//                                c.drawBitmap(icon, null, iconDest, p);
-//                            }
-                        }
-//                        super.onChildDraw(c, r, h, dX, dY, actionState, isCurrentlyActive);
-                    }
-                };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+                    else
+                        Log.d("crash", "crash");
+                }
+            });
+        } catch (Exception e3) {
+            Log.d(TAG, "crash");
+        }
     }
 
 }
