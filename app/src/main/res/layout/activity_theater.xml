@@ -9,23 +9,8 @@
         <!--android:layout_width="250dp"-->
         <!--android:layout_height="250dp" />-->
 
-    <VideoView
-        android:visibility="gone"
-        android:layout_marginTop="12dp"
-        android:id="@+id/vid2"
-        android:layout_width="250dp"
-        android:layout_height="250dp" />
-
-
-
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="150dp"
-        android:layout_height="150dp" />
-
-    <Button
-        android:id="@+id/start"
-        android:text="Start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </LinearLayout>
