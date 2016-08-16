@@ -73,10 +73,15 @@
     <string name="no_admin">This team currently has no admin. \n\nPlease try again later.</string>
 
     <string name="nodata">No Search Results</string>
-    <string name="follow_sure">Are you sure?</string>
+    <string name="follow_sure">Follow this team?</string>
     <string name="please_wait">Please wait...</string>
 
     <string name="my_family"><b>My Family</b></string>
     <string name="friends"><b>Friends</b></string>
+
+    <string name="which_child">Which child is on this team?</string>
+    <string name="none_follow">None, I just want to follow it</string>
+    <string name="unfollow">Unfollow?</string>
+    <string name="must_follow">You must first request to follow this team</string>
 
 </resources>

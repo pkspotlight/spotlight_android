@@ -135,13 +135,11 @@ public class ChildSpotlightsFragment extends Fragment
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         spotlightsAdapter = new SpotlightsAdapter(getActivity(), childSpotlights, this);
         recyclerView.setAdapter(spotlightsAdapter);
-
-        loadTeams();
     }
 
     private void loadTeams() {
-        if (!childSpotlights.isEmpty())
-            childSpotlights.clear();
+        if (!childTeams.isEmpty())
+            childTeams.clear();
         ParseQuery<ParseObject> childQuery = new ParseQuery<>(ParseConstants.OBJECT_CHILD);
         childQuery.whereEqualTo("objectId", getArguments().getString("objectId"));
         childQuery.findInBackground(new FindCallback<ParseObject>() {
@@ -149,7 +147,7 @@ public class ChildSpotlightsFragment extends Fragment
             public void done(List<ParseObject> objects, ParseException e) {
                 if (null == e) {
                     if (!objects.isEmpty()) {
-                        ParseObject mChild = objects.get(0);
+                        final ParseObject mChild = objects.get(0);
                         try {
                             mChild.fetchIfNeeded();
                         } catch (ParseException e1) {
@@ -166,6 +164,7 @@ public class ChildSpotlightsFragment extends Fragment
                                             try {
                                                 Team team = new Team();
                                                 team.setObjectId(parseObject.getObjectId());
+                                                Log.d(TAG, parseObject.getObjectId() + " " + mChild.getObjectId());
 
                                                 if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
                                                     team.setTeamName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
@@ -270,8 +269,6 @@ public class ChildSpotlightsFragment extends Fragment
                                             spotlight.setCoverUrl(coverUrls);
 
                                             childSpotlights.add(spotlight);
-                                            Collections.sort(childSpotlights, comparator);
-                                            spotlightsAdapter.notifyDataSetChanged();
                                         }
                                     }
                                 }
@@ -280,6 +277,8 @@ public class ChildSpotlightsFragment extends Fragment
                                 Log.d(TAG, "parse exception");
                             }
                         }
+                        Collections.sort(childSpotlights, comparator);
+                        spotlightsAdapter.notifyDataSetChanged();
 
                     } else {
                         Log.d(TAG, "empty query spotlights");
@@ -302,6 +301,7 @@ public class ChildSpotlightsFragment extends Fragment
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
+        loadTeams();
     }
 
     @Override

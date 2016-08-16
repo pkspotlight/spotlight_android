@@ -60,22 +60,6 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildHolder>
         if (null != child.getAvatarUrl())
             avatarUrl = child.getAvatarUrl();
 
-//        if (!"".equals(avatarUrl)) {
-//            Picasso.with(context)
-//                    .load(avatarUrl)
-//                    .fit().centerCrop()
-//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
-//                    .transform(round)
-//                    .into(childHolder.childAvatar);
-//        } else {
-//            Picasso.with(context)
-//                    .load(R.drawable.unknown_user)
-//                    .fit().centerCrop()
-//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
-//                    .transform(round)
-//                    .into(childHolder.childAvatar);
-//        }
-
         if (!"".equals(avatarUrl)) {
             Glide.with(context)
                     .load(avatarUrl)
@@ -109,7 +93,6 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildHolder>
     public class ChildHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.child_avatar)
-//        ImageView childAvatar;
         CircleImageView childAvatar;
         @Bind(R.id.child_name)
         TextView childName;

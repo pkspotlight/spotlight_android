@@ -44,6 +44,7 @@ public class User {
 
     String objectId;
     boolean emailVerified;
+    boolean isFriend;
     List<Friend> friends;
     String phone;
     ProfilePictureMedia profilePic;
@@ -61,6 +62,14 @@ public class User {
     /*
         Temp Getter/Setters for Parse.com objects
      */
+
+    public boolean isFriend() {
+        return isFriend;
+    }
+
+    public void setFriend(boolean friend) {
+        isFriend = friend;
+    }
 
     public String getAvatarUrl() {
         return avatarUrl;

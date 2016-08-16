@@ -56,6 +56,7 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
     Thread teamsThread;
     @Bind(R.id.nodata)
     View nodata;
+    private CharSequence[] kids;
 
     /*
         Manufacturing singleton
@@ -68,14 +69,67 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
     }
 
     public void onShowDetails(Team team) {
-        Bundle bundle = new Bundle();
-        bundle.putString("objectId", team.getObjectId());
-        FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
+        try {
+            if (team.isMine()) {
+                Bundle bundle = new Bundle();
+                bundle.putString("objectId", team.getObjectId());
+                FragmentUtils.changeFragment(getActivity(), R.id.content, TeamDetailsFragment.newInstance(bundle), true);
+            } else {
+                final AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                        .setMessage(R.string.must_follow)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .create();
+                alertDialog.show();
+            }
+        } catch (Exception e) {
+            Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "exception showing details");
+        }
     }
 
-    public void onRequestFollow(final Team team, int position, final boolean unfollow) {
+    public void onRequestFollow(final Team team, final int position, final boolean unfollow) {
+        if (unfollow) {
+            onReqFol(team, position, unfollow);
+        } else {
+            CharSequence[] backup = new CharSequence[1];
+            final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.which_child)
+                    .setItems((kids == null) ? backup : kids, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            switch (i) {
+                                case 0:
+                                    // TODO: add relation
+                                    Toast.makeText(getActivity(), kids[0], Toast.LENGTH_LONG).show();
+                                    break;
+                                case 1:
+                                    // TODO: add relation
+                                    Toast.makeText(getActivity(), kids[1], Toast.LENGTH_LONG).show();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    })
+                    .setPositiveButton(R.string.none_follow, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            onReqFol(team, position, unfollow);
+                        }
+                    })
+                    .create();
+            dialog.show();
+        }
+    }
+
+    private void onReqFol(final Team team, int position, final boolean unfollow) {
         final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setMessage(R.string.follow_sure)
+                .setMessage(unfollow ? R.string.unfollow : R.string.follow_sure)
                 .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -99,7 +153,36 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
 
 
     private void unfollowTeam(Team team) {
-        Toast.makeText(getActivity(), "Unfollowing " + team.getName(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "Unfollowing " + team.getName(), Toast.LENGTH_SHORT).show();
+        ParseQuery<ParseObject> parseQuery = new ParseQuery<>(ParseConstants.OBJECT_TEAM);
+        parseQuery.whereEqualTo("objectId", team.getObjectId());
+        parseQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        try {
+
+                            ParseObject team = objects.get(0);
+                            team.fetchIfNeeded();
+                            ParseRelation<ParseObject> teamsRel = ParseUser.getCurrentUser().getRelation("teams");
+                            teamsRel.remove(team);
+                            ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (null == e) {
+                                        getActivity().onBackPressed();
+                                    }
+                                }
+                            });
+
+                        } catch (ParseException e1) {
+                            Log.d(TAG, e1.getMessage());
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -117,6 +200,7 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
         teamsAdapter = new TeamsAdapter(getActivity(), teams, this, false);
         teamsAdapter.registerAdapterDataObserver(adapterDataObserver);
         teamsList.setAdapter(teamsAdapter);
+        getKids();
         searchTeams.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -140,8 +224,6 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
                 //
             }
         });
-
-//        loadTeams();
     }
 
     @Override
@@ -407,8 +489,9 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
 
 
     /*
-    Showing the "no data" block if there's no data
- */
+        Showing the "no data" block if there's no data
+    */
+
     RecyclerView.AdapterDataObserver adapterDataObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onChanged() {
@@ -420,4 +503,39 @@ public class SearchTeamsFragment extends Fragment implements TeamsAdapter.Action
             }
         }
     };
+
+    private void getKids() {
+        final List<String> kids = new ArrayList<>();
+        ParseRelation<ParseObject> kidsRel = ParseUser.getCurrentUser().getRelation("children");
+        ParseQuery<ParseObject> kidsQuery = kidsRel.getQuery();
+        kidsQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject parseObject : objects) {
+                            try {
+                                parseObject.fetchIfNeeded();
+                                StringBuilder stringBuilder = new StringBuilder();
+                                stringBuilder.append(parseObject.getString("firstName"));
+                                stringBuilder.append(" ");
+                                stringBuilder.append(parseObject.getString("lastName"));
+                                kids.add(stringBuilder.toString());
+                            } catch (ParseException e1) {
+                                Log.d(TAG, e1.getMessage());
+                            }
+                        }
+                        toCharseq(kids);
+                    }
+                }
+            }
+        });
+    }
+
+    private void toCharseq(List<String> data) {
+        kids = new CharSequence[data.size()];
+        for (int i = 0; i < data.size(); i++) {
+            kids[i] = data.get(i);
+        }
+    }
 }

@@ -67,34 +67,15 @@ public class ChildTeamsFragment extends Fragment implements TeamsAdapter.ActionL
 
     public void onRequestFollow(final Team team, int position, boolean unfollow) {
         // you are following all your kids teams by default
-
-
-//        final AlertDialog dialog = new AlertDialog.Builder(getContext())
-//                .setMessage(R.string.follow_sure)
-//                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        dialogInterface.dismiss();
-//                        createRequest(team);
-//                    }
-//                })
-//                .setPositiveButton("No", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        dialogInterface.dismiss();
-//                    }
-//                })
-//                .create();
-//        dialog.show();
     }
 
     private void unfollowTeam(Team team) {
-        Toast.makeText(getActivity(), "Unfollowing " + team.getName(), Toast.LENGTH_LONG).show();
+//        Toast.makeText(getActivity(), "Unfollowing " + team.getName(), Toast.LENGTH_LONG).show();
     }
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = layoutInflater.inflate(R.layout.fragment_child_teams, container, true);
+        View view = layoutInflater.inflate(R.layout.fragment_child_teams, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -104,10 +85,8 @@ public class ChildTeamsFragment extends Fragment implements TeamsAdapter.ActionL
         super.onActivityCreated(savedInstanceState);
 //        Toast.makeText(getContext(), getArguments().getString("objectId"), Toast.LENGTH_LONG).show();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        teamsAdapter = new TeamsAdapter(getActivity(), childTeams, this, false);
+        teamsAdapter = new TeamsAdapter(getActivity(), childTeams, this, true);
         recyclerView.setAdapter(teamsAdapter);
-
-        loadTeams();
     }
 
 
@@ -211,6 +190,7 @@ public class ChildTeamsFragment extends Fragment implements TeamsAdapter.ActionL
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
+        loadTeams();
     }
 
     @Override
@@ -273,129 +253,4 @@ public class ChildTeamsFragment extends Fragment implements TeamsAdapter.ActionL
         }
         return 0;
     }
-
-
-
-    /*
-        Requests functionality
-     */
-
-    private void createRequest(Team team) {
-        ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.OBJECT_TEAM);
-        query.whereEqualTo("objectId", team.getObjectId());
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (null == e) {
-                    if (!objects.isEmpty()) {
-                        final ParseObject team = objects.get(0);
-                        team.getRelation("moderators").getQuery().findInBackground(new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(List<ParseObject> objects, ParseException e) {
-                                if (null == e) {
-                                    if (!objects.isEmpty()) {
-//                                        Toast.makeText(getContext(), objects.get(0).getObjectId(), Toast.LENGTH_LONG).show();
-                                        String adminUserId = objects.get(0).getObjectId();
-                                        finishRequest(team, adminUserId);
-                                    } else {
-//                                        Toast.makeText(getContext(), "empty", Toast.LENGTH_LONG).show();
-                                        final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                                                .setMessage(getString(R.string.no_admin))
-                                                .setNegativeButton("Got it", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        dialogInterface.dismiss();
-                                                    }
-                                                })
-                                                .create();
-                                        dialog.show();
-                                    }
-                                } else {
-//                                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                                    final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                                            .setMessage(e.getMessage())
-                                            .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    dialogInterface.dismiss();
-                                                }
-                                            })
-                                            .create();
-                                    dialog.show();
-                                }
-                            }
-                        });
-
-                    }
-                }
-            }
-        });
-    }
-
-    private void finishRequest(final ParseObject team, String adminUserId) {
-
-        ParseQuery<ParseUser> reqQ = ParseUser.getQuery();
-        reqQ.whereEqualTo("objectId", adminUserId);
-        reqQ.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-                if (null == e) {
-                    if (!objects.isEmpty()) {
-                        final ParseUser admin = objects.get(0);
-                        ParseObject parseObject = new ParseObject(ParseConstants.OBJECT_TEAM_REQUEST);
-
-                        if (null != ParseUser.getCurrentUser().getParseObject("profilePic")) {
-                            ParseObject profilePic = ParseUser.getCurrentUser().getParseObject("profilePic");
-                            try {
-                                profilePic.fetchIfNeeded();
-                            } catch (ParseException ee) {}
-
-                            parseObject.put("PicOfRequester", profilePic);
-                            parseObject.put("admin", admin);
-                            parseObject.put("requestState", 0);
-                            parseObject.put("nameOfRequester", ParseUser.getCurrentUser().getString("firstName") + " "
-                                    + ParseUser.getCurrentUser().getString("lastName"));
-                            parseObject.put("team", team);
-                            parseObject.put("teamName", team.getString("teamName"));
-                            parseObject.put("timeStamp", String.valueOf(System.currentTimeMillis()));
-                            parseObject.put("user", ParseUser.getCurrentUser());
-                            parseObject.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if (null == e) {
-//                                        Toast.makeText(getContext(), "Request created", Toast.LENGTH_LONG).show();
-                                        final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                                                .setMessage("The request to follow has been sent")
-                                                .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        dialogInterface.dismiss();
-                                                        /// getActivity().onBackPressed();
-                                                    }
-                                                })
-                                                .create();
-                                        dialog.show();
-                                    } else {
-                                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            });
-
-                        }
-
-
-
-                    } else {
-                        Toast.makeText(getContext(), "empty", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-
-
-    }
-
 }

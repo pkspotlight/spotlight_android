@@ -78,8 +78,9 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
     }
 
     public void onUnfollow(final Friend friend) {
+        String n = (null != friend.getFirstName()) ? friend.getFirstName() : "";
         final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setMessage(R.string.follow_sure)
+                .setMessage("Unfollow " + n + " ?")
                 .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

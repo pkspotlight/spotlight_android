@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -46,7 +47,8 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
     EditText searchFriends;
     @Bind(R.id.recycler_view_users)
     RecyclerView usersList;
-    List<User> users = new ArrayList<>();
+    private List<User> friends = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
     UsersAdapter usersAdapter;
     @Bind(R.id.progress)
     ProgressBar progressBar;
@@ -78,8 +80,40 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
     }
 
     public void onFollow(final User user) {
+        if (user.isFriend()) {
+            unfollow(user);
+        } else {
+            follow(user);
+        }
+    }
+
+    private void unfollow(final User user) {
+        String name = (user.getFirstName() != null) ? user.getFirstName() : "";
+        String title = "Unfollow " + name + " ?";
         final AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                .setTitle(getString(R.string.sure))
+                .setMessage(title)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        // TODO: unfollow
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void follow(final User user) {
+        String name = (user.getFirstName() != null) ? user.getFirstName() : "";
+        String title = "Follow " + name + " ?";
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setMessage(title)
                 .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -159,14 +193,13 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                 //
             }
         });
-
-//        loadUsers();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.add_spotlighters));
+        loadFriends();
     }
 
     @Override
@@ -174,6 +207,30 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
         super.onPause();
         if (null != friendsThread)
             friendsThread.interrupt();
+    }
+
+    private void loadFriends() {
+        if (!friends.isEmpty())
+            friends.clear();
+        ParseRelation<ParseUser> friendsRel = ParseUser.getCurrentUser().getRelation("friends");
+        friendsRel.getQuery().findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        try {
+                            for (ParseUser friend : objects) {
+                                User user = new User();
+                                user.setObjectId(friend.getObjectId());
+                                friends.add(user);
+                            }
+                        } catch (Exception e1) {
+                            Log.d(TAG, (null != e1.getMessage()) ? e1.getMessage() : "friends relation query exception");
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void loadUsers(String param) {
@@ -199,6 +256,11 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
 
                                         User user = new User();
                                         user.setObjectId(parseUser.getObjectId());
+                                        for (User u : friends) {
+                                            if (u.getObjectId().equals(parseUser.getObjectId())) {
+                                                user.setFriend(true);
+                                            }
+                                        }
                                         if (null != parseUser.getString("firstName")) {
                                             if (!"".equals(parseUser.getString("firstName"))) {
                                                 user.setFirstName(parseUser.getString("firstName"));
