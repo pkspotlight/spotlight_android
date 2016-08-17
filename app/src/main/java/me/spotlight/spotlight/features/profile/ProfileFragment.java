@@ -2,6 +2,7 @@ package me.spotlight.spotlight.features.profile;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -70,7 +71,6 @@ public class ProfileFragment extends Fragment {
     Transformation round;
     Uri mImageCaptureUri;
     @Bind(R.id.profile_avatar)
-//    ImageView profileAvatar;
     CircleImageView profileAvatar;
     @Bind(R.id.profile_name)
     TextView profileName;
@@ -195,6 +195,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadFamily() {
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Please wait...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         final StringBuilder stringBuilder = new StringBuilder();
         final ParseRelation<ParseObject> familyRelation = ParseUser.getCurrentUser().getRelation("children");
         ParseQuery<ParseObject> familyQuery = familyRelation.getQuery();
@@ -202,6 +206,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if (null == e) {
+                    progressDialog.dismiss();
                     if (!objects.isEmpty()) {
                         for (ParseObject parseObject : objects) {
                             if (null != parseObject.getString("firstName")) {
@@ -216,6 +221,8 @@ public class ProfileFragment extends Fragment {
 
                         profileFamily.setText(stringBuilder.toString());
                     }
+                } else {
+                    progressDialog.dismiss();
                 }
             }
         });
@@ -246,27 +253,11 @@ public class ProfileFragment extends Fragment {
         loadFamily();
     }
 
-//    private void initAvatar(String url) {
-//        Picasso.with(getActivity())
-//                .load(url)
-//                .fit().centerCrop()
-//                .transform(round)
-//                .into(profileAvatar);
-//    }
-
     private void initAvatar(String url) {
         Glide.with(getActivity())
                 .load(url)
                 .into(profileAvatar);
     }
-
-//    private void initEmptyAvatar() {
-//        Picasso.with(getActivity())
-//                .load(R.drawable.unknown_user)
-//                .fit().centerCrop()
-//                .transform(round)
-//                .into(profileAvatar);
-//    }
 
     private void initEmptyAvatar() {
         Glide.with(getActivity())

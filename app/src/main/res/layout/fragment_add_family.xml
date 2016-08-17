@@ -11,13 +11,13 @@
     <LinearLayout
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
 
         <ImageView
-            android:layout_margin="8dp"
+            android:layout_margin="28dp"
             android:id="@+id/fam_add_avatar"
             android:layout_width="130dp"
             android:layout_height="130dp" />

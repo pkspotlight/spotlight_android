@@ -36,6 +36,7 @@ import me.spotlight.spotlight.features.spotlights.details.SpotlightDetailsFragme
 import me.spotlight.spotlight.models.Spotlight;
 import me.spotlight.spotlight.models.SpotlightMedia;
 import me.spotlight.spotlight.models.Team;
+import me.spotlight.spotlight.utils.Convert;
 import me.spotlight.spotlight.utils.DialogUtils;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
@@ -204,9 +205,7 @@ public class FriendSpotlightsFragment extends Fragment
                                 if (null == e) {
                                     if (!objects.isEmpty()) {
                                         for (ParseObject parseObject : objects) {
-                                            Team team = new Team();
-                                            team.setObjectId(parseObject.getObjectId());
-
+                                            Team team = Convert.toTeam(parseObject);
 
                                             for (String string : myTeamsIds) {
                                                 if (string.equals(parseObject.getObjectId())) {
@@ -214,42 +213,6 @@ public class FriendSpotlightsFragment extends Fragment
                                                 }
                                             }
 
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
-                                                    team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
-                                                    team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
-                                                    team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
-                                                    team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
-                                                }
-                                            }
-                                            if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
-                                                if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
-                                                    team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
-                                                }
-                                            }
-                                            if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
-                                                try {
-                                                    parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
-                                                } catch (ParseException e1) {
-                                                }
-                                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
-                                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
-                                                        team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
-                                                    }
-                                                }
-                                            }
                                             friendTeams.add(team);
                                         }
                                     }
@@ -257,7 +220,7 @@ public class FriendSpotlightsFragment extends Fragment
                                     loadMySpotlights(friendTeams);
 
                                 } else {
-                                    // TODO: handle e
+                                    Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
                                 }
                             }
                         });

@@ -69,9 +69,6 @@ public class MainActivity extends AppCompatActivity {
         return intent;
     }
 
-//    @Bind(R.id.navigation)
-//    CustomViewPager mViewPager;
-
     @Bind(R.id.btn_tab_spotlights)
     View spotlights;
     @Bind(R.id.btn_tab_friends)
@@ -246,30 +243,6 @@ public class MainActivity extends AppCompatActivity {
 //            }
         }
     };
-
-
-    /*
-        View pager adapter
-     */
-
-    private class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
-
-        public ScreenSlidePagerAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return tabViews.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return NUM_TABS;
-        }
-    }
-
-
 
     /*
         Lower tabs actions

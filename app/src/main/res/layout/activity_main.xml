@@ -19,19 +19,13 @@
 
 
     <FrameLayout
+        android:orientation="vertical"
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <!--<me.spotlight.spotlight.utils.CustomViewPager-->
-            <!--android:visibility="gone"-->
-            <!--android:id="@+id/navigation"-->
-            <!--android:layout_marginBottom="58dp"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent" />-->
-
-        <FrameLayout
+        <LinearLayout
+            android:orientation="vertical"
             android:id="@+id/inner_content"
             android:layout_marginBottom="58dp"
             android:layout_width="match_parent"
@@ -43,9 +37,5 @@
 
 
     </FrameLayout>
-
-
-
-
 
 </LinearLayout>

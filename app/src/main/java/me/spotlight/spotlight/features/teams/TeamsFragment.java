@@ -125,6 +125,7 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
             }
         });
 
+
         loadTeams();
     }
 

@@ -112,6 +112,9 @@ public class AddTeamFragment extends Fragment {
         setup(teamAddSeason);
         setup(teamAddTown);
         setup(teamAddSport);
+
+        ViewGroup tabs = (ViewGroup) getActivity().findViewById(R.id.include);
+        if (null != tabs) tabs.setVisibility(View.GONE);
     }
 
     private void setup(final EditText editText) {
@@ -134,6 +137,8 @@ public class AddTeamFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        ViewGroup tabs = (ViewGroup) getActivity().findViewById(R.id.include);
+        if (null != tabs) tabs.setVisibility(View.VISIBLE);
     }
 
     private void getPermission() {

@@ -29,6 +29,7 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".activities.MainActivity"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="portrait">
             <intent-filter>
