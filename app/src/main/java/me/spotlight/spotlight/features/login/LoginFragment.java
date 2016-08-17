@@ -2,11 +2,15 @@ package me.spotlight.spotlight.features.login;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
@@ -55,6 +59,24 @@ public class LoginFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        setup(loginPassword);
+        setup(loginUsername);
+    }
+
+    private void setup(final EditText editText) {
+        editText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (motionEvent.getRawX() >=
+                            (editText.getRight() - editText.getCompoundDrawables()[2].getBounds().width())) {
+                        editText.setText("");
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     @OnClick(R.id.login_submit)

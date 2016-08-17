@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -56,9 +57,26 @@ public class SignupFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        setup(signupEmail);
+        setup(signupPassword);
+        setup(signupUsername);
     }
 
-
+    private void setup(final EditText editText) {
+        editText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (motionEvent.getRawX() >=
+                            (editText.getRight() - editText.getCompoundDrawables()[2].getBounds().width())) {
+                        editText.setText("");
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
 
     @OnClick(R.id.signup_submit)
     public void signup() {

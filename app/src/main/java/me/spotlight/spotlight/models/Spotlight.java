@@ -15,6 +15,7 @@ public class Spotlight {
     String teamsAvatar;
     String cover;
     String month;
+    boolean accessible;
     int day;
     int year;
     List<String> coverUrls = new ArrayList<>();
@@ -25,6 +26,14 @@ public class Spotlight {
     User creator;
     List<User> moderators;
     Team team;
+
+    public boolean isAccessible() {
+        return accessible;
+    }
+
+    public void setAccessible(boolean accessible) {
+        this.accessible = accessible;
+    }
 
     public String getMonth() {
         return month;

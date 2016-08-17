@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         return intent;
     }
 
-    @Bind(R.id.navigation)
-    CustomViewPager mViewPager;
+//    @Bind(R.id.navigation)
+//    CustomViewPager mViewPager;
 
     @Bind(R.id.btn_tab_spotlights)
     View spotlights;

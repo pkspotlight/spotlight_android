@@ -188,7 +188,6 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
         friendTeamsAdapter = new TeamsAdapter(getActivity(), friendTeams, this, false);
         friendTeamsList.setAdapter(friendTeamsAdapter);
         getKids();
-        loadTeams();
         loadMyTeamsIds();
     }
 
@@ -222,6 +221,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
     @Override
     public void onResume() {
         super.onResume();
+        loadTeams();
     }
 
     private void loadTeams() {
@@ -315,6 +315,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
     }
 
     Comparator<Team> comparator = new Comparator<Team>() {
+        public static final String TAG = "teamComparator";
         @Override
         public int compare(Team team1, Team team2) {
             int result = 0;

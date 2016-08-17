@@ -7,9 +7,13 @@ public class ParseConstants {
 
     public static final String FIELD_USER_PIC = "profilePic";
     public static final String FIELD_USER_FRIENDS = "friends";
+    public static final String FIELD_USER_FAMILY = "children";
     public static final String FIELD_OBJECT_MEDIA_FILE = "mediaFile";
     public static final String FIELD_OBJECT_THUMB_FILE = "thumbnailImageFile";
     public static final String FIELD_OBJECT_ID = "objectId";
+
+    public static final String FIELD_CHILD_FIRST = "firstName";
+    public static final String FIELD_CHILD_LAST = "lastName";
 
     public static final String FIELD_TEAM_NAME = "teamName";
     public static final String FIELD_TEAM_GRADE = "grade";

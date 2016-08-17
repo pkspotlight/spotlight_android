@@ -41,6 +41,7 @@ import me.spotlight.spotlight.features.friends.details.ChildDetailsFragment;
 import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
 import me.spotlight.spotlight.models.Child;
 import me.spotlight.spotlight.models.Friend;
+import me.spotlight.spotlight.utils.Convert;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
@@ -50,6 +51,7 @@ import me.spotlight.spotlight.utils.ParseConstants;
 public class FriendsFragment extends Fragment implements FriendsAdapter.ActionListener,
         ChildAdapter.ActionListener {
 
+    public static final String TAG = "FriendsFragment";
     @Bind(R.id.recycler_view_friends)
     RecyclerView friendsList;
     @Bind(R.id.recycler_view_family)
@@ -195,17 +197,22 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
                     .edit().putBoolean("first2" + ParseUser.getCurrentUser().getObjectId(), true)
                     .commit();
         }
-
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_friends).getWindowToken(), 0);
+        try {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_friends).getWindowToken(), 0);
+        } catch (Exception e) {
+            Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : " exception");
+        }
     }
 
-
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.main, menu);
-//        final MenuItem item = menu.findItem(R.id.action_add);
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -221,19 +228,14 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
         return ret;
     }
 
-
-
     public void addSpotlighters() {
-//        FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightersFragment.newInstance(), true);
         FragmentUtils.addFragment(getActivity(), R.id.content, this, AddSpotlightersFragment.newInstance(), true);
     }
 
     public void addFamily() {
-//        FragmentUtils.changeFragment(getActivity(), R.id.content, AddFamilyFragment.newInstance(), true);
         FragmentUtils.addFragment(getActivity(), R.id.content, this, AddFamilyFragment.newInstance(), true);
     }
 
-//    @OnClick(R.id.fab_add_spotlighters)
     public void onFab() {
         final AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle(getString(R.string.friends_dialog))
@@ -273,35 +275,18 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
                 if (null == e) {
                     if (!objects.isEmpty()) {
                         for (ParseUser parseUser : objects) {
-                            Friend friend = new Friend();
-                            friend.setObjectId(parseUser.getObjectId());
-                            if (null != parseUser.getString("firstName")) {
-                                if (!"".equals(parseUser.getString("firstName"))) {
-                                    friend.setFirstName(parseUser.getString("firstName"));
-                                }
+                            try {
+                                Friend friend = Convert.toFriend(parseUser);
+                                friends.add(friend);
+                            } catch (Exception e1) {
+                                Log.d(TAG, "exception");
                             }
-                            if (null != parseUser.getString("lastName")) {
-                                if (!"".equals(parseUser.getString("lastName"))) {
-                                    friend.setLastName(parseUser.getString("lastName"));
-                                }
-                            }
-                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
-                                try {
-                                    parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
-                                } catch (ParseException e1) {}
-                                if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
-                                    if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
-                                        friend.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
-                                    }
-                                }
-                            }
-                            friends.add(friend);
                         }
 
                         friendsAdapter.notifyDataSetChanged();
                     }
                 } else {
-                    // TODO: handle e
+                    Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "parse exception");
                 }
             }
         });
@@ -318,115 +303,20 @@ public class FriendsFragment extends Fragment implements FriendsAdapter.ActionLi
                 if (null == e) {
                     if (!objects.isEmpty()) {
                         for (ParseObject parseObject : objects) {
-
-                            Child child = new Child();
                             try {
-                                parseObject.fetchIfNeeded();
-                                child.setObjectId(parseObject.getObjectId());
-                                if (null != parseObject.getParseObject("profilePic")) {
-                                    ParseObject profilePic = parseObject.getParseObject("profilePic");
-                                    profilePic.fetchIfNeeded();
-                                    ParseFile mediaFile = profilePic.getParseFile("mediaFile");
-                                    if (null != mediaFile.getUrl())
-                                        child.setAvatarUrl(mediaFile.getUrl());
-                                }
-                                if (null != parseObject.getString("firstName"))
-                                    child.setFirstName(parseObject.getString("firstName"));
-                                if (null != parseObject.getString("lastName"))
-                                    child.setLastName(parseObject.getString("lastName"));
-
+                                Child child = Convert.toChild(parseObject);
                                 children.add(child);
-                                childAdapter.notifyDataSetChanged();
-
-                            } catch (ParseException e1) {
-                                //
+                            } catch (Exception e1) {
+                                Log.d(TAG, (null != e1.getMessage()) ? e1.getMessage() : " exception");
                             }
                         }
+                        childAdapter.notifyDataSetChanged();
                     } else {
-                        //
+                        Log.d(TAG, "");
                     }
                 } else {
-                    //
+                    Log.d(TAG, "");
                 }
-            }
-        });
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // TODO: remove this
-    private void addingFriends() {
-
-        ParseQuery<ParseUser> usersQuery = ParseUser.getCurrentUser().getQuery();
-        usersQuery.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-
-                ParseRelation<ParseUser> friends = ParseUser.getCurrentUser().getRelation("friends");
-
-                if (null == e)
-                    Toast.makeText(getActivity(), "Shit!" + String.valueOf(objects.size()), Toast.LENGTH_SHORT).show();
-
-                int i = 0;
-                for (ParseUser parseUser : objects) {
-                    i++;
-                    if (i % 4 == 0)
-                        friends.add(parseUser);
-                    Log.d("users", parseUser.getUsername());
-                }
-
-                ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (null == e) {
-                            Toast.makeText(getActivity(), "Success!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
-    }
-    private void gettingAllUsers() {
-        ParseQuery<ParseUser> usersQuery = ParseUser.getCurrentUser().getQuery();
-        usersQuery.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-
-                if (null == e) {
-
-                    for (ParseUser parseUser : objects) {
-
-                        Friend friend = new Friend();
-                        if (null != parseUser.getString("firstName")) {
-                            if (!"".equals(parseUser.getString("firstName"))) {
-                                friend.setFirstName(parseUser.getString("firstName"));
-                                friend.setLastName(parseUser.getString("firstName"));
-                            }
-                        }
-                        friends.add(friend);
-                    }
-
-                    Log.d("fg", String.valueOf(friends.size()));
-                    friendsAdapter.notifyDataSetChanged();
-                }
-
             }
         });
     }

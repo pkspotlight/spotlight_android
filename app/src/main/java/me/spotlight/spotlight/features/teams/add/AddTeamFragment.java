@@ -22,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -104,7 +105,31 @@ public class AddTeamFragment extends Fragment {
         super.onResume();
         getActivity().setTitle(getString(R.string.add_teams));
         getPermission();
+        setup(teamAddCoach);
+        setup(teamAddYear);
+        setup(teamAddGrade);
+        setup(teamAddName);
+        setup(teamAddSeason);
+        setup(teamAddTown);
+        setup(teamAddSport);
     }
+
+    private void setup(final EditText editText) {
+        editText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (motionEvent.getRawX() >=
+                            (editText.getRight() - editText.getCompoundDrawables()[2].getBounds().width())) {
+                        editText.setText("");
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
 
     @Override
     public void onPause() {

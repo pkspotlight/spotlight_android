@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="#DD676767"
+    android:id="@+id/include_tabs"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_gravity="bottom"
@@ -103,8 +104,4 @@
             android:layout_height="wrap_content" />
 
     </LinearLayout>
-
-
-
-
 </LinearLayout>

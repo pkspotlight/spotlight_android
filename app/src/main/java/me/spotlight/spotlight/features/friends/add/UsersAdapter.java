@@ -36,7 +36,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
 
     public interface ActionListener {
         void onShowDetails(User user);
-        void onFollow(User user);
+        void onFollow(User user, int position);
     }
 
     public void setActionListener(ActionListener actionListener) {
@@ -55,7 +55,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final UserHolder userHolder, int position) {
+    public void onBindViewHolder(final UserHolder userHolder, final int position) {
         final User user = users.get(position);
 
         // populating name
@@ -105,7 +105,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
         userHolder.fol.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                actionListener.onFollow(user);
+                actionListener.onFollow(user, position);
             }
         });
 

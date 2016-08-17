@@ -36,6 +36,7 @@ import me.spotlight.spotlight.features.spotlights.details.SpotlightDetailsFragme
 import me.spotlight.spotlight.models.Spotlight;
 import me.spotlight.spotlight.models.SpotlightMedia;
 import me.spotlight.spotlight.models.Team;
+import me.spotlight.spotlight.utils.DialogUtils;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
@@ -51,6 +52,7 @@ public class FriendSpotlightsFragment extends Fragment
     List<Team> friendTeams = new ArrayList<>();
     List<Spotlight> friendSpotlights = new ArrayList<>();
     SpotlightsAdapter spotlightsAdapter;
+    private List<String> myTeamsIds = new ArrayList<>();
 
     /*
         Manufacturing singleton
@@ -62,64 +64,71 @@ public class FriendSpotlightsFragment extends Fragment
     }
 
     public void onShowDetails(Spotlight spotlight) {
-        try {
-
-            Bundle bundle = new Bundle();
-            bundle.putString("objectId", spotlight.getObjectId());
-            bundle.putString("teamAvatar", spotlight.getTeamsAvatar());
-            bundle.putString("teamName", spotlight.getTeam().getName());
-            bundle.putString("teamGrade", spotlight.getTeam().getGrade());
-            bundle.putString("teamSport", spotlight.getTeam().getSport());
-            bundle.putString("date", SpotlightsAdapter.getMonth(spotlight.getMonth())
-                    + " " + String.valueOf(spotlight.getDay()) + ", "
-                    + String.valueOf(spotlight.getYear()));
-            FragmentUtils.changeFragment(getActivity(), R.id.content, SpotlightDetailsFragment.newInstance(bundle), true);
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
+        if (spotlight.isAccessible()) {
+            try {
+                Bundle bundle = new Bundle();
+                bundle.putString("objectId", spotlight.getObjectId());
+                bundle.putString("teamAvatar", spotlight.getTeamsAvatar());
+                bundle.putString("teamName", spotlight.getTeam().getName());
+                bundle.putString("teamGrade", spotlight.getTeam().getGrade());
+                bundle.putString("teamSport", spotlight.getTeam().getSport());
+                bundle.putString("date", SpotlightsAdapter.getMonth(spotlight.getMonth())
+                        + " " + String.valueOf(spotlight.getDay()) + ", "
+                        + String.valueOf(spotlight.getYear()));
+                FragmentUtils.changeFragment(getActivity(), R.id.content, SpotlightDetailsFragment.newInstance(bundle), true);
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
+            }
+        } else {
+            DialogUtils.showAlertDialog(getContext(), "Sorry, you can only view the spotlights of a team you follow.");
         }
     }
 
     public void onDelete(final Spotlight spotlight, final int position) {
-        final AlertDialog dialog = new AlertDialog.Builder(getContext())
-            .setTitle(getString(R.string.remove_spotlight))
-            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            })
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                    progressDialog.setMessage("deleting...");
-                    progressDialog.show();
-                    ParseQuery<ParseObject> q = new ParseQuery<>(ParseConstants.OBJECT_SPOTLIGHT);
-                    q.whereEqualTo("objectId", spotlight.getObjectId());
-                    q.findInBackground(new FindCallback<ParseObject>() {
+        if (spotlight.isAccessible()) {
+            final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle(getString(R.string.remove_spotlight))
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
-                        public void done(List<ParseObject> objects, ParseException e) {
-                            if (null == e) {
-                                ParseObject s = objects.get(0);
-                                s.deleteInBackground(new DeleteCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (null == e) {
-                                            progressDialog.dismiss();
-                                            friendSpotlights.remove(position);
-                                            spotlightsAdapter.notifyDataSetChanged();
-                                            Toast.makeText(getActivity(), "Spotlight deleted successfully!", Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                            }
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
                         }
-                    });
-                }
-            })
-            .create();
-        dialog.show();
+                    })
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                            progressDialog.setMessage("deleting...");
+                            progressDialog.show();
+                            ParseQuery<ParseObject> q = new ParseQuery<>(ParseConstants.OBJECT_SPOTLIGHT);
+                            q.whereEqualTo("objectId", spotlight.getObjectId());
+                            q.findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(List<ParseObject> objects, ParseException e) {
+                                    if (null == e) {
+                                        ParseObject s = objects.get(0);
+                                        s.deleteInBackground(new DeleteCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                if (null == e) {
+                                                    progressDialog.dismiss();
+                                                    friendSpotlights.remove(position);
+                                                    spotlightsAdapter.notifyDataSetChanged();
+                                                    Toast.makeText(getActivity(), "Spotlight deleted successfully!", Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .create();
+            dialog.show();
+        } else {
+            DialogUtils.showAlertDialog(getContext(), "You can only delete the spotlights of a team you follow.");
+        }
     }
 
     @Override
@@ -132,15 +141,44 @@ public class FriendSpotlightsFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         spotlightsAdapter = new SpotlightsAdapter(getActivity(), friendSpotlights, this);
         recyclerView.setAdapter(spotlightsAdapter);
+        loadMyTeamsIds();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
         loadTeams();
     }
 
+    private void loadMyTeamsIds() {
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+        ParseRelation teamsRel = ParseUser.getCurrentUser().getRelation("teams");
+        ParseQuery<ParseObject> teamsQ = teamsRel.getQuery();
+        teamsQ.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseObject parseObject : objects) {
+                            myTeamsIds.add(parseObject.getObjectId());
+                        }
 
+                        progressDialog.dismiss();
+                    } else {
+                        progressDialog.dismiss();
+                    }
+                } else {
+                    progressDialog.dismiss();
+                }
+            }
+        });
+    }
 
 
     private void loadTeams() {
@@ -168,6 +206,13 @@ public class FriendSpotlightsFragment extends Fragment
                                         for (ParseObject parseObject : objects) {
                                             Team team = new Team();
                                             team.setObjectId(parseObject.getObjectId());
+
+
+                                            for (String string : myTeamsIds) {
+                                                if (string.equals(parseObject.getObjectId())) {
+                                                    team.setMine(true);
+                                                }
+                                            }
 
                                             if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
                                                 if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
@@ -242,8 +287,6 @@ public class FriendSpotlightsFragment extends Fragment
                                 Date date = spotlight.getUpdatedAt();
                                 int end = date.toString().length();
                                 int start = end - 4;
-                                Log.d(TAG, date.toString());
-                                Log.d(TAG, String.valueOf(date.toString().length()));
 
                                 if (null != spotlight.getParseObject("team")) {
                                     ParseObject team = spotlight.getParseObject("team");
@@ -258,9 +301,6 @@ public class FriendSpotlightsFragment extends Fragment
                                             spotlight1.setYear(Integer.valueOf(date.toString().substring(start, end)));
                                             spotlight1.setDay(Integer.valueOf(date.toString().substring(8, 10)));
                                             spotlight1.setMonth(date.toString().substring(4, 7));
-                                            Log.d(TAG, date.toString().substring(start, end));
-                                            Log.d(TAG, date.toString().substring(8, 10));
-                                            Log.d(TAG, date.toString().substring(4, 7));
 
                                             coverUrls.clear();
                                             for (SpotlightMedia m : SpotlightsFragment.spotlightMedias) {
@@ -273,6 +313,15 @@ public class FriendSpotlightsFragment extends Fragment
                                             }
 
                                             spotlight1.setCoverUrl(coverUrls);
+
+                                            // set if we can see it - if it belongs to any of my teams
+                                            for (String id : myTeamsIds) {
+                                                if (id.equals(team.getObjectId())) {
+                                                    Log.d(TAG, "found a team thats mine " + id);
+                                                    Log.d(TAG, "found a team " + team1.getName());
+                                                    spotlight1.setAccessible(true);
+                                                }
+                                            }
 
                                             friendSpotlights.add(spotlight1);
                                             Collections.sort(friendSpotlights, comparator);

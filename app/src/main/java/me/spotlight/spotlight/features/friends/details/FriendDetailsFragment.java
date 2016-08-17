@@ -45,7 +45,6 @@ public class FriendDetailsFragment extends Fragment {
     String avatarUrl;
     Transformation round;
     @Bind(R.id.friend_detail_avatar)
-//    ImageView friendDetailAvatar;
     CircleImageView friendDetailAvatar;
     @Bind(R.id.friend_detail_name)
     TextView friendDetailName;
@@ -179,27 +178,11 @@ public class FriendDetailsFragment extends Fragment {
         });
     }
 
-//    private void initAvatar(String url) {
-//        Picasso.with(getActivity())
-//                .load(url)
-//                .fit().centerCrop()
-//                .transform(round)
-//                .into(friendDetailAvatar);
-//    }
-
     private void initAvatar(String url) {
         Glide.with(getActivity())
                 .load(url)
                 .into(friendDetailAvatar);
     }
-
-//    private void initEmptyAvatar() {
-//        Picasso.with(getActivity())
-//                .load(R.drawable.unknown_user)
-//                .fit().centerCrop()
-//                .transform(round)
-//                .into(friendDetailAvatar);
-//    }
 
     private void initEmptyAvatar() {
         Glide.with(getActivity())

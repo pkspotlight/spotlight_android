@@ -1,5 +1,6 @@
 package me.spotlight.spotlight.features.friends.add;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -33,6 +34,7 @@ import butterknife.ButterKnife;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
 import me.spotlight.spotlight.models.User;
+import me.spotlight.spotlight.utils.Convert;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
@@ -42,7 +44,6 @@ import me.spotlight.spotlight.utils.ParseConstants;
 public class AddSpotlightersFragment extends Fragment implements UsersAdapter.ActionListener {
 
     public static final String TAG = "AddSpotlightersFragment";
-
     @Bind(R.id.friends_search)
     EditText searchFriends;
     @Bind(R.id.recycler_view_users)
@@ -79,7 +80,7 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
         FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
     }
 
-    public void onFollow(final User user) {
+    public void onFollow(final User user, int position) {
         if (user.isFriend()) {
             unfollow(user);
         } else {
@@ -96,7 +97,7 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
-                        // TODO: unfollow
+                        forgeRelation(user);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -130,13 +131,12 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
         dialog.show();
     }
 
-    private void addRelation(User user) {
+    private void addRelation(final User user) {
         ParseQuery<ParseUser> findUser = ParseUser.getCurrentUser().getQuery();
         findUser.whereEqualTo("objectId", user.getObjectId());
         findUser.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
-//                Toast.makeText(getActivity(), "Found him!", Toast.LENGTH_LONG).show();
                 ParseRelation<ParseUser> rel = ParseUser.getCurrentUser().getRelation(ParseConstants.FIELD_USER_FRIENDS);
                 if (null == e) {
                     if (!objects.isEmpty()) {
@@ -146,7 +146,6 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                             public void done(ParseException e) {
                                 if (null == e) {
                                     try {
-
                                         Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
                                         getActivity().onBackPressed();
                                     } catch (Exception e1) {
@@ -161,7 +160,41 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
         });
     }
 
+    private void forgeRelation(final User user) {
+        final ProgressDialog progress = new ProgressDialog(getContext());
+        progress.setMessage(getString(R.string.please_wait));
+        progress.setCancelable(false);
+        progress.show();
+        ParseQuery<ParseUser> friendQuery = ParseUser.getCurrentUser().getQuery();
+        friendQuery.whereEqualTo("objectId", user.getObjectId());
+        friendQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        ParseRelation<ParseUser> friendsRel = ParseUser.getCurrentUser().getRelation("friends");
+                        friendsRel.remove(objects.get(0));
+                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
 
+                                if (null == e) {
+                                    progress.dismiss();
+                                    getActivity().onBackPressed();
+                                } else {
+                                    progress.dismiss();
+                                }
+                            }
+                        });
+                    } else {
+                        progress.dismiss();
+                    }
+                } else {
+                    progress.dismiss();
+                }
+            }
+        });
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -199,7 +232,7 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
     public void onResume() {
         super.onResume();
         getActivity().setTitle(getString(R.string.add_spotlighters));
-        loadFriends();
+        loadFriendIds();
     }
 
     @Override
@@ -209,9 +242,13 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
             friendsThread.interrupt();
     }
 
-    private void loadFriends() {
+    private void loadFriendIds() {
         if (!friends.isEmpty())
             friends.clear();
+        final ProgressDialog progress = new ProgressDialog(getContext());
+        progress.setMessage(getString(R.string.please_wait));
+        progress.setCancelable(false);
+        progress.show();
         ParseRelation<ParseUser> friendsRel = ParseUser.getCurrentUser().getRelation("friends");
         friendsRel.getQuery().findInBackground(new FindCallback<ParseUser>() {
             @Override
@@ -224,10 +261,16 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                                 user.setObjectId(friend.getObjectId());
                                 friends.add(user);
                             }
+                            progress.dismiss();
                         } catch (Exception e1) {
                             Log.d(TAG, (null != e1.getMessage()) ? e1.getMessage() : "friends relation query exception");
+                            progress.dismiss();
                         }
+                    } else {
+                        progress.dismiss();
                     }
+                } else {
+                    progress.dismiss();
                 }
             }
         });
@@ -253,32 +296,11 @@ public class AddSpotlightersFragment extends Fragment implements UsersAdapter.Ac
                                 for (ParseUser parseUser : objects) {
 
                                     try {
+                                        User user = Convert.toUser(parseUser);
 
-                                        User user = new User();
-                                        user.setObjectId(parseUser.getObjectId());
                                         for (User u : friends) {
                                             if (u.getObjectId().equals(parseUser.getObjectId())) {
                                                 user.setFriend(true);
-                                            }
-                                        }
-                                        if (null != parseUser.getString("firstName")) {
-                                            if (!"".equals(parseUser.getString("firstName"))) {
-                                                user.setFirstName(parseUser.getString("firstName"));
-                                            }
-                                        }
-                                        if (null != parseUser.getString("lastName")) {
-                                            if (!"".equals(parseUser.getString("lastName"))) {
-                                                user.setLastName(parseUser.getString("lastName"));
-                                            }
-                                        }
-                                        if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC)) {
-                                            try {
-                                                parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).fetchIfNeeded();
-                                            } catch (ParseException e1) {}
-                                            if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile")) {
-                                                if (null != parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl()) {
-                                                    user.setAvatarUrl(parseUser.getParseObject(ParseConstants.FIELD_USER_PIC).getParseFile("mediaFile").getUrl());
-                                                }
                                             }
                                         }
 

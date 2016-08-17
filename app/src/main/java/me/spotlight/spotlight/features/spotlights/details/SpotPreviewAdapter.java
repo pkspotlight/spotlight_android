@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -37,7 +38,9 @@ public class SpotPreviewAdapter extends RecyclerView.Adapter<SpotPreviewAdapter.
     public void onBindViewHolder(final PreviewHolder previewHolder, int position) {
         final String url = urls.get(position);
 
-        Picasso.with(context).load(url).fit().centerCrop().into(previewHolder.preview);
+        Glide.with(context).load(url)
+                .fitCenter()
+                .into(previewHolder.preview);
     }
 
     @Override

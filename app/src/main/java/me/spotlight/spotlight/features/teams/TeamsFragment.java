@@ -44,6 +44,7 @@ import me.spotlight.spotlight.features.teams.requests.RequestsFragment;
 import me.spotlight.spotlight.features.teams.search.SearchTeamsFragment;
 import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.Constants;
+import me.spotlight.spotlight.utils.Convert;
 import me.spotlight.spotlight.utils.DialogUtils;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
@@ -54,7 +55,6 @@ import me.spotlight.spotlight.utils.ParseConstants;
 public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListener {
 
     public static final String TAG = "TeamsFragment";
-
     @Bind(R.id.recycler_view_myteams)
     RecyclerView myteamsList;
     TeamsAdapter myteamsAdapter;
@@ -150,16 +150,17 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
                     .commit();
         }
 
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_teams).getWindowToken(), 0);
+        try {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_teams).getWindowToken(), 0);
+        } catch (Exception e) {
+            Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : " exception");
+        }
     }
-
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.main, menu);
-//        final MenuItem item = menu.findItem(R.id.action_add);
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -175,14 +176,11 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
         return ret;
     }
 
-
     public void addTeams() {
-//        FragmentUtils.changeFragment(getActivity(), R.id.content, AddTeamFragment.newInstance(), true);
         FragmentUtils.addFragment(getActivity(), R.id.content, this, AddTeamFragment.newInstance(), true);
     }
 
     public void searchTeams() {
-//        FragmentUtils.changeFragment(getActivity(), R.id.content, SearchTeamsFragment.newInstance(), true);
         FragmentUtils.addFragment(getActivity(), R.id.content, this, SearchTeamsFragment.newInstance(), true);
     }
 
@@ -228,49 +226,10 @@ public class TeamsFragment extends Fragment implements TeamsAdapter.ActionListen
                     if (!objects.isEmpty()) {
                         for (ParseObject parseObject : objects) {
                             try {
-
-                                Team team = new Team();
-                                team.setObjectId(parseObject.getObjectId());
-                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_NAME)) {
-                                    if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_NAME))) {
-                                        team.setName(parseObject.getString(ParseConstants.FIELD_TEAM_NAME));
-                                    }
-                                }
-                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_GRADE)) {
-                                    if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE))) {
-                                        team.setGrade(parseObject.getString(ParseConstants.FIELD_TEAM_GRADE));
-                                    }
-                                }
-                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SPORT)) {
-                                    if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT))) {
-                                        team.setSport(parseObject.getString(ParseConstants.FIELD_TEAM_SPORT));
-                                    }
-                                }
-                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_SEASON)) {
-                                    if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON))) {
-                                        team.setSeason(parseObject.getString(ParseConstants.FIELD_TEAM_SEASON));
-                                    }
-                                }
-                                if (null != parseObject.getString(ParseConstants.FIELD_TEAM_YEAR)) {
-                                    if (!"".equals(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR))) {
-                                        team.setYear(parseObject.getString(ParseConstants.FIELD_TEAM_YEAR));
-                                    }
-                                }
-                                if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA)) {
-                                    try {
-                                        parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).fetchIfNeeded();
-                                    } catch (ParseException e1) {
-                                    }
-                                    if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile")) {
-                                        if (null != parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl()) {
-                                            team.setAvatarUrl(parseObject.getParseObject(ParseConstants.FIELD_TEAM_MEDIA).getParseFile("mediaFile").getUrl());
-                                        }
-                                    }
-                                }
-
+                                Team team = Convert.toTeam(parseObject);
                                 myTeams.add(team);
                             } catch (Exception e1) {
-                                Log.d(TAG, "crash");
+                                Log.d(TAG, (null != e1.getMessage()) ? e1.getMessage() : " exception");
                             }
                         }
                     }

@@ -1,7 +1,10 @@
 package me.spotlight.spotlight.features.teams.details;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +20,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +32,9 @@ import me.spotlight.spotlight.features.friends.add.UsersAdapter;
 import me.spotlight.spotlight.features.friends.details.FriendDetailsFragment;
 import me.spotlight.spotlight.models.Friend;
 import me.spotlight.spotlight.models.User;
+import me.spotlight.spotlight.utils.Convert;
 import me.spotlight.spotlight.utils.FragmentUtils;
+import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/18/2016.
@@ -40,6 +46,7 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
     RecyclerView teamMembersList;
     UsersAdapter teamMembersAdapter;
     List<User> members = new ArrayList<>();
+    List<String> friendIds = new ArrayList<>();
 
     /*
         Manufacturing singleton
@@ -56,9 +63,124 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
         FragmentUtils.changeFragment(getActivity(), R.id.content, FriendDetailsFragment.newInstance(bundle), true);
     }
 
-    public void onFollow(User user) {
-        Toast.makeText(getActivity(), "Following" + user.getLastName() + " " + user.getFirstName(), Toast.LENGTH_LONG).show();
+    public void onFollow(final User user, int position) {
+        if (user.isFriend()) {
+            unfollow(user, position);
+        } else {
+            follow(user, position);
+        }
     }
+
+    private void unfollow(final User user, final int position) {
+        String name = (user.getFirstName() != null) ? user.getFirstName() : "";
+        String title = "Unfollow " + name + " ?";
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setMessage(title)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        forgeRelation(user, position);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void follow(final User user, final int position) {
+        String name = (user.getFirstName() != null) ? user.getFirstName() : "";
+        String title = "Follow " + name + " ?";
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setMessage(title)
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        addRelation(user, position);
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void addRelation(final User user, final int position) {
+        ParseQuery<ParseUser> findUser = ParseUser.getCurrentUser().getQuery();
+        findUser.whereEqualTo("objectId", user.getObjectId());
+        findUser.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                ParseRelation<ParseUser> rel = ParseUser.getCurrentUser().getRelation(ParseConstants.FIELD_USER_FRIENDS);
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        rel.add(objects.get(0));
+                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (null == e) {
+                                    try {
+                                        Toast.makeText(getActivity(), "Success!", Toast.LENGTH_LONG).show();
+                                        user.setFriend(true);
+                                        teamMembersAdapter.notifyItemChanged(position);
+                                    } catch (Exception e1) {
+                                        Log.d(TAG, e1.getMessage());
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    private void forgeRelation(final User user, final int position) {
+        final ProgressDialog progress = new ProgressDialog(getContext());
+        progress.setMessage(getString(R.string.please_wait));
+        progress.setCancelable(false);
+        progress.show();
+        ParseQuery<ParseUser> friendQuery = ParseUser.getCurrentUser().getQuery();
+        friendQuery.whereEqualTo("objectId", user.getObjectId());
+        friendQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        ParseRelation<ParseUser> friendsRel = ParseUser.getCurrentUser().getRelation("friends");
+                        friendsRel.remove(objects.get(0));
+                        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+
+                                if (null == e) {
+                                    progress.dismiss();
+                                    user.setFriend(false);
+                                    teamMembersAdapter.notifyItemChanged(position);
+                                } else {
+                                    progress.dismiss();
+                                }
+                            }
+                        });
+                    } else {
+                        progress.dismiss();
+                    }
+                } else {
+                    progress.dismiss();
+                }
+            }
+        });
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,6 +192,8 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated");
+        loadFriendIds();
         teamMembersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         teamMembersAdapter = new UsersAdapter(getActivity(), members);
         teamMembersAdapter.setActionListener(this);
@@ -77,9 +201,15 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-
+        Log.d(TAG, "onResume");
         loadMembers();
     }
 
@@ -87,7 +217,7 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
         if (!members.isEmpty()) {
             members.clear();
         }
-        ParseQuery<ParseObject> currentTeamQuery = new ParseQuery<>("Team");
+        ParseQuery<ParseObject> currentTeamQuery = new ParseQuery<>(ParseConstants.OBJECT_TEAM);
         currentTeamQuery.whereEqualTo("objectId", getArguments().getString("objectId"));
         currentTeamQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -110,23 +240,16 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
                                     if (!objects.isEmpty()) {
                                         for (ParseUser parseUser : objects) {
                                             try {
-                                                parseUser.fetchIfNeeded();
-                                            } catch (ParseException parseException2) {}
-                                            User user = new User();
-                                            user.setObjectId(parseUser.getObjectId());
-                                            user.setFirstName(parseUser.getString("firstName"));
-                                            user.setLastName(parseUser.getString("lastName"));
-                                            if (null != parseUser.getParseObject("profilePic")) {
-                                                ParseObject profilePic = parseUser.getParseObject("profilePic");
-                                                try {
-                                                    profilePic.fetchIfNeeded();
-                                                } catch (ParseException parseException3) {}
-                                                if (null != profilePic.getParseFile("mediaFile")) {
-                                                    ParseFile mediaFile = profilePic.getParseFile("mediaFile");
-                                                    user.setAvatarUrl(mediaFile.getUrl());
+                                                User user = Convert.toUser(parseUser);
+                                                for (String id : friendIds) {
+                                                    if (id.equals(parseUser.getObjectId())) {
+                                                        user.setFriend(true);
+                                                    }
                                                 }
+                                                members.add(user);
+                                            } catch (Exception e1) {
+                                                Log.d(TAG, (null != e1.getMessage()) ? e1.getMessage() : " exception");
                                             }
-                                            members.add(user);
                                         }
                                     }
                                 }
@@ -134,6 +257,38 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
                             }
                         });
                     }
+                }
+            }
+        });
+    }
+
+    private void loadFriendIds() {
+
+        final ProgressDialog progress = new ProgressDialog(getContext());
+        progress.setMessage(getString(R.string.please_wait));
+        progress.setCancelable(false);
+        progress.show();
+        ParseRelation friendsRel = ParseUser.getCurrentUser().getRelation(ParseConstants.FIELD_USER_FRIENDS);
+        ParseQuery<ParseUser> friendsQuery = friendsRel.getQuery();
+        friendsQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (null == e) {
+                    if (!objects.isEmpty()) {
+                        for (ParseUser parseUser : objects) {
+                            try {
+                                friendIds.add(parseUser.getObjectId());
+                            } catch (Exception e1) {
+                                Log.d(TAG, "");
+                            }
+                        }
+                        progress.dismiss();
+                        Log.d(TAG, "Number of friends: " + String.valueOf(friendIds.size()));
+                    } else {
+                        progress.dismiss();
+                    }
+                } else {
+                    progress.dismiss();
                 }
             }
         });
