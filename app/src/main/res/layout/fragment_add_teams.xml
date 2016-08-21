@@ -36,6 +36,7 @@
             android:layout_height="wrap_content">
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_margin="6dp"
                 android:textSize="16sp"
                 android:hint="@string/team_add_name"
@@ -49,6 +50,7 @@
 
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
                 android:textSize="16sp"
@@ -63,6 +65,7 @@
 
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_margin="6dp"
                 android:textSize="16sp"
                 android:hint="@string/team_add_sport"
@@ -76,6 +79,7 @@
 
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
                 android:textSize="16sp"
@@ -90,6 +94,7 @@
 
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_margin="6dp"
                 android:textSize="16sp"
                 android:hint="@string/team_add_year"
@@ -103,6 +108,7 @@
 
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
                 android:textSize="16sp"
@@ -115,8 +121,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="34dp" />
 
-
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_margin="6dp"
                 android:textSize="16sp"
                 android:hint="@string/team_add_coach"
@@ -126,7 +132,7 @@
                 android:id="@+id/team_add_coach"
                 android:background="@android:color/darker_gray"
                 android:layout_width="match_parent"
-                android:layout_height="34dp" />
+                android:layout_height="34dp"/>
 
             <Button
                 android:layout_gravity="center"

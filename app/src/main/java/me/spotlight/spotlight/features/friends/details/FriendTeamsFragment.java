@@ -339,7 +339,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
                     result = (int) Integer.valueOf(year2) - Integer.valueOf(year1);
                 }
             } catch (Exception e) {
-                Log.d(TAG, e.getMessage());
+                Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
             }
 
 

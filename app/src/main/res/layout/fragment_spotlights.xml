@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<android.support.v4.widget.SwipeRefreshLayout-->
-    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:id="@+id/swipe_spotlights"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent">-->
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_spotlights"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!---->
-
-
-<!--</android.support.v4.widget.SwipeRefreshLayout>-->
-
-
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+    <FrameLayout
         android:background="@android:color/darker_gray"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ProgressBar
+            android:layout_gravity="center"
             android:id="@+id/progress"
-            android:layout_width="match_parent"
-            android:layout_height="40dp" />
+            android:layout_width="80dp"
+            android:layout_height="80dp" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_spolights"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+    </FrameLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
 
-    </LinearLayout>
+
+

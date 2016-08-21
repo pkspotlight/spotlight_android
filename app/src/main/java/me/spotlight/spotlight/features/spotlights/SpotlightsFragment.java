@@ -3,19 +3,13 @@ package me.spotlight.spotlight.features.spotlights;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,7 +23,6 @@ import android.widget.Toast;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -43,9 +36,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import me.spotlight.spotlight.R;
-import me.spotlight.spotlight.activities.MainActivity;
 import me.spotlight.spotlight.features.spotlights.add.AddSpotlightFragment;
 import me.spotlight.spotlight.features.spotlights.details.SpotlightDetailsFragment;
 import me.spotlight.spotlight.models.Spotlight;
@@ -53,27 +44,27 @@ import me.spotlight.spotlight.models.SpotlightMedia;
 import me.spotlight.spotlight.models.Team;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
-import me.spotlight.spotlight.utils.QuickAction;
 
 /**
  * Created by Anatol on 7/10/2016.
+ * Copyright (c) 2016 Spotlight Partners, Inc. All rights reserved.
  */
 public class SpotlightsFragment extends Fragment
         implements SpotlightsAdapter.ActionListener {
 
     public static final String TAG = "SpotlightsFragment";
 
-    @Bind(R.id.recycler_view_spolights)
-    RecyclerView mySpotlightsList;
+    @Bind(R.id.recycler_view_spolights) RecyclerView mySpotlightsList;
     SpotlightsAdapter spotlightsAdapter;
     List<Spotlight> mySpotlights = new ArrayList<>();
     List<Spotlight> myKidsSpotlights = new ArrayList<>();
     List<Team> myTeams = new ArrayList<>();
     List<Team> kidsTeams = new ArrayList<>();
     public static List<SpotlightMedia> spotlightMedias = new ArrayList<>();
-    @Bind(R.id.progress)
-    ProgressBar progressBar;
+    @Bind(R.id.progress) ProgressBar progressBar;
+    @Bind(R.id.swipe_spotlights) SwipeRefreshLayout refreshLayout;
     Thread loadTeamsThread;
+    Paint paint;
 
     /*
         Manufacturing singleton
@@ -146,6 +137,18 @@ public class SpotlightsFragment extends Fragment
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        preloadSpotlightMedia();
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_spotlights, container, false);
         ButterKnife.bind(this, view);
@@ -161,7 +164,6 @@ public class SpotlightsFragment extends Fragment
         spotlightsAdapter = new SpotlightsAdapter(getActivity(), mySpotlights, this);
         mySpotlightsList.setAdapter(spotlightsAdapter);
 
-        preloadSpotlightMedia();
     }
 
     @Override
@@ -186,7 +188,6 @@ public class SpotlightsFragment extends Fragment
                     .edit().putBoolean("first" + ParseUser.getCurrentUser().getObjectId(), true)
                     .commit();
         }
-//        initSwipe(mySpotlightsList, spotlightsAdapter);
     }
 
     @Override
@@ -220,10 +221,12 @@ public class SpotlightsFragment extends Fragment
     }
 
 
-
     private void preloadSpotlightMedia() {
+        if (!spotlightMedias.isEmpty())
+            spotlightMedias.clear();
         ParseQuery<ParseObject> mediaQ = new ParseQuery<>(ParseConstants.OBJECT_SPOTLIGHT_MEDIA);
         mediaQ.setLimit(1000);
+        mediaQ.orderByDescending("createdAt");
         mediaQ.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
@@ -267,7 +270,6 @@ public class SpotlightsFragment extends Fragment
         });
     }
 
-
     private void loadTeams() {
         if (!myTeams.isEmpty())
             myTeams.clear();
@@ -304,10 +306,12 @@ public class SpotlightsFragment extends Fragment
                         loadTeamsRunnable.run();
 
                     } else {
+                        progressBar.setVisibility(View.GONE);
                         Log.d("spotteams", "Empty");
                     }
                 } else {
                     // TODO: handle e
+                    progressBar.setVisibility(View.GONE);
                     Log.d("spotteams", "Error");
                 }
             }
@@ -417,8 +421,6 @@ public class SpotlightsFragment extends Fragment
                                         }
                                     }
 
-                                    Collections.sort(mySpotlights, comparator);
-                                    spotlightsAdapter.notifyDataSetChanged();
                                 }
 
                             } catch (Exception e1) {
@@ -427,6 +429,8 @@ public class SpotlightsFragment extends Fragment
                         }
                         Log.d(TAG, String.valueOf(mySpotlights.size()));
 
+                        Collections.sort(mySpotlights, comparator);
+                        spotlightsAdapter.notifyDataSetChanged();
 
                     }
                 }
@@ -502,7 +506,6 @@ public class SpotlightsFragment extends Fragment
             }
         });
     }
-
 
     Comparator<Spotlight> comparator = new Comparator<Spotlight>() {
         public static final String TAG = "SpotlightsComparator";

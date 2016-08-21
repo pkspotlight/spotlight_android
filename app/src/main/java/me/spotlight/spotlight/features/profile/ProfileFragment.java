@@ -58,13 +58,17 @@ import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.activities.LoginActivity;
 import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.utils.Constants;
+import me.spotlight.spotlight.utils.DialogUtils;
 import me.spotlight.spotlight.utils.FragmentUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/11/2016.
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements ProfileContract {
+
+    public static final String TAG = "ProfileFragment";
+    private ProfilePresenter presenter;
 
     String profilePicUrl;
     ParseUser currentUser;
@@ -96,7 +100,15 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        presenter = new ProfilePresenter(this);
+        Log.d(TAG, "onStart");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View view = layoutInflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, view);
         return view;
@@ -105,15 +117,18 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated");
         setHasOptionsMenu(true);
         currentUser = ParseUser.getCurrentUser();
-
+        Log.d(TAG, currentUser.getObjectId());
         round = new RoundedTransformationBuilder().oval(true).build();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume");
+
         getActivity().setTitle("Profile");
 
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -128,25 +143,25 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        Log.d(TAG, "onCreateOptionsMenu");
         menuInflater.inflate(R.menu.profile, menu);
-//        final MenuItem item = menu.findItem(R.id.action_add);
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
+        Log.d(TAG, "onOptionsItemSelected");
         boolean ret = true;
         if (menuItem.getItemId() == android.R.id.home) {
             ret = false;
         }
         if (menuItem.getItemId() == R.id.action_save) {
             menuItem.setVisible(false);
-//            Toast.makeText(getContext(), "WWWWW", Toast.LENGTH_LONG).show();
             update();
             ret = true;
         }
         return ret;
     }
 
-    private void parse() {
+    private void parsetest() {
 
         Drawable drawable = getResources().getDrawable(R.drawable.test);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
@@ -170,7 +185,6 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-
     private void update() {
         currentUser.put("firstName", profileFirst.getText().toString());
         currentUser.put("lastName", profileLast.getText().toString());
@@ -191,6 +205,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void refresh() {
+        Log.d(TAG, "refreshing fragment");
         getActivity().getSupportFragmentManager().beginTransaction().detach(this).attach(this).commit();
     }
 
@@ -264,6 +279,42 @@ public class ProfileFragment extends Fragment {
                 .load(R.drawable.unknown_user)
                 .into(profileAvatar);
     }
+
+
+    public void onAvatarUpdated(boolean ok) {
+        if (ok) loadAvatar();
+        else DialogUtils.showAlertDialog(getContext(), "There was an error. Please try again.");
+    }
+
+    public void onAvatarFetched(String url) {
+        if (null != url) {
+            if (!TextUtils.isEmpty(url)) initAvatar(url);
+            else initEmptyAvatar();
+        } else initEmptyAvatar();
+    }
+
+    public void onProfileUpdated(boolean ok) {
+        //
+    }
+
+    public void onProfileFetched(boolean ok) {
+        //
+    }
+
+//    public void showProgress(boolean show) {
+//        try {
+//            if (show) {
+//                Log.d(TAG, "showing progress");
+//                progressDialog.show();
+//            } else {
+//                Log.d(TAG, "dismissing progress");
+//                progressDialog.dismiss();
+//            }
+//        } catch (Exception e) {
+//            if (null != progressDialog) progressDialog.dismiss();
+//            Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
+//        }
+//    }
 
     private void loadAvatar() {
         ParseObject profilePic =  currentUser.getParseObject(ParseConstants.FIELD_USER_PIC);
@@ -387,7 +438,7 @@ public class ProfileFragment extends Fragment {
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         pickedPicture.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                         byte[] bytes = byteArrayOutputStream.toByteArray();
-                        uploadAvatar(bytes);
+                        presenter.updateAvatar(bytes);
                     } catch (IOException e) {
                         Log.d("capture", e.getMessage());
                     }
@@ -399,7 +450,7 @@ public class ProfileFragment extends Fragment {
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         pickedPicture.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                         byte[] bytes = byteArrayOutputStream.toByteArray();
-                        uploadAvatar(bytes);
+                        presenter.updateAvatar(bytes);
                     } catch (IOException e) {
                         Log.d("capture", e.getMessage());
                     }

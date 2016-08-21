@@ -1,37 +1,17 @@
 package me.spotlight.spotlight.activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseInstallation;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseSession;
 import com.parse.ParseUser;
-import com.parse.PushService;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,20 +20,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.spotlight.spotlight.R;
-import me.spotlight.spotlight.api.Token;
-import me.spotlight.spotlight.base.BaseActivity;
 import me.spotlight.spotlight.features.friends.FriendsFragment;
-import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.features.profile.ProfileFragment;
 import me.spotlight.spotlight.features.spotlights.SpotlightsFragment;
-import me.spotlight.spotlight.features.spotlights.add.AddSpotlightFragment;
 import me.spotlight.spotlight.features.teams.TeamsFragment;
-import me.spotlight.spotlight.models.Spotlight;
-import me.spotlight.spotlight.models.SpotlightMedia;
-import me.spotlight.spotlight.models.User;
-import me.spotlight.spotlight.utils.CustomViewPager;
 import me.spotlight.spotlight.utils.FragmentUtils;
-import me.spotlight.spotlight.utils.QuickAction;
 
 
 /**

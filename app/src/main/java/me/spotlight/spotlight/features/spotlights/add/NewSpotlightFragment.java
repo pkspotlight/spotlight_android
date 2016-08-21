@@ -131,7 +131,6 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.main, menu);
-//        final MenuItem item = menu.findItem(R.id.action_add);
     }
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
@@ -140,9 +139,6 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
             ret = false;
         }
         if (menuItem.getItemId() == R.id.action_add) {
-//            menuItem.setVisible(false);
-//            FragmentUtils.changeFragment(getActivity(), R.id.content, AddSpotlightFragment.newInstance(), true);
-//            FragmentUtils.addFragment(getActivity(), R.id.content, this, AddSpotlightFragment.newInstance(), true);
             addMedia();
             ret = true;
         }
@@ -329,7 +325,7 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
 
     @OnClick(R.id.share)
     public void share(View view) {
-        shareIntent();
+
     }
 
 //    @OnClick(R.id.view)
@@ -481,7 +477,7 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
     @Override
     public void onTitlePicked(String string) {
         title = string;
-        Toast.makeText(getActivity(), title, Toast.LENGTH_LONG).show();
+//        Toast.makeText(getActivity(), title, Toast.LENGTH_LONG).show();
     }
 
     private void pickTitle() {
@@ -617,94 +613,5 @@ public class NewSpotlightFragment extends Fragment implements TitleDialog.Action
         }
 
         return Environment.getExternalStorageDirectory() + timeStamp + filename;
-    }
-
-    /*
-        Creates reel from list of saved mp4 or png files
-     */
-
-//    private void createReel(List<String> files) {
-//        Movie reel = new Movie();
-//        if (!files.isEmpty()) {
-//            for (String file : files) {
-//                if (file.endsWith(".mp4")) {
-//
-//                    // deal with video file
-//                    reel = appendVideo(reel, file);
-//                }
-//
-//                if (file.endsWith(".png")) {
-//
-//                    // deal with photo file
-//                    reel = appendSlideshow(reel, file);
-//                }
-//            }
-//
-//            // after all this appending write the reel out to internal storage
-//            try {
-//
-//                String timeStamp = String.valueOf(System.currentTimeMillis());
-//                String reelPath = Environment.getExternalStorageDirectory() + "/" + "reel" + timeStamp + ".mp4";
-//                Container mp4file = new DefaultMp4Builder().build(reel);
-//                File file = new File(reelPath);
-//                FileChannel fileChannel = new FileOutputStream(file).getChannel();
-//                mp4file.writeContainer(fileChannel);
-//                fileChannel.close();
-//
-//                // all done - now pass the reel path to the theater activity
-//                startTheater(reelPath);
-//
-//            } catch (IOException e) {}
-//
-//        } else {
-//            // no data source for reel
-//            DialogUtils.showAlertDialog(getActivity(), "Please add media first!");
-//        }
-//    }
-//
-//    private Movie appendVideo(Movie movie, String file) {
-//        try {
-//            Movie temp = MovieCreator.build(file);
-//            List<Track> tracks = new ArrayList<>();
-//            for (Track track : temp.getTracks()) {
-//                if (track.getHandler().equals("vide")) {
-//                    tracks.add(track);
-//                }
-//            }
-//            movie.addTrack(new AppendTrack(tracks.toArray(new Track[tracks.size()])));
-//
-//        } catch (IOException e) {}
-//        //
-//        return movie;
-//    }
-//
-//    private Movie appendSlideshow(Movie movie, String file) {
-//        String outputPath = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + "slide.mp4";
-//        File output = new File(outputPath);
-//        List<Bitmap> bitmaps = new ArrayList<>();
-//        for (int i = 0; i < 120; i++) {
-//            Bitmap bitmap = BitmapFactory.decodeFile(file);
-//            bitmaps.add(bitmap);
-//        }
-//        try {
-//            SequenceEncoder sequenceEncoder = new SequenceEncoder(output);
-//            for (int i = 0; i < 120; i++) {
-//                sequenceEncoder.encodeImage(bitmaps.get(i));
-//            }
-//            sequenceEncoder.finish();
-//
-//            // got the slideshow mp4 - now add it
-//            appendVideo(movie, outputPath);
-//
-//        } catch (IOException e) {
-//            Log.d("jcodec", "jcodec IOExceptio" + e.getMessage());
-//        }
-//
-//
-//        return movie;
-//    }
-
-    private void startTheater(String reelPath) {
-        startActivity(TheaterActivity.getStartIntent(getActivity(), reelPath, musicPath));
     }
 }

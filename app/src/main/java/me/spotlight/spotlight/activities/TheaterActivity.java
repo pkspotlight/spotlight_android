@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -74,24 +76,29 @@ public class TheaterActivity extends Activity {
     /*
         Intent manufacturing
      */
-    public static Intent getStartIntent(Context context, String reelPath, String musicPath) {
+    public static Intent getStartIntent(Context context, String url) {
         Intent intent = new Intent(context, TheaterActivity.class);
-        intent.putExtra("reel", reelPath);
-        intent.putExtra("music", musicPath);
+        intent.putExtra("url", url);
         return intent;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_theater);
         ButterKnife.bind(this);
 //        if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
-
-        webView.getSettings().setBuiltInZoomControls(true);
-
-
         getPermission();
+
+        try {
+            webView.getSettings().setBuiltInZoomControls(true);
+            webView.loadUrl(getIntent().getStringExtra("url"));
+        } catch (Exception e) {
+            Log.d(TAG, "Crash");
+        }
     }
 
 

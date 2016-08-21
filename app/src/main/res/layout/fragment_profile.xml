@@ -84,6 +84,7 @@
                 android:layout_height="wrap_content" />
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_weight="0.8"
                 android:id="@+id/profile_first"
                 android:hint="@string/profile_first_hint"
@@ -111,6 +112,7 @@
                 android:layout_height="wrap_content" />
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_weight="0.8"
                 android:id="@+id/profile_last"
                 android:hint="@string/profile_last_hint"
@@ -138,6 +140,7 @@
                 android:layout_height="wrap_content" />
 
             <EditText
+                android:inputType="textCapSentences"
                 android:layout_weight=".8"
                 android:id="@+id/profile_hometown"
                 android:hint="@string/profile_hometown_hint"

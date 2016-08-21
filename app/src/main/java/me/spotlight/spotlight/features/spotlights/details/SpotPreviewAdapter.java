@@ -23,10 +23,16 @@ public class SpotPreviewAdapter extends RecyclerView.Adapter<SpotPreviewAdapter.
 
     Context context;
     List<String> urls;
+    private ActionListener actionListener;
 
-    public SpotPreviewAdapter(Context context, List<String> urls) {
+    public interface ActionListener {
+        void onShow(String url);
+    }
+
+    public SpotPreviewAdapter(Context context, List<String> urls, ActionListener actionListener) {
         this.context = context;
         this.urls = urls;
+        this.actionListener = actionListener;
     }
 
     @Override
@@ -41,6 +47,13 @@ public class SpotPreviewAdapter extends RecyclerView.Adapter<SpotPreviewAdapter.
         Glide.with(context).load(url)
                 .fitCenter()
                 .into(previewHolder.preview);
+
+        previewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionListener.onShow(url);
+            }
+        });
     }
 
     @Override

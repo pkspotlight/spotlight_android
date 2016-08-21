@@ -5,6 +5,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
+import me.spotlight.spotlight.R;
+
 /**
  * Created by Anatol on 7/10/2016.
  */
@@ -47,6 +49,7 @@ public class FragmentUtils {
                                        Fragment fragment, boolean addToBackStack) {
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide, R.anim.slide);
         fragmentTransaction.replace(contentFrame, fragment, FRAGMENT_TAG);
 
         if (addToBackStack) {
@@ -62,6 +65,7 @@ public class FragmentUtils {
     public static void addFragment(FragmentActivity activity, int contentFrame, Fragment fragmentRemove,
                                         Fragment fragmentAdd, boolean addToBackStack) {
         FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide, R.anim.slide);
         ft.remove(fragmentRemove);
         ft.add(contentFrame, fragmentAdd);
         ft.addToBackStack(null);

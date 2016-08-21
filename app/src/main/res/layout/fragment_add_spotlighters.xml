@@ -11,6 +11,7 @@
         android:layout_height="40dp" />
 
     <EditText
+        android:inputType="textCapSentences"
         android:textColorHint="@android:color/darker_gray"
         android:textColor="@android:color/darker_gray"
         android:paddingLeft="12dp"

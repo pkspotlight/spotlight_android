@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.chauthai.swipereveallayout.SwipeRevealLayout;
+import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
@@ -26,18 +28,18 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.spotlight.spotlight.R;
 import me.spotlight.spotlight.models.Spotlight;
+import me.spotlight.spotlight.utils.ImageUtils;
 
 /**
- * Created by gherg012 on 7/23/2016.
+ * Created by Anatol on 7/23/2016.
+ * Copyright (c) 2016 Spotlight Partners, Inc. All rights reserved.
  */
 public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.SpotlightHolder> {
 
-    Context context;
-    List<Spotlight> spotlights = new ArrayList<>();
-    Transformation round;
-    ActionListener actionListener;
-    float xStart;
-    float xFinish;
+    private Context context;
+    private List<Spotlight> spotlights = new ArrayList<>();
+    private ActionListener actionListener;
+    private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
 
     public interface ActionListener {
         void onShowDetails(Spotlight spotlight);
@@ -48,7 +50,7 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
         this.context = context;
         this.spotlights = spotlights;
         this.actionListener = actionListener;
-        round = new RoundedTransformationBuilder().oval(true).build();
+        viewBinderHelper.setOpenOnlyOne(true);
     }
 
     @Override
@@ -59,109 +61,30 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
     @Override
     public void onBindViewHolder(final SpotlightHolder spotlightHolder, final int position) {
         try {
-
             final Spotlight spotlight = spotlights.get(position);
-
-            spotlightHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    Log.d("touch", String.valueOf(motionEvent.getAction()));
-                    Log.d("touch", String.valueOf(motionEvent.getX()));
-                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                        xStart = motionEvent.getX();
-                        Log.d("touch", String.valueOf(motionEvent.getX()));
-                    }
-                    if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        if (motionEvent.getX() > (xStart)) {
-                            Log.d("touch", String.valueOf(motionEvent.getX()));
-                            spotlightHolder.group.setVisibility(View.VISIBLE);
-                            spotlightHolder.group2.setVisibility(View.GONE);
-                        } else if (motionEvent.getX() < (xStart)) {
-                            Log.d("touch", String.valueOf(motionEvent.getX()));
-                            spotlightHolder.group2.setVisibility(View.VISIBLE);
-                            spotlightHolder.group.setVisibility(View.GONE);
-                        } else {
-                            actionListener.onShowDetails(spotlight);
-                        }
-                    }
-                    return true;
-                }
-            });
-
-
+            viewBinderHelper.bind(spotlightHolder.revealLayout, spotlight.getObjectId());
             spotlightHolder.teamInfo.setText(spotlight.getTeam().getName()
                     + " " + spotlight.getTeam().getSport()
                     + " - Grade " + spotlight.getTeam().getGrade());
-            spotlightHolder.teamInfo2.setText(spotlight.getTeam().getName()
-                    + " " + spotlight.getTeam().getSport()
-                    + " - Grade " + spotlight.getTeam().getGrade());
-
-
-
-            // cover
-            if (null != spotlight.getCover()) {
-                if (!"".equals(spotlight.getCover())) {
-                    Glide.with(context)
-                            .load(spotlight.getCover())
-                            .centerCrop()
-                            .into(spotlightHolder.spotCover);
-                    Glide.with(context)
-                            .load(spotlight.getCover())
-                            .centerCrop()
-                            .into(spotlightHolder.spotCover2);
-                } else {
-                    // TODO:
-                }
-            } else {
-                // TODO:
-            }
-
-
-            //team avatar
-            if (null != spotlight.getTeamsAvatar()) {
-                if (!"".equals(spotlight.getTeamsAvatar())) {
-                    Glide.with(context)
-                            .load(spotlight.getTeamsAvatar())
-                            .into(spotlightHolder.spotAvatar);
-                    Glide.with(context)
-                            .load(spotlight.getTeamsAvatar())
-                            .into(spotlightHolder.spotAvatar2);
-                } else {
-                    Glide.with(context)
-                            .load(R.drawable.unknown_user)
-                            .into(spotlightHolder.spotAvatar);
-                    Glide.with(context)
-                            .load(R.drawable.unknown_user)
-                            .into(spotlightHolder.spotAvatar2);
-                }
-            } else {
-                Glide.with(context)
-                        .load(R.drawable.unknown_user)
-                        .into(spotlightHolder.spotAvatar);
-                Glide.with(context)
-                        .load(R.drawable.unknown_user)
-                        .into(spotlightHolder.spotAvatar2);
-            }
-
-//            spotlightHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    actionListener.onShowDetails(spotlight);
-//                }
-//            });
-            spotlightHolder.remove.setOnClickListener(new View.OnClickListener() {
+            spotlightHolder.spotCover.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    spotlightHolder.group.setVisibility(View.VISIBLE);
-                    spotlightHolder.group2.setVisibility(View.GONE);
+                    actionListener.onShowDetails(spotlight);
+                }
+            });
+            spotlightHolder.delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    viewBinderHelper.closeLayout(spotlight.getObjectId());
                     actionListener.onDelete(spotlight, position);
                 }
             });
-
-            spotlightHolder.spot_date.setText(getMonth(spotlight.getMonth()) + " " +
+            spotlightHolder.spotDate.setText(getMonth(spotlight.getMonth()) + " " +
                     String.valueOf(spotlight.getDay())
                     + ", "
                     + String.valueOf(spotlight.getYear()));
+            ImageUtils.into(context, spotlightHolder.spotCover, spotlight.getCover());
+            ImageUtils.into(context, spotlightHolder.spotAvatar, spotlight.getTeamsAvatar());
 
         } catch (Exception e) {
             Log.d("adapter", "exception");
@@ -176,38 +99,14 @@ public class SpotlightsAdapter extends RecyclerView.Adapter<SpotlightsAdapter.Sp
             return 0;
     }
 
-    public void removeItem(int position) {
-//        spotlights.remove(position);
-//        notifyItemRemoved(position);
-//        notifyItemRangeChanged(position, spotlights.size());
-    }
-
     public class SpotlightHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.spotlight_avatar)
-//        ImageView spotAvatar;
-        CircleImageView spotAvatar;
-        @Bind(R.id.spotlight_cover)
-        ImageView spotCover;
-        @Bind(R.id.spotlight_team_info)
-        TextView teamInfo;
-        @Bind(R.id.spotlight_date)
-        TextView spot_date;
-        @Bind(R.id.spotlight_avatar2)
-//        ImageView spotAvatar2;
-        CircleImageView spotAvatar2;
-        @Bind(R.id.spotlight_cover2)
-        ImageView spotCover2;
-        @Bind(R.id.spotlight_team_info2)
-        TextView teamInfo2;
-        @Bind(R.id.spotlight_date2)
-        TextView spotDate2;
-        @Bind(R.id.item_spot_frame)
-        View group;
-        @Bind(R.id.item_spot_frame2)
-        View group2;
-        @Bind(R.id.remove)
-        View remove;
+        @Bind(R.id.delete) View delete;
+        @Bind(R.id.reveal_layout) SwipeRevealLayout revealLayout;
+        @Bind(R.id.spotlight_avatar) CircleImageView spotAvatar;
+        @Bind(R.id.spotlight_cover) ImageView spotCover;
+        @Bind(R.id.spotlight_team_info) TextView teamInfo;
+        @Bind(R.id.spotlight_date) TextView spotDate;
 
         public SpotlightHolder(View itemView) {
             super(itemView);
