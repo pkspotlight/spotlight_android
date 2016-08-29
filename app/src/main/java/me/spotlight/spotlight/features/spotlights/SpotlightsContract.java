@@ -9,17 +9,18 @@ import me.spotlight.spotlight.models.SpotlightMedia;
 import me.spotlight.spotlight.models.Team;
 
 /**
- * Created by Evgheni on 8/21/2016.
+ * Created by Anatol on 8/21/2016.
+ * Copyright (c) 2016 Spotlight Partners, Inc. All rights reserved.
  */
 public interface SpotlightsContract {
 
     void onMediaFetched(List<SpotlightMedia> data);
 
-    void onTeamsFetched(List<Team> data);
+    void onTeamsFetched(List<ParseObject> data);
 
     void onKidsFetched(List<ParseObject> data);
 
-    void onKidsTeamsFetched(List<Team> data);
+    void onKidsTeamsFetched(List<ParseObject> data);
 
     void onSpotlightsFetched(List<Spotlight> data);
 

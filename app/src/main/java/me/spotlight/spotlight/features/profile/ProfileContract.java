@@ -14,6 +14,6 @@ public interface ProfileContract {
 
     void onAvatarUpdated(boolean ok);
 
-//    void showProgress(boolean show);
+    void showProgress(boolean show);
 
 }

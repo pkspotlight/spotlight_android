@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,10 +30,9 @@ import me.spotlight.spotlight.activities.MainActivity;
  */
 public class LoginFragment extends Fragment {
 
-    @Bind(R.id.login_username)
-    EditText loginUsername;
-    @Bind(R.id.login_password)
-    EditText loginPassword;
+    public static final String TAG = "LoginFragment";
+    @Bind(R.id.login_username) EditText loginUsername;
+    @Bind(R.id.login_password) EditText loginPassword;
 
     /*
         Manufacturing singleton
@@ -96,6 +96,7 @@ public class LoginFragment extends Fragment {
                                 startActivity(MainActivity.getStartIntent(getActivity()));
                             } else {
                                 Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
                             }
                         }
                     });

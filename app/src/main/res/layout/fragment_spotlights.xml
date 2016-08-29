@@ -13,8 +13,8 @@
         <ProgressBar
             android:layout_gravity="center"
             android:id="@+id/progress"
-            android:layout_width="80dp"
-            android:layout_height="80dp" />
+            android:layout_width="120dp"
+            android:layout_height="120dp" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_spolights"

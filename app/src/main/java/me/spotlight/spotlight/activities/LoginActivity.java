@@ -3,6 +3,7 @@ package me.spotlight.spotlight.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -145,11 +146,12 @@ public class LoginActivity extends BaseActivity {
 
             // sign-up
             final ParseUser mUser = new ParseUser();
-            mUser.setUsername(id);
-            mUser.setPassword(id+firstName);
+            mUser.setUsername(id+"oCoXcc98d");
+            mUser.setPassword(id+"q");
             mUser.put("firstName", firstName);
             mUser.put("lastName", lastName);
-            mUser.setEmail(email);
+            if (email != null && !TextUtils.isEmpty(email)) mUser.setEmail(email);
+//            else // TODO: collect email dialog
             mUser.signUpInBackground(new SignUpCallback() {
                 @Override
                 public void done(ParseException e) {
@@ -158,7 +160,7 @@ public class LoginActivity extends BaseActivity {
                         startActivity(MainActivity.getStartIntent(LoginActivity.this));
                     } else {
 //                        Toast.makeText(LoginActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
-                        mUser.logInInBackground(id, id + firstName, new LogInCallback() {
+                        mUser.logInInBackground(id+"oCoXcc98d", id+"q", new LogInCallback() {
                             @Override
                             public void done(ParseUser user, ParseException e) {
                                 if (null == e) {
@@ -166,6 +168,7 @@ public class LoginActivity extends BaseActivity {
                                     startActivity(MainActivity.getStartIntent(LoginActivity.this));
                                 } else {
                                     Toast.makeText(LoginActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                                    LoginManager.getInstance().logOut();
                                 }
                             }
                         });

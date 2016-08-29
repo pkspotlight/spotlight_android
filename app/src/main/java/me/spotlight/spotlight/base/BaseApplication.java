@@ -42,27 +42,33 @@ public class BaseApplication extends Application {
         super.onCreate();
         context = getApplicationContext();
 
-        Parse.enableLocalDatastore(getContext());
-        Parse.initialize(this, PARSE_APP_ID, PARSE_CLIENT_KEY);
-        ParseACL defaultACL = new ParseACL();
-        defaultACL.setPublicReadAccess(true);
-        defaultACL.setPublicWriteAccess(true);
-        ParseACL.setDefaultACL(defaultACL, true);
-        ParsePush.subscribeInBackground("", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (null == e) {
-                    Log.d("push", "push success");
-                } else {
-                    Log.d("push", "push success");
-                }
-            }
-        });
+//        Parse.enableLocalDatastore(getContext());
+//        Parse.initialize(this, PARSE_APP_ID, PARSE_CLIENT_KEY);
+        Parse.initialize(new Parse.Configuration.Builder(context)
+                .applicationId(PARSE_APP_ID)
+                .clientKey(null)
+//                .server("http://parse.myspotlight.me/parse/")
+                .server("http://parse-spotlight.us-east-1.elasticbeanstalk.com/parse/")
+                .build());
+//        ParseACL defaultACL = new ParseACL();
+//        defaultACL.setPublicReadAccess(true);
+//        defaultACL.setPublicWriteAccess(true);
+//        ParseACL.setDefaultACL(defaultACL, true);
+//        ParsePush.subscribeInBackground("", new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (null == e) {
+//                    Log.d("push", "push success");
+//                } else {
+//                    Log.d("push", "push not success");
+//                }
+//            }
+//        });
 
 
         FacebookSdk.sdkInitialize(context);
         TwitterAuthConfig twitterAuthConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(twitterAuthConfig), new Crashlytics());
+        Fabric.with(this, new Twitter(twitterAuthConfig));
     }
 
     public static Context getContext() { return context; }

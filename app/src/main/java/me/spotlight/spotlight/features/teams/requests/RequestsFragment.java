@@ -212,8 +212,8 @@ public class RequestsFragment extends Fragment implements RequestAdapter.ActionL
                                     requests.add(teamRequest);
                                 }
 
-                            } catch (ParseException e1) {
-                                Log.d(TAG, "exception fetching request object");
+                            } catch (Exception e1) {
+                                Log.d(TAG, (null != e1.getMessage()) ? e1.getMessage() : "");
                             }
 
                         }

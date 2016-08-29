@@ -50,9 +50,11 @@ import me.spotlight.spotlight.utils.ParseConstants;
  * Copyright (c) 2016 Spotlight Partners, Inc. All rights reserved.
  */
 public class SpotlightsFragment extends Fragment
-        implements SpotlightsAdapter.ActionListener {
+        implements SpotlightsAdapter.ActionListener, SpotlightsContract {
 
     public static final String TAG = "SpotlightsFragment";
+    private SpotlightsPresenter presenter;
+    private List<SpotlightMedia> spotlightMedia = new ArrayList<>();
 
     @Bind(R.id.recycler_view_spolights) RecyclerView mySpotlightsList;
     SpotlightsAdapter spotlightsAdapter;
@@ -139,7 +141,7 @@ public class SpotlightsFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        preloadSpotlightMedia();
+        //preloadSpotlightMedia();
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -164,6 +166,7 @@ public class SpotlightsFragment extends Fragment
         spotlightsAdapter = new SpotlightsAdapter(getActivity(), mySpotlights, this);
         mySpotlightsList.setAdapter(spotlightsAdapter);
 
+        presenter = new SpotlightsPresenter(this);
     }
 
     @Override
@@ -188,6 +191,9 @@ public class SpotlightsFragment extends Fragment
                     .edit().putBoolean("first" + ParseUser.getCurrentUser().getObjectId(), true)
                     .commit();
         }
+
+
+        presenter.fetchMedia();
     }
 
     @Override
@@ -218,6 +224,40 @@ public class SpotlightsFragment extends Fragment
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
+    }
+
+    public void onMediaFetched(List<SpotlightMedia> data) {
+//        Toast.makeText(getContext(), String.valueOf(data.size()), Toast.LENGTH_SHORT).show();
+        if (!spotlightMedia.isEmpty()) spotlightMedia.clear();
+        spotlightMedia.addAll(data);
+        presenter.fetchTeams();
+    }
+
+    public void onTeamsFetched(List<ParseObject> data) {
+//        Toast.makeText(getContext(), String.valueOf(data.size()), Toast.LENGTH_SHORT).show();
+//        presenter.fetchKids();
+        presenter.fetchSpotlights(data, spotlightMedia);
+    }
+
+    public void onKidsFetched(List<ParseObject> data) {
+        Toast.makeText(getContext(), String.valueOf(data.size()), Toast.LENGTH_SHORT).show();
+//        presenter.fetchKidsTeams(data);
+    }
+
+    public void onKidsTeamsFetched(List<ParseObject> data) {
+//        Toast.makeText(getContext(), String.valueOf(data.size()), Toast.LENGTH_SHORT).show();
+    }
+
+    public void onSpotlightsFetched(List<Spotlight> data) {
+//        Toast.makeText(getContext(), String.valueOf(data.size()), Toast.LENGTH_SHORT).show();
+        mySpotlights.addAll(data);
+        Collections.sort(mySpotlights, comparator);
+        spotlightsAdapter.notifyDataSetChanged();
+    }
+
+    public void showProgress(boolean show) {
+        if (show) progressBar.setVisibility(View.VISIBLE);
+        else progressBar.setVisibility(View.GONE);
     }
 
 
@@ -263,7 +303,6 @@ public class SpotlightsFragment extends Fragment
                         }
 
                         loadTeams();
-                        getKids();
                     }
                 }
             }
@@ -318,27 +357,6 @@ public class SpotlightsFragment extends Fragment
         });
     }
 
-    private void getKids() {
-        final List<ParseObject> kids = new ArrayList<>();
-        ParseRelation<ParseObject> kidsRel = ParseUser.getCurrentUser().getRelation("children");
-        ParseQuery<ParseObject> kidsQuery = kidsRel.getQuery();
-        kidsQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (null == e) {
-                    if (!objects.isEmpty()) {
-                        for (ParseObject parseObject : objects) {
-                            kids.add(parseObject);
-                        }
-
-                        // go on
-                        getKidsTeams(kids);
-                    }
-                }
-            }
-        });
-    }
-
     private void getKidsTeams(List<ParseObject> kids) {
         final List<Team> kidsTeams = new ArrayList<>();
         for (ParseObject kid : kids) {
@@ -385,8 +403,6 @@ public class SpotlightsFragment extends Fragment
                                 Date date = spotlight.getUpdatedAt();
                                 int end = date.toString().length();
                                 int start = end - 4;
-//                                Log.d(TAG, date.toString());
-//                                Log.d(TAG, String.valueOf(date.toString().length()));
 
                                 if (null != spotlight.getParseObject("team")) {
                                     ParseObject team = spotlight.getParseObject("team");
@@ -401,9 +417,6 @@ public class SpotlightsFragment extends Fragment
                                             mSpot.setYear(Integer.valueOf(date.toString().substring(start, end)));
                                             mSpot.setDay(Integer.valueOf(date.toString().substring(8, 10)));
                                             mSpot.setMonth(date.toString().substring(4, 7));
-//                                            Log.d(TAG, date.toString().substring(start, end));
-//                                            Log.d(TAG, date.toString().substring(8, 10));
-//                                            Log.d(TAG, date.toString().substring(4, 7));
 
                                             coverUrls.clear();
                                             for (SpotlightMedia m : spotlightMedias) {

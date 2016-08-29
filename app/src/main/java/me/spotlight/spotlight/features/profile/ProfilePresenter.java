@@ -35,7 +35,7 @@ public class ProfilePresenter {
 
     public void updateAvatar(byte[] bytes) {
         try {
-//            contract.showProgress(true);
+            contract.showProgress(true);
             ParseFile pictureFile = new ParseFile("image.png", bytes);
             ParseObject pictureObject = new ParseObject(ParseConstants.OBJECT_PROFILE_PIC);
             pictureObject.put(ParseConstants.FIELD_OBJECT_MEDIA_FILE, pictureFile);
@@ -44,22 +44,31 @@ public class ProfilePresenter {
                 @Override
                 public void done(ParseException e) {
                     if (null == e) {
-//                        contract.showProgress(false);
+                        contract.showProgress(false);
                         contract.onAvatarUpdated(true);
                     } else {
-//                        contract.showProgress(false);
+                        contract.showProgress(false);
                         contract.onAvatarUpdated(false);
                         Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
                     }
                 }
             });
         } catch (Exception e){
-//            contract.showProgress(false);
+            contract.showProgress(false);
             Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
         }
     }
 
-    public void loadAvatar() {
-        //
+    public void fetchAvatar() {
+        try {
+//            contract.showProgress(true);
+            ParseObject pictureObject = ParseUser.getCurrentUser().getParseObject(ParseConstants.FIELD_USER_PIC);
+            pictureObject.fetchIfNeeded();
+            ParseFile pictureFile = pictureObject.getParseFile("mediaFile");
+            contract.onAvatarFetched(pictureFile.getUrl());
+        } catch (Exception e){
+//            contract.showProgress(false);
+            Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
+        }
     }
 }

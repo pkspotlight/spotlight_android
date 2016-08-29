@@ -3,6 +3,7 @@ package me.spotlight.spotlight.features.signup;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,12 +26,10 @@ import me.spotlight.spotlight.activities.MainActivity;
  */
 public class SignupFragment extends Fragment {
 
-    @Bind(R.id.signup_email)
-    EditText signupEmail;
-    @Bind(R.id.signup_username)
-    EditText signupUsername;
-    @Bind(R.id.signup_password)
-    EditText signupPassword;
+    public static final String TAG = "SignupFragment";
+    @Bind(R.id.signup_email) EditText signupEmail;
+    @Bind(R.id.signup_username) EditText signupUsername;
+    @Bind(R.id.signup_password) EditText signupPassword;
 
     /*
         Manufacturing singleton
@@ -95,6 +94,7 @@ public class SignupFragment extends Fragment {
                         startActivity(MainActivity.getStartIntent(getActivity()));
                     } else {
                         Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
                     }
                 }
             });

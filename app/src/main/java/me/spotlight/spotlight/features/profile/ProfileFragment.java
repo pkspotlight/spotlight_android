@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +61,7 @@ import me.spotlight.spotlight.features.friends.add.AddFamilyFragment;
 import me.spotlight.spotlight.utils.Constants;
 import me.spotlight.spotlight.utils.DialogUtils;
 import me.spotlight.spotlight.utils.FragmentUtils;
+import me.spotlight.spotlight.utils.ImageUtils;
 import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
@@ -70,24 +72,15 @@ public class ProfileFragment extends Fragment implements ProfileContract {
     public static final String TAG = "ProfileFragment";
     private ProfilePresenter presenter;
 
-    String profilePicUrl;
-    ParseUser currentUser;
-    Transformation round;
     Uri mImageCaptureUri;
-    @Bind(R.id.profile_avatar)
-    CircleImageView profileAvatar;
-    @Bind(R.id.profile_name)
-    TextView profileName;
-    @Bind(R.id.profile_username)
-    TextView profileUsername;
-    @Bind(R.id.profile_first)
-    EditText profileFirst;
-    @Bind(R.id.profile_last)
-    EditText profileLast;
-    @Bind(R.id.profile_hometown)
-    EditText profileHometown;
-    @Bind(R.id.profile_family)
-    TextView profileFamily;
+    @Bind(R.id.profile_avatar) CircleImageView profileAvatar;
+    @Bind(R.id.profile_name) TextView profileName;
+    @Bind(R.id.profile_username) TextView profileUsername;
+    @Bind(R.id.profile_first) EditText profileFirst;
+    @Bind(R.id.profile_last) EditText profileLast;
+    @Bind(R.id.profile_hometown) EditText profileHometown;
+    @Bind(R.id.profile_family) TextView profileFamily;
+    @Bind(R.id.progress) ProgressBar progressBar;
 
     /*
         Manufacturing singleton
@@ -119,9 +112,6 @@ public class ProfileFragment extends Fragment implements ProfileContract {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
         setHasOptionsMenu(true);
-        currentUser = ParseUser.getCurrentUser();
-        Log.d(TAG, currentUser.getObjectId());
-        round = new RoundedTransformationBuilder().oval(true).build();
     }
 
     @Override
@@ -134,7 +124,7 @@ public class ProfileFragment extends Fragment implements ProfileContract {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_profile).getWindowToken(), 0);
 
-        loadAvatar();
+        presenter.fetchAvatar();
 
         getPermission();
 
@@ -162,35 +152,35 @@ public class ProfileFragment extends Fragment implements ProfileContract {
     }
 
     private void parsetest() {
-
-        Drawable drawable = getResources().getDrawable(R.drawable.test);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-
-        ParseFile profilePic = new ParseFile("image.png", bytes);
-        ParseObject parseObject = new ParseObject("ProfilePictureMedia");
-        parseObject.put("mediaFile", profilePic);
-
-        currentUser.put("profilePic", parseObject);
-        currentUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (null == e)
-                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+//
+//        Drawable drawable = getResources().getDrawable(R.drawable.test);
+//        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+//        byte[] bytes = byteArrayOutputStream.toByteArray();
+//
+//        ParseFile profilePic = new ParseFile("image.png", bytes);
+//        ParseObject parseObject = new ParseObject("ProfilePictureMedia");
+//        parseObject.put("mediaFile", profilePic);
+//
+//        currentUser.put("profilePic", parseObject);
+//        currentUser.saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (null == e)
+//                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+//                else
+//                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     private void update() {
-        currentUser.put("firstName", profileFirst.getText().toString());
-        currentUser.put("lastName", profileLast.getText().toString());
-        currentUser.put("homeTown", profileHometown.getText().toString());
+        ParseUser.getCurrentUser().put("firstName", profileFirst.getText().toString());
+        ParseUser.getCurrentUser().put("lastName", profileLast.getText().toString());
+        ParseUser.getCurrentUser().put("homeTown", profileHometown.getText().toString());
 
-        currentUser.saveInBackground(new SaveCallback() {
+        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (null == e) {
@@ -210,10 +200,6 @@ public class ProfileFragment extends Fragment implements ProfileContract {
     }
 
     private void loadFamily() {
-        final ProgressDialog progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Please wait...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
         final StringBuilder stringBuilder = new StringBuilder();
         final ParseRelation<ParseObject> familyRelation = ParseUser.getCurrentUser().getRelation("children");
         ParseQuery<ParseObject> familyQuery = familyRelation.getQuery();
@@ -221,7 +207,6 @@ public class ProfileFragment extends Fragment implements ProfileContract {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if (null == e) {
-                    progressDialog.dismiss();
                     if (!objects.isEmpty()) {
                         for (ParseObject parseObject : objects) {
                             if (null != parseObject.getString("firstName")) {
@@ -237,60 +222,45 @@ public class ProfileFragment extends Fragment implements ProfileContract {
                         profileFamily.setText(stringBuilder.toString());
                     }
                 } else {
-                    progressDialog.dismiss();
+                    //
                 }
             }
         });
     }
 
     private void populateFields() {
-        if (null != currentUser.getUsername()) {
-            if (!TextUtils.isEmpty(currentUser.getUsername())) {
-                profileUsername.setText(currentUser.getUsername());
+        if (null != ParseUser.getCurrentUser().getUsername()) {
+            if (!TextUtils.isEmpty(ParseUser.getCurrentUser().getUsername())) {
+                profileUsername.setText(ParseUser.getCurrentUser().getUsername());
             }
         }
 
-        if (null != currentUser.getString("firstName") && null != currentUser.getString("lastName")) {
-            if (!TextUtils.isEmpty(currentUser.getString("firstName"))
-                    && !TextUtils.isEmpty(currentUser.getString("lastName"))) {
-                profileName.setText(currentUser.getString("firstName") + " " + currentUser.getString("lastName"));
-                profileFirst.setText(currentUser.getString("firstName"));
-                profileLast.setText(currentUser.getString("lastName"));
+        if (null != ParseUser.getCurrentUser().getString("firstName") && null != ParseUser.getCurrentUser().getString("lastName")) {
+            if (!TextUtils.isEmpty(ParseUser.getCurrentUser().getString("firstName"))
+                    && !TextUtils.isEmpty(ParseUser.getCurrentUser().getString("lastName"))) {
+                profileName.setText(ParseUser.getCurrentUser().getString("firstName") + " " + ParseUser.getCurrentUser().getString("lastName"));
+                profileFirst.setText(ParseUser.getCurrentUser().getString("firstName"));
+                profileLast.setText(ParseUser.getCurrentUser().getString("lastName"));
             }
         }
 
-        if (null != currentUser.getString("homeTown")) {
-            if (!TextUtils.isEmpty(currentUser.getString("homeTown"))) {
-                profileHometown.setText(currentUser.getString("homeTown"));
+        if (null != ParseUser.getCurrentUser().getString("homeTown")) {
+            if (!TextUtils.isEmpty(ParseUser.getCurrentUser().getString("homeTown"))) {
+                profileHometown.setText(ParseUser.getCurrentUser().getString("homeTown"));
             }
         }
 
         loadFamily();
     }
 
-    private void initAvatar(String url) {
-        Glide.with(getActivity())
-                .load(url)
-                .into(profileAvatar);
-    }
-
-    private void initEmptyAvatar() {
-        Glide.with(getActivity())
-                .load(R.drawable.unknown_user)
-                .into(profileAvatar);
-    }
-
 
     public void onAvatarUpdated(boolean ok) {
-        if (ok) loadAvatar();
+        if (ok) presenter.fetchAvatar();
         else DialogUtils.showAlertDialog(getContext(), "There was an error. Please try again.");
     }
 
     public void onAvatarFetched(String url) {
-        if (null != url) {
-            if (!TextUtils.isEmpty(url)) initAvatar(url);
-            else initEmptyAvatar();
-        } else initEmptyAvatar();
+        ImageUtils.into(getContext(), profileAvatar, url);
     }
 
     public void onProfileUpdated(boolean ok) {
@@ -301,47 +271,21 @@ public class ProfileFragment extends Fragment implements ProfileContract {
         //
     }
 
-//    public void showProgress(boolean show) {
-//        try {
-//            if (show) {
-//                Log.d(TAG, "showing progress");
-//                progressDialog.show();
-//            } else {
-//                Log.d(TAG, "dismissing progress");
-//                progressDialog.dismiss();
-//            }
-//        } catch (Exception e) {
-//            if (null != progressDialog) progressDialog.dismiss();
-//            Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
-//        }
-//    }
-
-    private void loadAvatar() {
-        ParseObject profilePic =  currentUser.getParseObject(ParseConstants.FIELD_USER_PIC);
-        if (null != profilePic) {
-            String profilePicId = profilePic.getObjectId();
-            ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.OBJECT_PROFILE_PIC);
-            query.whereEqualTo(ParseConstants.FIELD_OBJECT_ID, profilePicId);
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> objects, ParseException e) {
-                    if (null == e) {
-                        if (!objects.isEmpty()) {
-                            profilePicUrl = objects.get(0)
-                                    .getParseFile(ParseConstants.FIELD_OBJECT_MEDIA_FILE).getUrl();
-                            initAvatar(profilePicUrl);
-                        } else {
-                            initEmptyAvatar();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        } else {
-            initEmptyAvatar();
+    public void showProgress(boolean show) {
+        try {
+            if (show) {
+                Log.d(TAG, "showing progress");
+                progressBar.setVisibility(View.VISIBLE);
+            } else {
+                Log.d(TAG, "dismissing progress");
+                progressBar.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            if (null != progressBar) progressBar.setVisibility(View.GONE);
+            Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
         }
     }
+
 
     private void getPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
@@ -461,25 +405,6 @@ public class ProfileFragment extends Fragment implements ProfileContract {
         }
     }
 
-    private void uploadAvatar(byte[] bytes) {
-        ParseFile profilePic = new ParseFile("image.png", bytes);
-        ParseObject parseObject = new ParseObject(ParseConstants.OBJECT_PROFILE_PIC);
-        parseObject.put(ParseConstants.FIELD_OBJECT_MEDIA_FILE, profilePic);
-
-        currentUser.put(ParseConstants.FIELD_USER_PIC, parseObject);
-        currentUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (null == e) {
-                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-                    loadAvatar();
-                } else {
-                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    loadAvatar();
-                }
-            }
-        });
-    }
 
 
     @OnClick(R.id.profile_logout)
