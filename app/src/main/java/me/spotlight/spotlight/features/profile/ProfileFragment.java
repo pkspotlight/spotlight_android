@@ -66,6 +66,7 @@ import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/11/2016.
+ * Copyright (c) 2016 Spotlight Partners, Inc. All rights reserved.
  */
 public class ProfileFragment extends Fragment implements ProfileContract {
 
@@ -118,9 +119,7 @@ public class ProfileFragment extends Fragment implements ProfileContract {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-
         getActivity().setTitle("Profile");
-
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.btn_tab_profile).getWindowToken(), 0);
 
@@ -149,30 +148,6 @@ public class ProfileFragment extends Fragment implements ProfileContract {
             ret = true;
         }
         return ret;
-    }
-
-    private void parsetest() {
-//
-//        Drawable drawable = getResources().getDrawable(R.drawable.test);
-//        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-//        byte[] bytes = byteArrayOutputStream.toByteArray();
-//
-//        ParseFile profilePic = new ParseFile("image.png", bytes);
-//        ParseObject parseObject = new ParseObject("ProfilePictureMedia");
-//        parseObject.put("mediaFile", profilePic);
-//
-//        currentUser.put("profilePic", parseObject);
-//        currentUser.saveInBackground(new SaveCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                if (null == e)
-//                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-//                else
-//                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
 
     private void update() {
@@ -404,8 +379,6 @@ public class ProfileFragment extends Fragment implements ProfileContract {
             }
         }
     }
-
-
 
     @OnClick(R.id.profile_logout)
     public void logout() {

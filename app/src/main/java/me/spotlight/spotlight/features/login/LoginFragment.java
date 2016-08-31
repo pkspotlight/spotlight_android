@@ -1,5 +1,6 @@
 package me.spotlight.spotlight.features.login;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,9 +94,11 @@ public class LoginFragment extends Fragment {
                         @Override
                         public void done(ParseUser user, ParseException e) {
                             if (null != user) {
+                                hideKeyboard();
                                 Toast.makeText(getActivity(), "Logged in successfully!", Toast.LENGTH_LONG).show();
                                 startActivity(MainActivity.getStartIntent(getActivity()));
                             } else {
+                                hideKeyboard();
                                 Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT).show();
                                 Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
                             }
@@ -103,7 +107,10 @@ public class LoginFragment extends Fragment {
         }
     }
 
-
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getActivity().findViewById(R.id.login_password).getWindowToken(), 0);
+    }
 
     public boolean validate() {
 

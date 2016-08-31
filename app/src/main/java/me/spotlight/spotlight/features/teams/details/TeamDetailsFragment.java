@@ -41,26 +41,21 @@ import me.spotlight.spotlight.utils.ParseConstants;
 
 /**
  * Created by Anatol on 7/11/2016.
+ * Copyright (c) 2016 Spotlight Partners, Inc. All rights reserved.
  */
 public class TeamDetailsFragment extends Fragment {
 
     public static final String TAG = "TeamDetailsFragment";
     String avatarUrl = "";
     Transformation round;
-    @Bind(R.id.team_detail_avatar)
-//    ImageView teamDetailAvatar;
-    CircleImageView teamDetailAvatar;
-    @Bind(R.id.team_detail_name)
-    TextView teamDetailName;
-    @Bind(R.id.team_detail_pager)
-    CustomViewPager teamDetailPager;
+    @Bind(R.id.team_detail_avatar) CircleImageView teamDetailAvatar;
+    @Bind(R.id.team_detail_name) TextView teamDetailName;
+    @Bind(R.id.team_detail_pager) CustomViewPager teamDetailPager;
     private List<Fragment> fragments = new ArrayList<>();
     private PagerAdapter pagerAdapter;
     private static final int NUM_TABS = 2;
-    @Bind(R.id.team_detail_member)
-    View teamMembers;
-    @Bind(R.id.team_detail_spot)
-    View teamSpot;
+    @Bind(R.id.team_detail_member) View teamMembers;
+    @Bind(R.id.team_detail_spot) View teamSpot;
     String teamName = "";
 
     /*
@@ -165,27 +160,11 @@ public class TeamDetailsFragment extends Fragment {
         });
     }
 
-//    private void initAvatar(String url) {
-//        Picasso.with(getActivity())
-//                .load(url)
-//                .fit().centerCrop()
-//                .transform(round)
-//                .into(teamDetailAvatar);
-//    }
-
     private void initAvatar(String url) {
         Glide.with(getActivity())
                 .load(url)
                 .into(teamDetailAvatar);
     }
-
-//    private void initEmptyAvatar() {
-//        Picasso.with(getActivity())
-//                .load(R.drawable.unknown_user)
-//                .fit().centerCrop()
-//                .transform(round)
-//                .into(teamDetailAvatar);
-//    }
 
     private void initEmptyAvatar() {
         Glide.with(getActivity())

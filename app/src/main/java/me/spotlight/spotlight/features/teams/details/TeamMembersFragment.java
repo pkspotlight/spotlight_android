@@ -39,14 +39,14 @@ import me.spotlight.spotlight.utils.ParseConstants;
 /**
  * Created by Anatol on 7/18/2016.
  */
-public class TeamMembersFragment extends Fragment implements UsersAdapter.ActionListener {
+public class TeamMembersFragment extends Fragment implements UsersAdapter.ActionListener, TeamMembersContract {
 
     public static final String TAG = "TeamMembersFragment";
-    @Bind(R.id.recycler_view_team_members)
-    RecyclerView teamMembersList;
+    @Bind(R.id.recycler_view_team_members) RecyclerView teamMembersList;
     UsersAdapter teamMembersAdapter;
     List<User> members = new ArrayList<>();
     List<String> friendIds = new ArrayList<>();
+    private TeamMembersPresenter presenter;
 
     /*
         Manufacturing singleton
@@ -181,7 +181,6 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
         });
     }
 
-
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View view = layoutInflater.inflate(R.layout.fragment_team_details_members, container, false);
@@ -193,6 +192,7 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
+        presenter = new TeamMembersPresenter(this);
         loadFriendIds();
         teamMembersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         teamMembersAdapter = new UsersAdapter(getActivity(), members);
@@ -210,7 +210,6 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        loadMembers();
     }
 
     private void loadMembers() {
@@ -263,7 +262,6 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
     }
 
     private void loadFriendIds() {
-
         final ProgressDialog progress = new ProgressDialog(getContext());
         progress.setMessage(getString(R.string.please_wait));
         progress.setCancelable(false);
@@ -292,5 +290,18 @@ public class TeamMembersFragment extends Fragment implements UsersAdapter.Action
                 }
             }
         });
+    }
+
+    @Override
+    public void showProgress(boolean show) {
+        //
+    }
+
+    @Override
+    public void onFriendIdsFetched(List<String> data) {
+        if (!friendIds.isEmpty())
+            friendIds.clear();
+        friendIds.addAll(data);
+        loadMembers();
     }
 }

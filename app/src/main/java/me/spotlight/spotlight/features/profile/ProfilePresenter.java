@@ -53,7 +53,7 @@ public class ProfilePresenter {
                     }
                 }
             });
-        } catch (Exception e){
+        } catch (Exception e) {
             contract.showProgress(false);
             Log.d(TAG, (null != e.getMessage()) ? e.getMessage() : "");
         }
