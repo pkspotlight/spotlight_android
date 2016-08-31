@@ -45,11 +45,11 @@ import me.spotlight.spotlight.utils.ParseConstants;
  * Created by Anatol on 7/21/2016.
  */
 public class FriendSpotlightsFragment extends Fragment
-        implements SpotlightsAdapter.ActionListener {
+        implements SpotlightsAdapter.ActionListener, FriendTeamsContract {
 
     public static final String TAG = "FriendSpotlightFragment";
-    @Bind(R.id.recycler_view_friend_spotlights)
-    RecyclerView recyclerView;
+    private FriendTeamsPresenter presenter;
+    @Bind(R.id.recycler_view_friend_spotlights) RecyclerView recyclerView;
     List<Team> friendTeams = new ArrayList<>();
     List<Spotlight> friendSpotlights = new ArrayList<>();
     SpotlightsAdapter spotlightsAdapter;
@@ -62,6 +62,17 @@ public class FriendSpotlightsFragment extends Fragment
         FriendSpotlightsFragment friendSpotlightsFragment = new FriendSpotlightsFragment();
         friendSpotlightsFragment.setArguments(args);
         return friendSpotlightsFragment;
+    }
+
+    @Override
+    public void showProgress(boolean show) {}
+
+    @Override
+    public void onTeamsIdsFetched(List<String> data) {
+        if (!myTeamsIds.isEmpty())
+            myTeamsIds.clear();
+        myTeamsIds.addAll(data);
+        loadTeams();
     }
 
     public void onShowDetails(Spotlight spotlight) {
@@ -142,45 +153,17 @@ public class FriendSpotlightsFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        presenter = new FriendTeamsPresenter(this);
+        if (null != presenter) presenter.fetchTeamsIds();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         spotlightsAdapter = new SpotlightsAdapter(getActivity(), friendSpotlights, this);
         recyclerView.setAdapter(spotlightsAdapter);
-        loadMyTeamsIds();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadTeams();
     }
-
-    private void loadMyTeamsIds() {
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
-        ParseRelation teamsRel = ParseUser.getCurrentUser().getRelation("teams");
-        ParseQuery<ParseObject> teamsQ = teamsRel.getQuery();
-        teamsQ.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (null == e) {
-                    if (!objects.isEmpty()) {
-                        for (ParseObject parseObject : objects) {
-                            myTeamsIds.add(parseObject.getObjectId());
-                        }
-
-                        progressDialog.dismiss();
-                    } else {
-                        progressDialog.dismiss();
-                    }
-                } else {
-                    progressDialog.dismiss();
-                }
-            }
-        });
-    }
-
 
     private void loadTeams() {
         if (!friendTeams.isEmpty())
@@ -229,8 +212,6 @@ public class FriendSpotlightsFragment extends Fragment
             }
         });
     }
-
-
 
     private void loadMySpotlights(final List<Team> teams) {
         if (!friendSpotlights.isEmpty())
@@ -303,9 +284,6 @@ public class FriendSpotlightsFragment extends Fragment
             }
         });
     }
-
-
-
 
     Comparator<Spotlight> comparator = new Comparator<Spotlight>() {
         public static final String TAG = "SpotlightsComparator";

@@ -39,11 +39,11 @@ import me.spotlight.spotlight.utils.ParseConstants;
 /**
  * Created by Anatol on 7/21/2016.
  */
-public class FriendTeamsFragment extends Fragment implements TeamsAdapter.ActionListener {
+public class FriendTeamsFragment extends Fragment implements TeamsAdapter.ActionListener, FriendTeamsContract {
 
     public static final String TAG = "FriendTeamsFragment";
-    @Bind(R.id.recycler_view_friend_teams)
-    RecyclerView friendTeamsList;
+    private FriendTeamsPresenter presenter;
+    @Bind(R.id.recycler_view_friend_teams) RecyclerView friendTeamsList;
     TeamsAdapter friendTeamsAdapter;
     List<Team> friendTeams = new ArrayList<>();
     List<String> myTeamsIds = new ArrayList<>();
@@ -86,6 +86,7 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
             onReqFol(team, position, unfollow);
         } else {
             CharSequence[] backup = new CharSequence[1];
+            backup[0] = "";
             final AlertDialog dialog = new AlertDialog.Builder(getContext())
                     .setTitle(R.string.which_child)
                     .setItems((kids == null) ? backup : kids, new DialogInterface.OnClickListener() {
@@ -184,44 +185,30 @@ public class FriendTeamsFragment extends Fragment implements TeamsAdapter.Action
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        presenter = new FriendTeamsPresenter(this);
+        if (null != presenter) presenter.fetchTeamsIds();
         friendTeamsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendTeamsAdapter = new TeamsAdapter(getActivity(), friendTeams, this, false);
         friendTeamsList.setAdapter(friendTeamsAdapter);
         getKids();
-        loadMyTeamsIds();
     }
 
-    private void loadMyTeamsIds() {
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
-        ParseRelation teamsRel = ParseUser.getCurrentUser().getRelation("teams");
-        ParseQuery<ParseObject> teamsQ = teamsRel.getQuery();
-        teamsQ.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (null == e) {
-                    if (!objects.isEmpty()) {
-                        for (ParseObject parseObject : objects) {
-                            myTeamsIds.add(parseObject.getObjectId());
-                        }
+    @Override
+    public void showProgress(boolean show) {
+        //
+    }
 
-                        progressDialog.dismiss();
-                    } else {
-                        progressDialog.dismiss();
-                    }
-                } else {
-                    progressDialog.dismiss();
-                }
-            }
-        });
+    @Override
+    public void onTeamsIdsFetched(List<String> data) {
+        if (!myTeamsIds.isEmpty())
+            myTeamsIds.clear();
+        myTeamsIds.addAll(data);
+        loadTeams();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadTeams();
     }
 
     private void loadTeams() {
